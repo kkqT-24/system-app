@@ -2124,6 +2124,13 @@
         font-size: 13px; letter-spacing: 0.2em; color: var(--red-soft); margin-bottom: 18px;
       }
       .sq-card.white .sq-exp { color: #ccc; }
+      .sq-verse {
+        font-size: 12.5px; letter-spacing: 0.04em; line-height: 1.6;
+        color: #e8e8e8; font-style: italic; text-transform: none;
+        margin: -6px 0 16px; padding: 0 6px;
+        text-shadow: 0 0 12px rgba(255,255,255,0.35);
+      }
+      .sq-verse .vr { display: block; margin-top: 6px; font-size: 10.5px; font-style: normal; letter-spacing: 0.2em; color: #aaa; }
       .sq-timer {
         font-family: "Orbitron", sans-serif; font-size: 32px; font-weight: 700;
         color: var(--red); margin-bottom: 22px; letter-spacing: 0.1em;
@@ -2618,6 +2625,7 @@
         <div class="sq-head">&#9888; Secret Quest &#9888;</div>
         <div class="sq-sub">Urgent directive from the System</div>
         <div class="sq-task" id="sqTask">—</div>
+        <div class="sq-verse is-hidden" id="sqVerse"><span id="sqVerseText"></span><span class="vr" id="sqVerseRef"></span></div>
         <div class="sq-exp" id="sqExp">—</div>
         <div class="sq-timer" id="sqTimer">15:00</div>
         <div class="sq-actions">
@@ -5904,6 +5912,20 @@
            Trigger: open counter hits a random target (first demo on 3rd
            open, then 15-30) AND cooldown elapsed (48h after workout,
            24h after other). */
+        var SECRET_VERSES = [
+          { t: "Pray without ceasing.", r: "1 Thessalonians 5:17" },
+          { t: "Be still, and know that I am God.", r: "Psalm 46:10" },
+          { t: "The Lord is my strength and my shield.", r: "Psalm 28:7" },
+          { t: "Do not be anxious about anything, but in every situation, by prayer, present your requests to God.", r: "Philippians 4:6" },
+          { t: "In all things God works for the good of those who love him.", r: "Romans 8:28" },
+          { t: "I can do all things through Christ who strengthens me.", r: "Philippians 4:13" },
+          { t: "The Lord bless you and keep you.", r: "Numbers 6:24" },
+          { t: "Trust in the Lord with all your heart.", r: "Proverbs 3:5" },
+          { t: "Peace I leave with you; my peace I give you.", r: "John 14:27" },
+          { t: "Ask and it will be given to you; seek and you will find.", r: "Matthew 7:7" },
+          { t: "The prayer of a righteous person is powerful and effective.", r: "James 5:16" },
+          { t: "Cast all your anxiety on him because he cares for you.", r: "1 Peter 5:7" }
+        ];
         var SECRET_POOL = [
           { text: "20 pushups OR 20 sit-ups \u2014 your choice", exp: 25, type: "workout" },
           { text: "30 bodyweight squats", exp: 25, type: "workout" },
@@ -5925,7 +5947,7 @@
               if (isFinite(+s.openCount)) SECRET.openCount = Math.max(0, Math.floor(+s.openCount));
               if (isFinite(+s.targetOpens)) SECRET.targetOpens = Math.max(1, Math.floor(+s.targetOpens));
               if (s.active && typeof s.active === "object" && isFinite(+s.active.expiresAt) && isFinite(+s.active.idx)) {
-                SECRET.active = { idx: Math.max(0, Math.min(SECRET_POOL.length - 1, s.active.idx | 0)), expiresAt: +s.active.expiresAt, seen: !!s.active.seen };
+                SECRET.active = { idx: Math.max(0, Math.min(SECRET_POOL.length - 1, s.active.idx | 0)), expiresAt: +s.active.expiresAt, seen: !!s.active.seen, verse: isFinite(+s.active.verse) ? Math.max(0, Math.min(SECRET_VERSES.length - 1, s.active.verse | 0)) : 0 };
               }
               if (s.lastType === "workout" || s.lastType === "other") SECRET.lastType = s.lastType;
               if (isFinite(+s.lastTime)) SECRET.lastTime = Math.max(0, +s.lastTime);
@@ -6011,6 +6033,13 @@
           sqTask.textContent = q.text;
           sqExp.textContent = "+" + q.exp + " EXP";
           sqCard.classList.toggle("white", !!q.white);
+          var vEl = document.getElementById("sqVerse");
+          if (q.white && vEl) {
+            var v = SECRET_VERSES[SECRET.active.verse || 0];
+            document.getElementById("sqVerseText").textContent = "\u201C" + v.t + "\u201D";
+            document.getElementById("sqVerseRef").textContent = v.r;
+            vEl.classList.remove("is-hidden");
+          } else if (vEl) { vEl.classList.add("is-hidden"); }
           sqOverlay.classList.add("show");
           sqOverlay.setAttribute("aria-hidden", "false");
           SECRET.active.seen = true;
@@ -6056,7 +6085,9 @@
         }
         function sqTrigger() {
           var idx = Math.floor(Math.random() * SECRET_POOL.length);
-          SECRET.active = { idx: idx, expiresAt: Date.now() + 15 * 60 * 1000, seen: false };
+          var verse = 0;
+          if (SECRET_POOL[idx].white) verse = Math.floor(Math.random() * SECRET_VERSES.length);
+          SECRET.active = { idx: idx, expiresAt: Date.now() + 15 * 60 * 1000, seen: false, verse: verse };
           secretSave();
           sqShow();
         }
