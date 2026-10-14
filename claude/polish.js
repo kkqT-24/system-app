@@ -267,3 +267,47 @@
   b.addEventListener("click", function () { window.scrollTo(0, 0); handle.click(); });
   ctr.appendChild(b);
 })();
+
+/* Top back bar: pulling a panel down charges a ring around the bar;
+   past the threshold it locks "ready", and letting go fires a pulse. */
+(function () {
+  "use strict";
+  if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+  var h = document.getElementById("tabsHandle");
+  if (!h) return;
+  var ring = document.createElement("span");
+  ring.className = "mx-pull-ring";
+  ring.setAttribute("aria-hidden", "true");
+  ring.innerHTML = '<svg viewBox="0 0 64 64"><defs><linearGradient id="mxPullG" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#8f5ef8"/><stop offset="1" stop-color="#7dd3fc"/></linearGradient></defs>' +
+    '<circle class="tr" cx="32" cy="32" r="29"/><circle class="pr" cx="32" cy="32" r="29"/><circle class="sp" cx="32" cy="3" r="2.2"/><circle class="sp" cx="32" cy="61" r="1.6"/></svg>';
+  h.appendChild(ring);
+  var last = 0, ready = false, wasOpen = false;
+  function openSec() {
+    var ss = document.querySelectorAll(".section");
+    for (var i = 0; i < ss.length; i++) if (!ss[i].classList.contains("is-hidden")) return ss[i];
+    return null;
+  }
+  (function loop() {
+    var p = 0, sec = document.body.classList.contains("tab-open") ? openSec() : null;
+    if (sec) {
+      var m = /translateY\((-?[\d.]+)px\)/.exec(sec.style.transform || "");
+      if (m) p = Math.max(0, Math.min(1, parseFloat(m[1]) / 136));
+    }
+    if (Math.abs(p - last) > 0.002) { h.style.setProperty("--pp", p.toFixed(3)); last = p; }
+    var r = p >= 1;
+    if (r !== ready) {
+      ready = r; h.classList.toggle("mx-ready", r);
+      if (r && window.__mx) window.__mx.buzz(12);
+    }
+    /* released while ready and the panel is leaving: fire a pulse */
+    if (wasOpen && sec && /110vh/.test(sec.style.transform || "")) {
+      var b = h.getBoundingClientRect(), fx = document.createElement("div");
+      fx.className = "mx-pull-burst"; fx.innerHTML = "<i></i><i></i>";
+      fx.style.left = (b.left + b.width / 2) + "px"; fx.style.top = (b.top + b.height / 2) + "px";
+      document.body.appendChild(fx); setTimeout(function () { fx.remove(); }, 700);
+      h.style.setProperty("--pp", "0"); last = 0; ready = false; h.classList.remove("mx-ready");
+      wasOpen = false;
+    } else wasOpen = !!sec && !/110vh/.test(sec.style.transform || "");
+    requestAnimationFrame(loop);
+  })();
+})();

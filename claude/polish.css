@@ -205,3 +205,92 @@ body.tab-open .main-controls .replay-btn { display: none !important; }
 @keyframes mxMote { 0% { transform: translateY(0); opacity: 0; } 15% { opacity: 0.9; } 100% { transform: translateY(-90px); opacity: 0; } }
 .mx-ar-card .mx-sh-fig .aura .fl { animation-duration: 1.1s; }
 @media (prefers-reduced-motion: reduce) { .mx-sh-fig .body, .mx-sh-fig .aura .fl, .mx-sh-fig .eyes, .mx-sh-fig .mt, .mx-sh-fig .orb { animation: none !important; } }
+
+/* ---------- boot: fade cleanly into the bottom edge ---------- */
+#boot::after { content: ""; position: absolute; left: 0; right: 0; bottom: -120px; height: 260px; z-index: 1; pointer-events: none;
+  background: linear-gradient(180deg, rgba(4, 4, 16, 0), #040410 55%); }
+#boot > .boot-bottom, #boot > .chatter { z-index: 4; }
+
+/* ---------- Sports Desk side borders ---------- */
+.section.mx-embed { border-left: 1px solid rgba(56, 189, 248, 0.65) !important; border-right: 1px solid rgba(56, 189, 248, 0.65) !important;
+  box-shadow: inset 6px 0 14px -10px #38bdf8, inset -6px 0 14px -10px #38bdf8, 0 14px 36px var(--shadow) !important; }
+.mx-embed-frame { border-left: 1px solid rgba(56, 189, 248, 0.35) !important; border-right: 1px solid rgba(56, 189, 248, 0.35) !important; }
+
+/* ---------- shadows: idle animations per class ---------- */
+.mx-sh-fig .plume, .mx-sh-fig .scarf, .mx-sh-fig .spear, .mx-sh-fig .axe, .mx-sh-fig .bow, .mx-sh-fig .dag, .mx-sh-fig .shield, .mx-sh-fig .blade { transform-box: view-box; }
+.mx-sh-fig .plume { transform-origin: 53px 16px; animation: mxPlume 2.2s ease-in-out infinite; }
+@keyframes mxPlume { 50% { transform: skewY(-8deg) scaleX(1.06); } }
+.mx-sh-fig .scarf { transform-origin: 56px 42px; animation: mxScarf 1.4s ease-in-out infinite; }
+@keyframes mxScarf { 0%, 100% { transform: skewY(0) scaleX(1); } 50% { transform: skewY(-10deg) scaleX(1.1); } }
+.mx-sh-fig .spear { transform-origin: 50px 62px; animation: mxSpear 3s ease-in-out infinite; }
+@keyframes mxSpear { 50% { transform: rotate(-4deg) translateY(-1px); } }
+.mx-sh-fig .axe { transform-origin: 67px 106px; animation: mxAxe 2.6s ease-in-out infinite; }
+@keyframes mxAxe { 50% { transform: rotate(-6deg); } }
+.mx-sh-fig .bow .string { animation: mxDraw 3.2s ease-in-out infinite; }
+@keyframes mxDraw { 0%, 30%, 100% { d: path("M73 24L73 98"); } 55%, 70% { d: path("M73 24L64 61L73 98"); } }
+.mx-sh-fig .dag.l { transform-origin: 32px 64px; animation: mxDagL 1.8s ease-in-out infinite; }
+.mx-sh-fig .dag.r { transform-origin: 68px 64px; animation: mxDagR 1.8s ease-in-out infinite; }
+@keyframes mxDagL { 50% { transform: rotate(10deg); } }
+@keyframes mxDagR { 50% { transform: rotate(-10deg); } }
+.mx-sh-fig .shield .wpn { animation: mxShield 2.8s ease-in-out infinite; }
+@keyframes mxShield { 50% { stroke-opacity: 1; stroke-width: 2.4; filter: drop-shadow(0 0 3px var(--tc)); } }
+.mx-sh-fig .blade { animation: mxBlade 3.4s ease-in-out infinite; }
+@keyframes mxBlade { 0%, 70%, 100% { stroke-opacity: 0.75; } 80% { stroke-opacity: 1; filter: drop-shadow(0 0 3px #fff); } }
+/* still figures (codex) and off-screen cards don't animate */
+.mx-sh-fig.still *, .mx-sh-card:not(.live) .mx-sh-fig * { animation: none !important; }
+.mx-sh-fig.still .aura { opacity: 0.6; }
+
+/* ---------- army scene ---------- */
+.mx-army { height: 200px !important; }
+.mx-army .u { appearance: none; background: none; border: 0; padding: 0; cursor: pointer; }
+.mx-army .u:active .mx-sh-fig { transform: scale(1.06); }
+.mx-army .cap { font-size: 8.5px !important; }
+.mx-sh-card { appearance: none; cursor: pointer; font: inherit; color: inherit; }
+.mx-sh-card:active { transform: scale(0.97); }
+.mx-sh-sub { font-family: "Share Tech Mono", monospace; font-size: 10px; letter-spacing: 0.3em; color: #d8b4fe; text-transform: uppercase; margin: 18px 0 8px; text-align: left; }
+
+/* ---------- codex ---------- */
+.mx-codex { margin-top: 6px; padding: 12px 10px; background: rgba(8, 4, 20, 0.6); border: 1px solid rgba(208, 124, 255, 0.3);
+  clip-path: polygon(10px 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%, 0 10px); }
+.mx-codex-h { display: flex; justify-content: space-between; font-family: "Share Tech Mono", monospace; font-size: 10px; letter-spacing: 0.24em; color: var(--ink-faint); text-transform: uppercase; }
+.mx-codex-h span:first-child { color: #d8b4fe; }
+.mx-codex-h b { color: #fff; font-weight: 400; }
+.mx-codex-bar { height: 3px; background: rgba(255, 255, 255, 0.06); margin: 8px 0 10px; position: relative; overflow: hidden; }
+.mx-codex-bar i { position: absolute; left: 0; top: 0; bottom: 0; background: linear-gradient(90deg, #6f9bff, #a855f7, #e879f9, #ffd166); box-shadow: 0 0 8px #a855f7; }
+.mx-codex-grid { display: grid; grid-template-columns: 52px repeat(8, 1fr); gap: 3px; align-items: center; }
+.mx-codex-tier { font-family: "Share Tech Mono", monospace; font-size: 7.5px; letter-spacing: 0.1em; text-transform: uppercase; text-align: left; }
+.mx-codex .cx { position: relative; aspect-ratio: 1 / 1.15; display: grid; place-items: center; border: 1px solid rgba(143, 94, 248, 0.15); background: rgba(0, 0, 0, 0.35); }
+.mx-codex .cx.off { color: rgba(143, 94, 248, 0.35); font-family: "Orbitron", sans-serif; font-size: 11px; }
+.mx-codex .cx.on { border-color: rgba(208, 124, 255, 0.45); }
+.mx-codex .cx .mx-sh-fig { width: 100%; height: 100%; }
+.mx-codex .cx em { position: absolute; right: 1px; bottom: 0; font-style: normal; font-family: "Share Tech Mono", monospace; font-size: 7px; color: #fff; }
+.mx-codex-cls { display: grid; grid-template-columns: 52px repeat(8, 1fr); gap: 3px; margin-top: 4px; }
+.mx-codex-cls::before { content: ""; }
+.mx-codex-cls span { font-family: "Share Tech Mono", monospace; font-size: 6px; letter-spacing: 0.04em; color: var(--ink-faint); text-transform: uppercase; text-align: center; overflow: hidden; }
+
+/* ---------- inspect ---------- */
+.mx-inspect { position: fixed; inset: 0; z-index: 99; display: grid; place-items: center; background: rgba(2, 0, 8, 0.85); opacity: 0; transition: opacity 0.28s ease; }
+.mx-inspect.on { opacity: 1; }
+.mx-inspect .mx-ar-card { position: relative; opacity: 1; transform: scale(0.92); transition: transform 0.4s cubic-bezier(0.2, 1.3, 0.3, 1); width: min(290px, 80vw); }
+.mx-inspect.on .mx-ar-card { transform: none; }
+.mx-inspect .mx-sh-fig { width: 200px; }
+.mx-in-stats { display: flex; justify-content: space-around; margin-top: 10px; }
+.mx-in-stats span { display: flex; flex-direction: column; font-family: "Share Tech Mono", monospace; font-size: 8.5px; letter-spacing: 0.2em; color: var(--ink-faint); text-transform: uppercase; }
+.mx-in-stats b { font-family: "Orbitron", sans-serif; font-size: 17px; color: #fff; letter-spacing: 0.04em; text-shadow: 0 0 10px var(--tc); }
+
+/* ---------- top back bar: charge ring while you pull down ---------- */
+.top-handle { position: relative; overflow: visible; }
+.mx-pull-ring { position: absolute; left: 50%; top: 50%; width: 64px; height: 64px; margin: -32px 0 0 -32px; pointer-events: none; opacity: var(--pp, 0);
+  transform: scale(calc(0.5 + var(--pp, 0) * 0.6)) rotate(calc(var(--pp, 0) * 540deg)); }
+.mx-pull-ring svg { width: 100%; height: 100%; overflow: visible; }
+.mx-pull-ring .tr { fill: none; stroke: rgba(143, 94, 248, 0.25); stroke-width: 2; stroke-dasharray: 3 5; }
+.mx-pull-ring .pr { fill: none; stroke: url(#mxPullG); stroke-width: 3; stroke-linecap: round; stroke-dasharray: 182; stroke-dashoffset: calc(182 * (1 - var(--pp, 0))); filter: drop-shadow(0 0 5px #8f5ef8); transform: rotate(-90deg); transform-origin: 32px 32px; }
+.mx-pull-ring .sp { fill: #fff; filter: drop-shadow(0 0 4px #c3b8fe); }
+.top-handle.mx-ready .mx-pull-ring { animation: mxReady 0.5s ease-in-out infinite alternate; }
+@keyframes mxReady { to { filter: brightness(1.6) drop-shadow(0 0 10px #c3b8fe); } }
+.top-handle.mx-ready .th-bar { box-shadow: 0 0 22px #c3b8fe !important; }
+.mx-pull-burst { position: fixed; width: 0; height: 0; z-index: 97; pointer-events: none; }
+.mx-pull-burst i { position: absolute; left: -30px; top: -30px; width: 60px; height: 60px; border-radius: 50%; border: 2px solid #c3b8fe; box-shadow: 0 0 18px #8f5ef8, inset 0 0 12px #8f5ef8;
+  animation: mxPullBurst 0.55s cubic-bezier(0.2, 0.8, 0.3, 1) forwards; }
+.mx-pull-burst i + i { animation-delay: 0.08s; border-color: #7dd3fc; }
+@keyframes mxPullBurst { from { transform: scale(0.6); opacity: 1; } to { transform: scale(4); opacity: 0; } }

@@ -104,16 +104,16 @@
      Each class has its own body and weapon. */
   var BODIES = {
     Knight:
-      '<path d="M53 15c9-9 26-8 36 6-9-4-19-2-26 4z"/>' +
+      '<path class="plume" d="M53 15c9-9 26-8 36 6-9-4-19-2-26 4z"/>' +
       '<path d="M41 22q9-12 18 0l1 14q-10 7-20 0z"/>' +
       '<path d="M26 47q7-11 18-5l-2 11-18 3zM74 47q-7-11-18-5l2 11 18 3zM28 44l-6-11 10 8zM72 44l6-11-10 8z"/>' +
       '<path d="M22 108l7-50q21-10 42 0l7 50q-28-6-56 0z"/>' +
       '<path d="M38 42h24l4 38-8 20H42l-8-20z"/>' +
-      '<path d="M48.5 57h3v47l-1.5 5-1.5-5zM41 56h18v3H41zM49 45h2v11h-2z"/><circle cx="50" cy="43.5" r="2"/>',
+      '<g class="blade"><path d="M48.5 57h3v47l-1.5 5-1.5-5zM41 56h18v3H41zM49 45h2v11h-2z"/><circle cx="50" cy="43.5" r="2"/></g>',
     Archer:
       '<path d="M50 13q15 4 12 25l-6 6H44l-6-6q-3-21 12-25z"/>' +
       '<path d="M29 106l7-56q14-9 28 0l10 56q-12-7-24-2-12-5-21 2z"/>' +
-      '<path d="M73 24q22 36 0 74" fill="none" stroke-width="3.2" class="wpn"/><path d="M73 24v74" fill="none" stroke-width="0.6" class="str"/>' +
+      '<g class="bow"><path d="M73 24q22 36 0 74" fill="none" stroke-width="3.2" class="wpn"/><path class="str string" d="M73 24L73 98" fill="none" stroke-width="0.6"/></g>' +
       '<path d="M36 52l-12 10 3 3 13-8z"/>',
     Mage:
       '<path d="M50 2l11 28q2 10-5 14H44q-7-4-5-14z"/>' +
@@ -121,19 +121,19 @@
       '<path d="M75 22h2.6v86H75z"/><circle class="orb" cx="76.3" cy="17" r="5.5"/>',
     Assassin:
       '<path d="M50 16q13 4 10 20l-6 6h-8l-6-6q-3-16 10-20z"/>' +
-      '<path d="M56 40c14 2 26-4 36-10-8 10-20 16-34 16zM55 44c10 6 18 6 26 4-8 6-18 6-27 2z"/>' +
+      '<path class="scarf" d="M56 40c14 2 26-4 36-10-8 10-20 16-34 16zM55 44c10 6 18 6 26 4-8 6-18 6-27 2z"/>' +
       '<path d="M42 42h16l4 28 4 38H56l-6-28-6 28H34l4-38z"/>' +
-      '<path d="M31 63l-9 17 2 1 10-16zM69 63l9 17-2 1-10-16z"/>',
+      '<path class="dag l" d="M31 63l-9 17 2 1 10-16z"/><path class="dag r" d="M69 63l9 17-2 1-10-16z"/>',
     Lancer:
       '<path d="M43 22c-7-8-9-14-5-20 2 8 6 12 9 16zM57 22c7-8 9-14 5-20-2 8-6 12-9 16z"/>' +
       '<path d="M42 24q8-10 16 0v12q-8 5-16 0z"/>' +
       '<path d="M27 48q7-10 17-5l-2 10-17 3zM73 48q-7-10-17-5l2 10 17 3z"/>' +
       '<path d="M36 42h28l4 38-6 28H38l-6-28z"/>' +
-      '<path d="M17 106l64-90 2 1.4-64 90z"/><path d="M80 14l8-12-1 14z"/>',
+      '<g class="spear"><path d="M17 106l64-90 2 1.4-64 90z"/><path d="M80 14l8-12-1 14z"/></g>',
     Bulwark:
       '<path d="M44 26q6-8 12 0v10H44z"/>' +
       '<path d="M12 108l3-50q4-20 23-24h24q19 4 23 24l3 50z"/>' +
-      '<path class="wpn" d="M28 54h44v32q-22 22-44 0z" stroke-width="1.6"/><path d="M50 58v30M34 70h32" fill="none" class="str" stroke-width="0.8"/>',
+      '<path d="M40 26l-6-6 2 9zM60 26l6-6-2 9z"/><g class="shield"><path class="wpn" d="M28 54h44v32q-22 22-44 0z" stroke-width="1.6"/><path d="M50 58v30M34 70h32" fill="none" class="str" stroke-width="0.8"/></g>',
     Healer:
       '<path d="M50 14q14 4 12 22l-6 7H44l-6-7q-2-18 12-22z"/>' +
       '<path d="M26 108l12-62q12-6 24 0l12 62q-24-8-48 0z"/><path d="M38 64q12 6 24 0" fill="none" class="str" stroke-width="0.8"/>' +
@@ -142,10 +142,10 @@
       '<path d="M40 24c-9-2-14 2-16-6 6 2 10 0 16 2zM60 24c9-2 14 2 16-6-6 2-10 0-16 2z"/>' +
       '<path d="M41 24q9-10 18 0v13q-9 6-18 0z"/>' +
       '<path d="M18 62q4-24 24-24h16q20 0 24 24l-6 4-4-12 2 54H26l2-54-4 12z"/>' +
-      '<path d="M76 28l-10 80 2.6.4 10-80z"/><path class="wpn" d="M72 18q24 2 22 26-10-8-22-6z"/>'
+      '<g class="axe"><path d="M76 28l-10 80 2.6.4 10-80z"/><path class="wpn" d="M72 18q24 2 22 26-10-8-22-6z"/></g>'
   };
   var figN = 0;
-  function shadowFigure(sh) {
+  function shadowFigure(sh, still) {
     var T = TIERS[sh.tier] || TIERS[0], c = T.color, id = "f" + (++figN);
     var body = BODIES[sh.cls] || BODIES.Knight;
     var flames = "";
@@ -155,7 +155,7 @@
     }
     var motes = "";
     for (var m = 0; m < 5; m++) motes += '<circle class="mt" cx="' + (28 + m * 11) + '" cy="100" r="' + (0.9 + (m % 2) * 0.6) + '" fill="' + c + '" style="animation-delay:-' + (m * 0.9).toFixed(1) + 's"/>';
-    return '<svg class="mx-sh-fig" viewBox="0 0 100 112" aria-hidden="true" style="--tc:' + c + '">' +
+    return '<svg class="mx-sh-fig cls-' + (sh.cls || "Knight").toLowerCase() + (still ? " still" : "") + '" viewBox="0 0 100 112" aria-hidden="true" style="--tc:' + c + '">' +
       '<defs><linearGradient id="' + id + 'f" x1="0" y1="1" x2="0" y2="0"><stop offset="0" stop-color="' + c + '" stop-opacity="0.75"/><stop offset="0.45" stop-color="#2a0a52" stop-opacity="0.55"/><stop offset="1" stop-color="#05010d" stop-opacity="0"/></linearGradient>' +
       '<radialGradient id="' + id + 'g" cx="50%" cy="62%" r="50%"><stop offset="0" stop-color="' + c + '" stop-opacity="0.35"/><stop offset="1" stop-color="' + c + '" stop-opacity="0"/></radialGradient></defs>' +
       '<ellipse cx="50" cy="66" rx="48" ry="44" fill="url(#' + id + 'g)"/>' +
@@ -368,25 +368,66 @@
     if (stEl) stEl.textContent = D.shadows.length ? D.shadows.length + " soldiers · power " + power.toLocaleString() : "Shadow army";
     var rules = '<div class="mx-sh-rules"><b>How to extract</b> Clear every daily quest in a day and the System raises one shadow. The longer your workout streak, the stronger it rises: ' +
       TIERS.map(function (t) { return '<span style="color:' + t.color + '">' + t.name + (t.min ? " " + t.min + "+" : "") + '</span>'; }).join(" · ") + '</div>';
+    /* the codex: every class × tier is a figure to collect */
+    var have = {};
+    D.shadows.forEach(function (sh) { have[sh.cls + "|" + sh.tier] = (have[sh.cls + "|" + sh.tier] || 0) + 1; });
+    var found = Object.keys(have).length, total = CLASSES.length * TIERS.length;
+    var codex = '<div class="mx-codex"><div class="mx-codex-h"><span>Codex</span><span><b>' + found + '</b> / ' + total + ' discovered</span></div>' +
+      '<div class="mx-codex-bar"><i style="width:' + (found / total * 100).toFixed(1) + '%"></i></div><div class="mx-codex-grid">' +
+      TIERS.map(function (t, ti) {
+        return '<div class="mx-codex-tier" style="color:' + t.color + '">' + t.name + '</div>' + CLASSES.map(function (cl) {
+          var n = have[cl + "|" + ti];
+          return n ? '<div class="cx on" title="' + t.name + " " + cl + '">' + shadowFigure({ id: "c", tier: ti, cls: cl }, true) + (n > 1 ? '<em>×' + n + '</em>' : "") + '</div>'
+            : '<div class="cx off" title="Undiscovered">?</div>';
+        }).join("");
+      }).join("") + '</div><div class="mx-codex-cls">' + CLASSES.map(function (c) { return "<span>" + c + "</span>"; }).join("") + '</div></div>';
     if (!D.shadows.length) {
-      root.innerHTML = '<div class="mx-sh-empty">' + shadowFigure({ id: "empty", tier: 0, cls: "Knight" }) + '<div>Your army is empty.</div></div>' + rules;
+      root.innerHTML = '<div class="mx-sh-empty">' + shadowFigure({ id: "empty", tier: 0, cls: "Knight" }) + '<div>Your army is empty.</div></div>' + rules + codex;
       return;
     }
+    /* the army: your strongest shadows stand in formation, idling */
+    var ranked = D.shadows.slice().sort(function (x, y) { return y.power - x.power; }).slice(0, 9);
+    var slots = [[50, 104, 1], [33, 84, 0.85], [67, 84, 0.85], [19, 68, 0.72], [81, 68, 0.72], [8, 56, 0.6], [92, 56, 0.6], [26, 48, 0.5], [74, 48, 0.5]];
+    var army = '<div class="mx-army"><div class="cap">Shadow army · ' + D.shadows.length + ' strong · tap one to inspect</div>' + ranked.map(function (sh, i) {
+      var sl = slots[i];
+      return '<button type="button" class="u" data-sh="' + sh.id + '" style="left:' + sl[0] + '%;width:' + sl[1] + 'px;z-index:' + (20 - i) + ';opacity:' + (0.5 + sl[2] * 0.5).toFixed(2) + ';bottom:' + ((1 - sl[2]) * 34 + 6).toFixed(0) + 'px;animation-delay:-' + (i * 0.7).toFixed(1) + 's" aria-label="' + esc(sh.name) + '">' + shadowFigure(sh) + '</button>';
+    }).join("") + '</div>';
     var cards = D.shadows.slice().reverse().map(function (sh) {
       var T = TIERS[sh.tier] || TIERS[0];
-      return '<div class="mx-sh-card" style="--tc:' + T.color + '">' + shadowFigure(sh) +
-        '<div class="nm">' + esc(sh.name) + '</div><div class="cl">' + T.name + ' · ' + esc(sh.cls) + '</div><div class="pw">PWR ' + sh.power + '</div></div>';
+      return '<button type="button" class="mx-sh-card" data-sh="' + sh.id + '" style="--tc:' + T.color + '">' + shadowFigure(sh) +
+        '<div class="nm">' + esc(sh.name) + '</div><div class="cl">' + T.name + ' · ' + esc(sh.cls) + '</div><div class="pw">PWR ' + sh.power + '</div></button>';
     }).join("");
-    /* the army itself: your strongest shadows stand in formation, the
-       strongest front and centre, the rest fading back into the mist */
-    var ranked = D.shadows.slice().sort(function (x, y) { return y.power - x.power; }).slice(0, 7);
-    var slots = [[50, 92, 1], [32, 70, 0.8], [68, 70, 0.8], [17, 56, 0.65], [83, 56, 0.65], [6, 46, 0.55], [94, 46, 0.55]];
-    var army = '<div class="mx-army"><div class="cap">Shadow army · ' + D.shadows.length + ' strong</div>' + ranked.map(function (sh, i) {
-      var sl = slots[i];
-      return '<div class="u" style="left:' + sl[0] + '%;width:' + sl[1] + 'px;z-index:' + (10 - i) + ';opacity:' + (0.55 + sl[2] * 0.45).toFixed(2) + ';animation-delay:-' + (i * 0.7).toFixed(1) + 's">' + shadowFigure(sh) + '</div>';
-    }).join("") + '</div>';
-    root.innerHTML = army + '<div class="mx-sh-grid">' + cards + '</div>' + rules;
+    root.innerHTML = army + codex + '<div class="mx-sh-sub">Roster</div><div class="mx-sh-grid">' + cards + '</div>' + rules;
+    liveCards();
   }
+  /* only cards on screen animate, so a big army stays smooth */
+  var liveIO = "IntersectionObserver" in window ? new IntersectionObserver(function (es) {
+    es.forEach(function (e) { e.target.classList.toggle("live", e.isIntersecting); });
+  }) : null;
+  function liveCards() {
+    var cs = document.querySelectorAll("#mxShadows .mx-sh-card");
+    for (var i = 0; i < cs.length; i++) { if (liveIO) liveIO.observe(cs[i]); else cs[i].classList.add("live"); }
+  }
+  function inspect(id) {
+    var sh = null;
+    D.shadows.forEach(function (x) { if (x.id === id) sh = x; });
+    if (!sh) return;
+    var T = TIERS[sh.tier] || TIERS[0];
+    var when = sh.t ? new Date(sh.t).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" }) : sh.day;
+    var rank = D.shadows.slice().sort(function (a, b) { return b.power - a.power; }).indexOf(sh) + 1;
+    var ov = el("div", "mx-inspect", '<div class="mx-ar-card" style="--tc:' + T.color + '"><div class="mx-ar-k">' + T.name + ' · ' + esc(sh.cls) + '</div>' + shadowFigure(sh) +
+      '<div class="mx-ar-name">' + esc(sh.name) + '</div>' +
+      '<div class="mx-in-stats"><span><b>' + sh.power + '</b>Power</span><span><b>#' + rank + '</b>In army</span><span><b>' + (sh.streak || 1) + '</b>Streak</span></div>' +
+      '<div class="mx-ar-meta">Extracted ' + esc(when || "") + '</div><div class="mx-ar-tap">Tap to close</div></div>');
+    document.body.appendChild(ov);
+    requestAnimationFrame(function () { ov.classList.add("on"); });
+    snd("tick");
+    ov.addEventListener("click", function () { ov.classList.remove("on"); setTimeout(function () { ov.remove(); }, 300); });
+  }
+  document.addEventListener("click", function (e) {
+    var b = e.target.closest ? e.target.closest("#mxShadows [data-sh]") : null;
+    if (b) inspect(b.getAttribute("data-sh"));
+  });
 
   /* ---------------- tiles ---------------- */
   function renderTiles() {
