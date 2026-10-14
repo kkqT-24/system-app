@@ -2185,15 +2185,19 @@
       .sq-defy .sq-fill { background: rgba(255, 45, 85, 0.35); }
       .sq-btn span.lbl { position: relative; z-index: 1; }
       /* cracks that spread while DEFY is held */
-      .sq-cracks {
-        position: absolute; inset: 0; pointer-events: none; opacity: 0;
-        background:
-          linear-gradient(63deg, transparent 46%, rgba(255,45,85,0.7) 47%, rgba(255,45,85,0.7) 48%, transparent 49%),
-          linear-gradient(117deg, transparent 42%, rgba(255,45,85,0.6) 43%, rgba(255,45,85,0.6) 44%, transparent 45%),
-          linear-gradient(24deg, transparent 58%, rgba(255,45,85,0.65) 59%, rgba(255,45,85,0.65) 60%, transparent 61%);
-        transition: opacity 0.2s;
+      .sq-cracks { position: absolute; inset: 0; pointer-events: none; opacity: 0; }
+      .sq-cracks.c1 {
+        background: linear-gradient(63deg, transparent 46%, rgba(255,45,85,0.75) 47%, rgba(255,45,85,0.75) 48%, transparent 49%);
       }
-      .sq-card.cracking .sq-cracks { opacity: 1; }
+      .sq-cracks.c2 {
+        background: linear-gradient(117deg, transparent 40%, rgba(255,45,85,0.65) 41%, rgba(255,45,85,0.65) 42%, transparent 43%),
+          linear-gradient(24deg, transparent 60%, rgba(255,45,85,0.6) 61%, rgba(255,45,85,0.6) 62%, transparent 63%);
+      }
+      .sq-cracks.c3 {
+        background: linear-gradient(48deg, transparent 30%, rgba(255,45,85,0.7) 31%, rgba(255,45,85,0.7) 32%, transparent 33%),
+          linear-gradient(132deg, transparent 68%, rgba(255,45,85,0.65) 69%, rgba(255,45,85,0.65) 70%, transparent 71%),
+          linear-gradient(85deg, transparent 50%, rgba(255,45,85,0.55) 51%, transparent 52%);
+      }
       .sq-card.shake { animation: sqShake 0.12s linear infinite; }
       @keyframes sqShake {
         0% { transform: translate(0, 0); }
@@ -2630,7 +2634,9 @@
     <!-- ================= SECRET QUEST popup ================= -->
     <div class="sq-overlay" id="sqOverlay" aria-hidden="true" role="dialog" aria-label="Secret Quest">
       <div class="sq-card" id="sqCard">
-        <div class="sq-cracks" aria-hidden="true"></div>
+        <div class="sq-cracks c1" aria-hidden="true"></div>
+        <div class="sq-cracks c2" aria-hidden="true"></div>
+        <div class="sq-cracks c3" aria-hidden="true"></div>
         <div class="sq-head">&#9888; Secret Quest &#9888;</div>
         <div class="sq-sub">Urgent directive from the System</div>
         <div class="sq-task" id="sqTask">—</div>
@@ -6030,9 +6036,11 @@
                 p.className = "sq-particle";
                 var sz = 2 + Math.random() * 4;
                 p.style.width = sz + "px"; p.style.height = sz + "px";
-                var gold = Math.random() < 0.35;
-                p.style.background = gold ? "#ffd700" : "#fff";
-                p.style.boxShadow = gold ? "0 0 10px #ffd700, 0 0 20px rgba(255,215,0,0.5)" : "0 0 10px #fff, 0 0 20px rgba(255,255,255,0.5)";
+                var col, glow;
+                if (sqAmbientMode === "ember") { col = "#ff2d55"; glow = "0 0 10px #ff2d55, 0 0 20px rgba(255,45,85,0.5)"; }
+                else { var gold = Math.random() < 0.35; col = gold ? "#ffd700" : "#fff"; glow = gold ? "0 0 10px #ffd700, 0 0 20px rgba(255,215,0,0.5)" : "0 0 10px #fff, 0 0 20px rgba(255,255,255,0.5)"; }
+                p.style.background = col;
+                p.style.boxShadow = glow;
                 p.style.left = (r.left + Math.random() * r.width) + "px";
                 p.style.top = (r.top + r.height * Math.random()) + "px";
                 document.body.appendChild(p);
@@ -6051,7 +6059,8 @@
             }
           } catch (err) {}
         }
-        function sqStartAmbient() { sqStopAmbient(); sqAmbientId = setInterval(sqAmbientTick, 350); }
+        var sqAmbientMode = "holy";
+        function sqStartAmbient(mode) { sqStopAmbient(); sqAmbientMode = mode || "holy"; sqAmbientId = setInterval(sqAmbientTick, 350); }
         function sqStopAmbient() { if (sqAmbientId) { clearInterval(sqAmbientId); sqAmbientId = null; } }
         function sqHide() {
           sqStopAmbient();
@@ -6078,7 +6087,7 @@
           if (q.exp > 0) { sqExp.textContent = "+" + q.exp + " EXP"; sqExp.classList.remove("is-hidden"); }
           else { sqExp.classList.add("is-hidden"); }
           sqCard.classList.toggle("white", !!q.white);
-          if (q.white) sqStartAmbient(); else sqStopAmbient();
+          if (q.white) sqStartAmbient("holy"); else sqStartAmbient("ember");
           var vEl = document.getElementById("sqVerse");
           if (q.white && vEl) {
             var v = SECRET_VERSES[SECRET.active.verse || 0];
@@ -6157,8 +6166,12 @@
               sqCard.style.opacity = (1 - p * 0.45).toFixed(2);
             }
             if (btn === sqDefyBtn) {
-              var cracks = sqCard.querySelector(".sq-cracks");
-              if (cracks) cracks.style.opacity = p.toFixed(2);
+              var c1 = sqCard.querySelector(".sq-cracks.c1");
+              var c2 = sqCard.querySelector(".sq-cracks.c2");
+              var c3 = sqCard.querySelector(".sq-cracks.c3");
+              if (c1) c1.style.opacity = p >= 0.2 ? Math.min(1, (p - 0.2) / 0.25).toFixed(2) : "0";
+              if (c2) c2.style.opacity = p >= 0.45 ? Math.min(1, (p - 0.45) / 0.25).toFixed(2) : "0";
+              if (c3) c3.style.opacity = p >= 0.7 ? Math.min(1, (p - 0.7) / 0.25).toFixed(2) : "0";
             }
             if (p >= 1) { cancel(); fn(); return; }
             raf = requestAnimationFrame(progress);
@@ -6173,8 +6186,8 @@
             if (btn === sqDefyBtn) {
               sqCard.classList.remove("cracking");
               sqCard.classList.remove("shake");
-              var cr = sqCard.querySelector(".sq-cracks");
-              if (cr) cr.style.opacity = "";
+              var crs = sqCard.querySelectorAll(".sq-cracks");
+              for (var ci = 0; ci < crs.length; ci++) crs[ci].style.opacity = "";
             }
             if (btn === sqFulfillBtn) { sqCard.classList.remove("fulfilling"); sqCard.style.opacity = ""; sqCard.style.filter = ""; }
             pid = null;
