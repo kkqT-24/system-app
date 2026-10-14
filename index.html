@@ -902,7 +902,7 @@
       .showcase.expanding .showcase-label { animation: cascadeIn 0.38s cubic-bezier(0.22, 1, 0.36, 1) 0.1s both; }
       .showcase.expanding .showcase-status { animation: cascadeIn 0.38s cubic-bezier(0.22, 1, 0.36, 1) 0.34s both; }
       /* an open section dismisses with a short settle before the tiles return */
-      .section.closing { animation: panelDismiss 0.7s ease-in both; }
+      .section.closing { animation: panelDismiss 0.24s ease-in both; }
       @keyframes panelDismiss {
         from { opacity: 1; transform: none; }
         to { opacity: 0; transform: translateY(100vh); }
@@ -5070,7 +5070,7 @@
           var dy = e.changedTouches[0].clientY - dragStartY;
           var dx = Math.abs(e.changedTouches[0].clientX - dragStartX);
           dragSec = null;
-          if (dy > 110 && dx < 70) {
+          if (dy > 160 && dx < 70) {
             sec.style.transition = "transform 0.28s ease-in";
             sec.style.transform = "translateY(110vh)";
             setTimeout(function () {
@@ -5109,7 +5109,7 @@
               document.body.classList.remove("tab-open");
               navBusy = false;
               expandShowcase();
-            }, 700);
+            }, 240);
           } else {
             for (var j2 = 0; j2 < sections.length; j2++) sections[j2].classList.add("is-hidden");
             document.body.classList.remove("tab-open");
