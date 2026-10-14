@@ -902,7 +902,7 @@
       .showcase.expanding .showcase-label { animation: cascadeIn 0.38s cubic-bezier(0.22, 1, 0.36, 1) 0.1s both; }
       .showcase.expanding .showcase-status { animation: cascadeIn 0.38s cubic-bezier(0.22, 1, 0.36, 1) 0.34s both; }
       /* an open section dismisses with a short settle before the tiles return */
-      .section.closing { animation: panelDismiss 0.5s ease-in both; }
+      .section.closing { animation: panelDismiss 0.7s ease-in both; }
       @keyframes panelDismiss {
         from { opacity: 1; transform: none; }
         to { opacity: 0; transform: translateY(100vh); }
@@ -922,6 +922,7 @@
       .handle-row { height: 40px; margin-top: 14px; display: flex; justify-content: center; align-items: center; }
       body.tab-open .handle-row { margin-top: 0; }
       body.tab-open .main-center { padding: 0; justify-content: flex-start; }
+      body.tab-open .main-top { display: none; }
       .top-handle {
         appearance: none; display: inline-flex; align-items: center;
         background: rgba(9, 7, 36, 0.62); border: 1px solid var(--line-soft); border-radius: 999px;
@@ -5067,7 +5068,7 @@
               document.body.classList.remove("tab-open");
               navBusy = false;
               expandShowcase();
-            }, 500);
+            }, 700);
           } else {
             for (var j2 = 0; j2 < sections.length; j2++) sections[j2].classList.add("is-hidden");
             document.body.classList.remove("tab-open");
