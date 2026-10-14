@@ -5039,17 +5039,57 @@
            then the tiles expand back out of the tab bar's center. With
            no panel open (first landing) the tiles simply cascade in. */
         /* swipe down on an open panel (at the top of the page) goes back to the tiles */
-        var swipePos = null;
+        /* pull-down to close (like pull-to-refresh, no spinner): the card
+           follows the finger down; release past the threshold and it slides
+           off, otherwise it springs back. */
+        var dragSec = null, dragStartY = 0, dragStartX = 0;
         document.addEventListener("touchstart", function (e) {
-          if (document.body.classList.contains("tab-open") && e.touches.length === 1) swipePos = { x: e.touches[0].clientX, y: e.touches[0].clientY };
-          else swipePos = null;
+          dragSec = null;
+          if (!document.body.classList.contains("tab-open") || e.touches.length !== 1 || navBusy) return;
+          for (var di = 0; di < sections.length; di++) {
+            if (!sections[di].classList.contains("is-hidden")) dragSec = sections[di];
+          }
+          if (dragSec && window.scrollY < 10) {
+            dragStartY = e.touches[0].clientY;
+            dragStartX = e.touches[0].clientX;
+            dragSec.classList.remove("assembling");
+            dragSec.style.transition = "none";
+          } else {
+            dragSec = null;
+          }
+        }, { passive: true });
+        document.addEventListener("touchmove", function (e) {
+          if (!dragSec) return;
+          var mdy = e.touches[0].clientY - dragStartY;
+          if (mdy > 0) dragSec.style.transform = "translateY(" + Math.round(mdy * 0.85) + "px)";
+          else dragSec.style.transform = "";
         }, { passive: true });
         document.addEventListener("touchend", function (e) {
-          if (!swipePos) return;
-          var dy = e.changedTouches[0].clientY - swipePos.y;
-          var dx = Math.abs(e.changedTouches[0].clientX - swipePos.x);
-          swipePos = null;
-          if (dy > 90 && dx < 60 && window.scrollY < 10 && document.body.classList.contains("tab-open")) enterShowcase();
+          if (!dragSec) return;
+          var sec = dragSec;
+          var dy = e.changedTouches[0].clientY - dragStartY;
+          var dx = Math.abs(e.changedTouches[0].clientX - dragStartX);
+          dragSec = null;
+          if (dy > 110 && dx < 70) {
+            sec.style.transition = "transform 0.28s ease-in";
+            sec.style.transform = "translateY(110vh)";
+            setTimeout(function () {
+              sec.style.transition = "";
+              sec.style.transform = "";
+              sec.classList.add("is-hidden");
+              document.body.classList.remove("tab-open");
+              tabsHandle.classList.remove("show");
+              tabsHandle.setAttribute("aria-expanded", "false");
+              expandShowcase();
+            }, 300);
+          } else {
+            sec.style.transition = "transform 0.32s cubic-bezier(0.22, 1, 0.36, 1)";
+            sec.style.transform = "translateY(0px)";
+            setTimeout(function () {
+              sec.style.transition = "";
+              sec.style.transform = "";
+            }, 340);
+          }
         }, { passive: true });
         function enterShowcase() {
           if (navBusy) return;
