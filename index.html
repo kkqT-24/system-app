@@ -1993,6 +1993,7 @@
         max-width: 540px; margin: 0 auto; padding: 18px 12px 2px;
       }
       .verse-line .ref { color: var(--lav); white-space: nowrap; }
+      body.tab-open .verse-line { display: none; }
       .main-controls { display: flex; flex-direction: column; align-items: center; gap: 6px; padding-bottom: 8px; }
       /* REBOOT is a HOLD button: press and hold and a red charge
          fills the button left to right (width driven by the hold
@@ -2000,7 +2001,7 @@
          full fill fires the reboot — a plain tap does nothing, so
          the boot sequence can't restart by accident. */
       .replay-btn {
-        appearance: none; margin-top: 12px; position: relative; overflow: hidden;
+        appearance: none; margin-top: 6px; position: relative; overflow: hidden;
         background: var(--field); color: var(--lav);
         border: 1px solid var(--line); padding: 13px 26px;
         font-family: "Orbitron", sans-serif; font-weight: 700; font-size: 13px; letter-spacing: 0.26em; text-indent: 0.26em;
@@ -5033,6 +5034,7 @@
            no panel open (first landing) the tiles simply cascade in. */
         function enterShowcase() {
           if (navBusy) return;
+          document.body.classList.remove("tab-open");
           var open = null;
           for (var j = 0; j < sections.length; j++) {
             if (!sections[j].classList.contains("is-hidden")) open = sections[j];
@@ -5063,6 +5065,7 @@
             for (var j = 0; j < sections.length; j++) {
               sections[j].classList.toggle("is-hidden", sections[j].id !== "sec-" + name);
             }
+            document.body.classList.add("tab-open");
             assembleSection(document.getElementById("sec-" + name));
             /* the handle above the panel is the way back to the tabs */
             tabsHandle.classList.add("show");
