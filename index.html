@@ -5455,6 +5455,8 @@
             navBusy = false;
           });
         }
+        /* exposed so the status-bar script (separate block) can open sections */
+        window.__ksSelectSection = selectSection;
         for (var ni = 0; ni < tileBtns.length; ni++) {
           tileBtns[ni].addEventListener("click", function () {
             /* Sports Desk: plain same-tab navigation straight to the desk —
@@ -6308,8 +6310,8 @@
         var bar = el.parentElement;
         /* the status bar doubles as the to-do tab: tapping it opens the list */
         bar.addEventListener("click", function () {
-          if (typeof selectSection === "function" && !document.body.classList.contains("tab-open")) {
-            selectSection("todo", null);
+          if (!document.body.classList.contains("tab-open") && typeof window.__ksSelectSection === "function") {
+            window.__ksSelectSection("todo", null);
           }
         });
         var t0 = Date.now();
