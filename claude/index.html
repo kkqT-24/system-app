@@ -7095,7 +7095,28 @@
           if (core) { var hr = core.getBoundingClientRect(); lift = Math.min(lift, Math.max(0, cr.top - hr.bottom - 12)); }
           card.style.setProperty("--wx-lift", (-lift).toFixed(0) + "px");
         }
-        /* v2: the card keeps one fixed position — re-measuring it mid-animation made it stutter */
+        /* v2: place the card ONCE, the instant the greeting appears, using the
+           layout's final positions (the core's slide and the card's rise are
+           subtracted out) — so it never jumps mid-animation. It sits centred
+           in the space between the core and the status lines. */
+        function placeCard() {
+          if (!card || greet.classList.contains("is-hidden")) return;
+          var cur = parseFloat(getComputedStyle(card).getPropertyValue("--wx-lift")) || 0;
+          var gm = new DOMMatrixReadOnly(getComputedStyle(greet).transform === "none" ? undefined : getComputedStyle(greet).transform);
+          var r = card.getBoundingClientRect();
+          var top0 = r.top - gm.m42 - cur, h = r.height;
+          var hudB = window.innerHeight * 0.55;
+          if (core) {
+            var hr = core.getBoundingClientRect(), tr = (core.style.translate || "").split(" ");
+            hudB = hr.bottom - (parseFloat(tr[1] || tr[0]) || 0) * (tr.length > 1 ? 1 : 0);
+          }
+          var lim = window.innerHeight - 70;
+          if (chatter) { var cr = chatter.getBoundingClientRect(); if (cr.height) lim = cr.top; else lim = cr.bottom - 80; }
+          var space = lim - hudB;
+          var target = space >= h + 16 ? hudB + (space - h) / 2 : hudB + 8;
+          card.style.setProperty("--wx-lift", Math.round(target - top0) + "px");
+        }
+        if (greet) new MutationObserver(function () { placeCard(); }).observe(greet, { attributes: true, attributeFilter: ["class"] });
       })();
     </script>
     <script src="motion.js"></script>

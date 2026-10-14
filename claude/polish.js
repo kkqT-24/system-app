@@ -345,29 +345,26 @@
   })();
 })();
 
-/* REBOOT: the System powers down like an old CRT — glitch, collapse to
-   a line, then to a point of light, a beat of black — and powers back
-   up into the boot sequence from a bright scanline. */
+/* REBOOT (modern): the interface sinks behind frosted glass, the System
+   mark draws itself — a ring tracing round, the star turning in — then
+   it blooms white and the boot sequence fades up from it. */
 (function () {
   "use strict";
   window.__mxReboot = function (done) {
     var main = document.getElementById("main");
     var ov = document.createElement("div");
-    ov.className = "mx-reboot";
-    ov.innerHTML = '<div class="msg">&gt; System shutdown initiated<span>_</span></div><div class="line"></div><div class="dot"></div><div class="top"></div><div class="bot"></div>';
+    ov.className = "mx-rb";
+    ov.innerHTML = '<div class="glass"></div><div class="mark"><svg viewBox="0 0 200 200" aria-hidden="true"><defs>' +
+      '<linearGradient id="mxRbG" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#7dd3fc"/><stop offset="0.5" stop-color="#a78bfa"/><stop offset="1" stop-color="#f472b6"/></linearGradient></defs>' +
+      '<circle class="trk" cx="100" cy="100" r="70"/><circle class="arc" cx="100" cy="100" r="70"/>' +
+      '<path class="star" d="M100 62C103 92 108 97 138 100 108 103 103 108 100 138 97 108 92 103 62 100 92 97 97 92 100 62Z"/></svg>' +
+      '<div class="lbl">Restarting<span class="d"><i></i><i></i><i></i></span></div></div><div class="bloom"></div>';
     document.body.appendChild(ov);
-    if (window.__mx) window.__mx.buzz([20, 60, 20]);
-    main.classList.add("mx-powerdown");
-    requestAnimationFrame(function () { ov.classList.add("a1"); });
-    setTimeout(function () { ov.classList.add("a2"); }, 620);           /* screen collapses */
-    setTimeout(function () { ov.classList.add("a3"); }, 1050);          /* line → dot */
-    setTimeout(function () { ov.classList.add("a4"); }, 1400);          /* black */
-    setTimeout(function () {
-      main.classList.remove("mx-powerdown");
-      done();                                                           /* boot starts underneath */
-      ov.classList.add("a5");                                           /* power-on scanline opens */
-      if (window.__mx) window.__mx.buzz(15);
-    }, 1750);
-    setTimeout(function () { ov.remove(); }, 2700);
+    if (window.__mx) window.__mx.buzz(12);
+    main.classList.add("mx-sink");
+    requestAnimationFrame(function () { ov.classList.add("in"); });
+    setTimeout(function () { ov.classList.add("bloom-on"); if (window.__mx) window.__mx.buzz(18); }, 1650);
+    setTimeout(function () { main.classList.remove("mx-sink"); done(); ov.classList.add("out"); }, 1950);
+    setTimeout(function () { ov.remove(); }, 2900);
   };
 })();

@@ -215,24 +215,34 @@
   ];
   function monarchFigure(m, still) {
     var id = "m" + (++figN), gold = "#ffd166", vio = "#a855f7";
-    var flames = "";
-    for (var i = 0; i < 9; i++) {
-      var x = 10 + i * 10, h = 40 + (i % 3) * 14 + (i === 4 ? 22 : 0);
-      flames += '<path class="fl" style="animation-delay:-' + (i * 0.29).toFixed(2) + 's;transform-origin:' + x + 'px 110px" d="M' + (x - 10) + ' 110 Q' + (x - 6) + ' ' + (110 - h * 0.6) + ' ' + x + ' ' + (110 - h) + ' Q' + (x + 6) + ' ' + (110 - h * 0.6) + ' ' + (x + 10) + ' 110Z" fill="url(#' + id + (i % 2 ? "v" : "g") + ')"/>';
+    /* three aura layers: a towering violet-gold blaze, a black smoke
+       curtain licking through it, and a crimson heat at the base */
+    var flames = "", smoke = "";
+    for (var i = 0; i < 11; i++) {
+      var x = 2 + i * 9.6, h = 62 + (i % 3) * 16 + (Math.abs(i - 5) < 2 ? 38 : 0);
+      flames += '<path class="fl big" style="animation-delay:-' + (i * 0.23).toFixed(2) + 's;transform-origin:' + x + 'px 112px" d="M' + (x - 11) + ' 112 Q' + (x - 7) + ' ' + (112 - h * 0.55) + ' ' + (x + (i % 2 ? 4 : -4)) + ' ' + (112 - h) + ' Q' + (x + 7) + ' ' + (112 - h * 0.6) + ' ' + (x + 11) + ' 112Z" fill="url(#' + id + (i % 2 ? "v" : "g") + ')"/>';
+    }
+    for (var k = 0; k < 7; k++) {
+      var sx = 12 + k * 13, sh = 48 + (k % 2) * 22;
+      smoke += '<path class="sm" style="animation-delay:-' + (k * 0.41).toFixed(2) + 's;transform-origin:' + sx + 'px 112px" d="M' + (sx - 9) + ' 112 C' + (sx - 12) + ' ' + (112 - sh * 0.5) + ' ' + (sx + 6) + ' ' + (112 - sh * 0.7) + ' ' + sx + ' ' + (112 - sh) + ' C' + (sx + 10) + ' ' + (112 - sh * 0.6) + ' ' + (sx + 4) + ' ' + (112 - sh * 0.3) + ' ' + (sx + 9) + ' 112Z" fill="url(#' + id + 's)"/>';
     }
     var bolts = '<g class="bolts" fill="none" stroke="#f3e8ff" stroke-width="0.9" stroke-linejoin="round">' +
-      '<path d="M14 40l6 6-4 4 7 8-3 3 6 7"/><path d="M86 34l-5 7 4 4-7 7 3 4-6 8"/><path d="M50 -2l-3 6 4 2-4 6"/></g>';
-    var eyes = m.eyes.map(function (e) { return '<ellipse cx="' + e[0] + '" cy="' + e[1] + '" rx="2.8" ry="1"/>'; }).join("");
+      '<path d="M8 34l7 6-5 5 8 9-4 4 7 8"/><path d="M92 28l-6 8 5 4-8 8 4 5-7 9"/><path d="M50 -10l-4 7 5 3-5 8"/><path d="M22 6l4 8-4 3 5 6"/><path d="M80 4l-3 7 4 3-4 7"/></g>';
+    var embers = "";
+    for (var e2 = 0; e2 < 8; e2++) embers += '<circle class="mt" cx="' + (12 + e2 * 11) + '" cy="108" r="' + (0.9 + (e2 % 3) * 0.5) + '" fill="' + (e2 % 2 ? gold : "#ff4d6d") + '" style="animation-delay:-' + (e2 * 0.6).toFixed(1) + 's"/>';
+    var eyes = m.eyes.map(function (e) { return '<ellipse cx="' + e[0] + '" cy="' + e[1] + '" rx="3" ry="1.1"/>'; }).join("");
     return '<svg class="mx-sh-fig monarch mon-' + m.key + (still ? " still" : "") + '" viewBox="0 0 100 112" aria-hidden="true" style="--tc:' + gold + ';--tv:' + vio + '">' +
-      '<defs><linearGradient id="' + id + 'g" x1="0" y1="1" x2="0" y2="0"><stop offset="0" stop-color="' + gold + '" stop-opacity="0.85"/><stop offset="0.5" stop-color="#5b1a8a" stop-opacity="0.6"/><stop offset="1" stop-color="#05010d" stop-opacity="0"/></linearGradient>' +
-      '<linearGradient id="' + id + 'v" x1="0" y1="1" x2="0" y2="0"><stop offset="0" stop-color="' + vio + '" stop-opacity="0.85"/><stop offset="0.55" stop-color="#1a0638" stop-opacity="0.5"/><stop offset="1" stop-color="#05010d" stop-opacity="0"/></linearGradient>' +
-      '<radialGradient id="' + id + 'r" cx="50%" cy="58%" r="55%"><stop offset="0" stop-color="' + gold + '" stop-opacity="0.35"/><stop offset="0.6" stop-color="' + vio + '" stop-opacity="0.18"/><stop offset="1" stop-color="' + vio + '" stop-opacity="0"/></radialGradient></defs>' +
-      '<ellipse cx="50" cy="62" rx="52" ry="50" fill="url(#' + id + 'r)"/>' +
-      '<g class="aura">' + flames + '</g>' + bolts +
-      '<g class="body" fill="#020007" stroke="' + gold + '" stroke-opacity="0.85" stroke-width="0.8" stroke-linejoin="round">' + m.body + '</g>' +
+      '<defs><linearGradient id="' + id + 'g" x1="0" y1="1" x2="0" y2="0"><stop offset="0" stop-color="#ff5a3c" stop-opacity="0.9"/><stop offset="0.25" stop-color="' + gold + '" stop-opacity="0.75"/><stop offset="0.6" stop-color="#5b1a8a" stop-opacity="0.55"/><stop offset="1" stop-color="#05010d" stop-opacity="0"/></linearGradient>' +
+      '<linearGradient id="' + id + 'v" x1="0" y1="1" x2="0" y2="0"><stop offset="0" stop-color="#c026d3" stop-opacity="0.9"/><stop offset="0.4" stop-color="' + vio + '" stop-opacity="0.7"/><stop offset="0.75" stop-color="#1a0638" stop-opacity="0.45"/><stop offset="1" stop-color="#05010d" stop-opacity="0"/></linearGradient>' +
+      '<linearGradient id="' + id + 's" x1="0" y1="1" x2="0" y2="0"><stop offset="0" stop-color="#000" stop-opacity="0.95"/><stop offset="0.6" stop-color="#0b0216" stop-opacity="0.7"/><stop offset="1" stop-color="#000" stop-opacity="0"/></linearGradient>' +
+      '<radialGradient id="' + id + 'r" cx="50%" cy="60%" r="58%"><stop offset="0" stop-color="#ff3b5c" stop-opacity="0.28"/><stop offset="0.35" stop-color="' + vio + '" stop-opacity="0.28"/><stop offset="1" stop-color="' + vio + '" stop-opacity="0"/></radialGradient></defs>' +
+      '<ellipse class="dome" cx="50" cy="64" rx="56" ry="56" fill="url(#' + id + 'r)"/>' +
+      '<ellipse class="quake" cx="50" cy="110" rx="40" ry="5" fill="none" stroke="#ff4d6d" stroke-width="1"/>' +
+      '<g class="aura">' + flames + '</g><g class="smoke">' + smoke + '</g>' + bolts +
+      '<g class="body" fill="#010005" stroke="' + gold + '" stroke-opacity="0.9" stroke-width="0.8" stroke-linejoin="round">' + m.body + '</g>' +
       '<path class="det" d="' + m.det + '" fill="none" stroke="' + gold + '" stroke-width="0.55" stroke-linecap="round"/>' +
-      '<g class="eyes" fill="#fff6d6">' + eyes + '</g>' +
-      '<ellipse cx="50" cy="110" rx="36" ry="3" fill="#000" opacity="0.85"/></svg>';
+      '<g class="eyes" fill="#ffe2e8">' + eyes + '</g>' + embers +
+      '<ellipse cx="50" cy="111" rx="38" ry="3" fill="#000" opacity="0.9"/></svg>';
   }
   function monarchByKey(k) { for (var i = 0; i < MONARCHS.length; i++) if (MONARCHS[i].key === k) return MONARCHS[i]; return null; }
   function bestDayRun() {
