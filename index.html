@@ -1995,6 +1995,7 @@
       }
       .verse-line .ref { color: var(--lav); white-space: nowrap; }
       body.tab-open .verse-line { display: none; }
+      body.tab-open #mainTitle, body.tab-open #mainGreet, body.tab-open #tabsHandle { display: none; }
       .main-controls { display: flex; flex-direction: column; align-items: center; gap: 6px; padding-bottom: 8px; }
       /* REBOOT is a HOLD button: press and hold and a red charge
          fills the button left to right (width driven by the hold
@@ -5048,7 +5049,6 @@
         }, { passive: true });
         function enterShowcase() {
           if (navBusy) return;
-          document.body.classList.remove("tab-open");
           var open = null;
           for (var j = 0; j < sections.length; j++) {
             if (!sections[j].classList.contains("is-hidden")) open = sections[j];
@@ -5061,11 +5061,13 @@
             setTimeout(function () {
               open.classList.remove("closing");
               open.classList.add("is-hidden");
+              document.body.classList.remove("tab-open");
               navBusy = false;
               expandShowcase();
             }, 240);
           } else {
             for (var j2 = 0; j2 < sections.length; j2++) sections[j2].classList.add("is-hidden");
+            document.body.classList.remove("tab-open");
             showcase.classList.remove("is-hidden", "leaving", "enter");
             void showcase.offsetWidth;
             showcase.classList.add("enter");
