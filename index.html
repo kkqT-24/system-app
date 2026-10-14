@@ -5061,6 +5061,7 @@
           tabsHandle.setAttribute("aria-expanded", "false");
           if (open && lastPickedTile && !RM) {
             navBusy = true;
+            open.classList.remove("assembling");
             open.classList.add("closing");
             setTimeout(function () {
               open.classList.remove("closing");
