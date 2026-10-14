@@ -345,44 +345,54 @@
   })();
 })();
 
-/* REBOOT: the interface is pulled apart into the void — every element
-   lifts off and is drawn into a dark rift at the centre while a rune
-   circle spins up around it; the rift spirals shut, a ring of light
-   ripples out once (no white flash), and the boot fades up from black. */
+/* REBOOT: a clean system restart. The interface shuts like blinds —
+   every row flips away top to bottom — then a single line of light
+   draws across the dark with a terse restart log ticking under it,
+   and the line opens like a shutter onto the boot. No flash. */
 (function () {
   "use strict";
+  var LOG = ["closing modules", "saving hunter state", "flushing cache", "core offline", "core online", "relinking modules", "handshake ok"];
   window.__mxReboot = function (done) {
     var main = document.getElementById("main");
-    var cx = innerWidth / 2, cy = innerHeight * 0.45;
-    var parts = main.querySelectorAll(".main-top, .main-rings-wrap, #mainTitle, #mainGreet, .showcase-label, .tab-tile, .showcase-status, .verse-line, .main-controls, .main-inner > .main-top:last-child");
-    for (var i = 0; i < parts.length; i++) {
-      var el = parts[i], r = el.getBoundingClientRect();
-      if (!r.width) continue;
-      var dx = cx - (r.left + r.width / 2), dy = cy - (r.top + r.height / 2), d = Math.sqrt(dx * dx + dy * dy);
+    var parts = Array.prototype.slice.call(main.querySelectorAll(".main-top, .main-rings-wrap, #mainTitle, #mainGreet, .showcase-label, .tab-tile, .showcase-status, .verse-line, .main-controls"))
+      .filter(function (e) { return e.getBoundingClientRect().height > 0; })
+      .sort(function (a, b) { return a.getBoundingClientRect().top - b.getBoundingClientRect().top; });
+    var top0 = parts.length ? parts[0].getBoundingClientRect().top : 0;
+    parts.forEach(function (el) {
+      var d = (el.getBoundingClientRect().top - top0) * 0.55;
       try {
         el.animate([
-          { transform: "none", opacity: 1, filter: "none" },
-          { transform: "translate(" + (-dx * 0.04).toFixed(1) + "px," + (-dy * 0.04 - 6).toFixed(1) + "px) scale(1.02)", opacity: 1, filter: "brightness(1.3)", offset: 0.25 },
-          { transform: "translate(" + dx.toFixed(1) + "px," + dy.toFixed(1) + "px) rotate(" + (dx > 0 ? 160 : -160) + "deg) scale(0.02)", opacity: 0, filter: "blur(6px) brightness(0.4)" }
-        ], { duration: 900, delay: Math.max(0, 260 - d * 0.35) + Math.random() * 60, easing: "cubic-bezier(0.55, 0, 0.75, 0.3)", fill: "forwards" });
+          { transform: "perspective(600px) rotateX(0deg)", opacity: 1 },
+          { transform: "perspective(600px) rotateX(-88deg)", opacity: 0 }
+        ], { duration: 420, delay: d, easing: "cubic-bezier(0.5, 0, 0.75, 0)", fill: "forwards" });
       } catch (e) {}
-    }
+    });
+    var shutT = Math.min(900, (parts.length ? (parts[parts.length - 1].getBoundingClientRect().top - top0) * 0.55 : 0) + 420);
     var ov = document.createElement("div");
-    ov.className = "mx-rift";
-    ov.style.setProperty("--cx", cx + "px"); ov.style.setProperty("--cy", cy + "px");
-    ov.innerHTML = '<div class="void"></div><div class="sig">' + (window.__mxSigil ? window.__mxSigil("mx-sigil") : "") + '</div><div class="core"></div><div class="wave"></div>' +
-      '<div class="txt"><b>Reinitializing</b><span class="pct">00</span></div>';
+    ov.className = "mx-rs";
+    ov.innerHTML = '<div class="bg"></div><div class="hd"><span>System</span><b>Restart</b></div><div class="ln"><i></i></div><div class="lg"></div><div class="shA"></div><div class="shB"></div>';
     document.body.appendChild(ov);
-    var pct = ov.querySelector(".pct"), t0 = performance.now();
-    (function count(now) { var k = Math.min(1, (now - t0) / 1500); pct.textContent = String(Math.round(k * 100)).padStart(2, "0"); if (k < 1 && ov.isConnected) requestAnimationFrame(count); })(t0);
-    if (window.__mx) { window.__mx.converge(cx, cy, 60, 1300, "#a855f7"); window.__mx.buzz([10, 80, 10]); }
-    requestAnimationFrame(function () { ov.classList.add("in"); });
-    setTimeout(function () { ov.classList.add("shut"); if (window.__mx) window.__mx.buzz(25); }, 1500);
+    var lg = ov.querySelector(".lg");
+    if (window.__mx) window.__mx.buzz(10);
+    setTimeout(function () { ov.classList.add("dark"); }, Math.max(0, shutT - 250));
     setTimeout(function () {
-      for (var i = 0; i < parts.length; i++) try { parts[i].getAnimations().forEach(function (a) { a.cancel(); }); } catch (e) {}
+      ov.classList.add("run");
+      LOG.forEach(function (t, k) {
+        setTimeout(function () {
+          var row = document.createElement("div");
+          row.innerHTML = "<em>" + String(k + 1).padStart(2, "0") + "</em>" + t + "<span>ok</span>";
+          lg.appendChild(row);
+          while (lg.children.length > 4) lg.removeChild(lg.firstChild);
+        }, 120 + k * 150);
+      });
+    }, shutT);
+    var openT = shutT + 1350;
+    setTimeout(function () {
+      parts.forEach(function (el) { try { el.getAnimations().forEach(function (a) { a.cancel(); }); } catch (e) {} });
       done();
-      ov.classList.add("out");
-    }, 1950);
-    setTimeout(function () { ov.remove(); }, 3000);
+      ov.classList.add("open");
+      if (window.__mx) window.__mx.buzz(15);
+    }, openT);
+    setTimeout(function () { ov.remove(); }, openT + 1000);
   };
 })();

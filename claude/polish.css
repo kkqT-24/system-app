@@ -308,7 +308,7 @@ body.tab-open .main-controls .replay-btn { display: none !important; }
 /* boot info card: one steady position, no mid-animation re-measure */
 /* the greeting fills the space under the core and centres the card in
    it, clear of the status lines — layout only, so it can't jump */
-#phaseGreet { flex: 1 1 auto; justify-content: center; padding-bottom: 92px; min-height: 0; }
+#phaseGreet { flex: 1 1 auto; justify-content: center; padding-bottom: 136px; min-height: 0; }
 #phaseGreet .weather-card { translate: none !important; transform: none; }
 @media (max-height: 640px) { #phaseGreet { padding-bottom: 8px; } }
 /* the dive into the hub: a softer zoom with a gentle blur */
@@ -469,3 +469,30 @@ body.tab-open .main-controls .replay-btn { display: none !important; }
 .mx-rift .txt .pct { display: block; margin-top: 8px; font-family: "Orbitron", sans-serif; font-size: 22px; letter-spacing: 0.2em; color: #fff; text-shadow: 0 0 12px #a855f7; }
 .mx-rift.out { transition: opacity 0.9s ease 0.15s; opacity: 0; }
 .mx-rift.out .void { background: #020008; }
+
+/* ---------- reboot: clean system restart ---------- */
+.mx-rs { position: fixed; inset: 0; z-index: 120; pointer-events: none; font-family: "Share Tech Mono", monospace; text-transform: uppercase; }
+.mx-rs .bg { position: absolute; inset: 0; background: #030209; opacity: 0; transition: opacity 0.35s ease; }
+.mx-rs.dark .bg { opacity: 1; }
+.mx-rs .hd { position: absolute; left: 0; right: 0; top: calc(50% - 46px); display: flex; justify-content: center; gap: 10px; font-size: 11px; letter-spacing: 0.5em; color: rgba(195, 184, 254, 0.55); opacity: 0; transform: translateY(6px); transition: opacity 0.4s ease, transform 0.4s ease; }
+.mx-rs .hd b { font-weight: 400; color: #e9e3ff; }
+.mx-rs.run .hd { opacity: 1; transform: none; }
+.mx-rs .ln { position: absolute; left: 10%; right: 10%; top: 50%; height: 1px; background: rgba(143, 94, 248, 0.15); transform: scaleX(0); transition: transform 0.5s cubic-bezier(0.2, 0.8, 0.2, 1); }
+.mx-rs.run .ln { transform: scaleX(1); }
+.mx-rs .ln i { position: absolute; left: 0; top: -1px; height: 3px; width: 0; background: linear-gradient(90deg, rgba(125, 211, 252, 0.4), #c4b5fd, #fff); box-shadow: 0 0 10px #8f5ef8, 0 0 22px rgba(143, 94, 248, 0.6); border-radius: 2px; }
+.mx-rs.run .ln i { animation: mxRsFill 1.15s cubic-bezier(0.6, 0, 0.3, 1) 0.15s forwards; }
+@keyframes mxRsFill { to { width: 100%; } }
+.mx-rs .lg { position: absolute; left: 10%; right: 10%; top: calc(50% + 18px); font-size: 10px; letter-spacing: 0.16em; color: rgba(172, 169, 232, 0.6); line-height: 1.9; }
+.mx-rs .lg div { display: flex; gap: 10px; animation: mxRsRow 0.25s ease both; }
+.mx-rs .lg em { font-style: normal; color: rgba(143, 94, 248, 0.7); }
+.mx-rs .lg span { margin-left: auto; color: #7dd3fc; }
+.mx-rs .lg div:last-child { color: #e9e3ff; }
+@keyframes mxRsRow { from { opacity: 0; transform: translateX(-6px); } to { opacity: 1; transform: none; } }
+.mx-rs .shA, .mx-rs .shB { position: absolute; left: 0; right: 0; height: 50%; background: #030209; opacity: 0; }
+.mx-rs .shA { top: 0; } .mx-rs .shB { bottom: 0; }
+.mx-rs.open .bg, .mx-rs.open .hd, .mx-rs.open .lg, .mx-rs.open .ln { opacity: 0; transition: opacity 0.15s ease; }
+.mx-rs.open .shA, .mx-rs.open .shB { opacity: 1; }
+.mx-rs.open .shA { animation: mxRsUp 0.85s cubic-bezier(0.7, 0, 0.2, 1) forwards; box-shadow: 0 1px 0 rgba(196, 181, 253, 0.8), 0 0 18px rgba(143, 94, 248, 0.5); }
+.mx-rs.open .shB { animation: mxRsDown 0.85s cubic-bezier(0.7, 0, 0.2, 1) forwards; box-shadow: 0 -1px 0 rgba(196, 181, 253, 0.8), 0 0 18px rgba(143, 94, 248, 0.5); }
+@keyframes mxRsUp { to { transform: translateY(-101%); } }
+@keyframes mxRsDown { to { transform: translateY(101%); } }

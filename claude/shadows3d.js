@@ -90,44 +90,77 @@
   }
 
   /* ---------- humanoid base ---------- */
+  function lathe(pts, seg) { return new THREE.LatheGeometry(pts.map(function (p) { return new THREE.Vector2(p[0], p[1]); }), seg || 16); }
+  /* a limb segment hanging down from its pivot, with a rounded joint */
+  function segment(M, len, r0, r1) {
+    var g = new THREE.Group();
+    g.add(mesh(lathe([[0, 0], [r0 * 0.9, 0.01], [r0, len * 0.15], [(r0 + r1) / 2 * 1.04, len * 0.55], [r1, len * 0.95], [r1 * 0.6, len], [0, len]], 12), M, 0, -len, 0));
+    g.children[0].rotation.x = Math.PI; g.children[0].position.y = 0;
+    return g;
+  }
   function humanoid(M, opt) {
     opt = opt || {};
     var root = new THREE.Group(), body = new THREE.Group();
     root.add(body);
-    var robe = opt.robe;
-    if (robe) {
-      body.add(mesh(cyl(0.2, 0.46, 1.2, 14), M, 0, 0.6, 0));
+    if (opt.robe) {
+      body.add(mesh(lathe([[0, 0], [0.48, 0], [0.44, 0.15], [0.33, 0.6], [0.22, 1.0], [0.19, 1.12], [0, 1.12]], 18), M, 0, 0, 0));
     } else {
-      body.add(mesh(cyl(0.085, 0.11, 0.82), M, -0.13, 0.41, 0));
-      body.add(mesh(cyl(0.085, 0.11, 0.82), M, 0.13, 0.41, 0));
-      body.add(mesh(box(0.16, 0.08, 0.26), M, -0.13, 0.04, 0.05));
-      body.add(mesh(box(0.16, 0.08, 0.26), M, 0.13, 0.04, 0.05));
+      /* legs: thigh, knee, shin, armoured boot */
+      [-1, 1].forEach(function (sd) {
+        var hip = new THREE.Group(); hip.position.set(0.11 * sd, 0.9, 0); body.add(hip);
+        var th = segment(M, 0.44, 0.105, 0.08); hip.add(th);
+        var knee = mesh(sph(0.075, 10, 8), M, 0, -0.44, 0.01); hip.add(knee);
+        var sh = segment(M, 0.4, 0.08, 0.06); sh.position.y = -0.45; hip.add(sh);
+        var boot = mesh(sph(0.08, 10, 8), M, 0, -0.86, 0.05); boot.scale.set(0.95, 0.65, 1.7); hip.add(boot);
+        hip.rotation.z = -0.03 * sd;
+      });
+      var pelvis = mesh(sph(0.2, 14, 10), M, 0, 0.92, 0); pelvis.scale.set(1.05, 0.62, 0.72); body.add(pelvis);
+      /* tasset plates over the hips */
+      [-1, 1].forEach(function (sd) { var t = mesh(box(0.16, 0.2, 0.03), M, 0.13 * sd, 0.8, 0.13); t.rotation.z = 0.12 * sd; t.rotation.x = -0.12; body.add(t); });
     }
-    var torso = mesh(cyl(0.3, 0.2, 0.72, 12), M, 0, 1.16, 0); torso.scale.z = 0.68; body.add(torso);
-    body.add(mesh(box(0.46, 0.1, 0.3), M, 0, 0.82, 0));
+    /* torso: waist → chest → shoulders, one smooth lathe */
+    var torso = mesh(lathe([[0, 0], [0.17, 0], [0.18, 0.08], [0.24, 0.26], [0.27, 0.42], [0.25, 0.52], [0.16, 0.6], [0.08, 0.64], [0, 0.64]], 18), M, 0, 0.94, 0);
+    torso.scale.z = 0.7; body.add(torso);
     var trim = glowMat(opt.color);
-    var belt = mesh(box(0.47, 0.018, 0.31), trim, 0, 0.84, 0); body.add(belt);
-    var neck = mesh(cyl(0.07, 0.08, 0.12), M, 0, 1.56, 0); body.add(neck);
-    var head = new THREE.Group(); head.position.set(0, 1.72, 0); body.add(head);
-    head.add(mesh(sph(0.15), M));
-    var sL = mesh(sph(0.15, 12, 8), M, -0.34, 1.46, 0); sL.scale.set(1.15, 0.8, 1); body.add(sL);
-    var sR = mesh(sph(0.15, 12, 8), M, 0.34, 1.46, 0); sR.scale.set(1.15, 0.8, 1); body.add(sR);
-    var armL = limb(M, 0.66, 0.07, 0.055); armL.position.set(-0.36, 1.44, 0); armL.rotation.z = -0.12; body.add(armL);
-    var armR = limb(M, 0.66, 0.07, 0.055); armR.position.set(0.36, 1.44, 0); armR.rotation.z = 0.12; body.add(armR);
+    var belt = mesh(new THREE.TorusGeometry(0.175, 0.012, 6, 24), trim, 0, 0.97, 0); belt.rotation.x = Math.PI / 2; belt.scale.y = 0.7; body.add(belt);
+    var collar = mesh(new THREE.TorusGeometry(0.12, 0.012, 6, 20), trim, 0, 1.53, 0); collar.rotation.x = Math.PI / 2; collar.scale.y = 0.7; body.add(collar);
+    body.add(mesh(cyl(0.065, 0.075, 0.12), M, 0, 1.6, 0));
+    var head = new THREE.Group(); head.position.set(0, 1.74, 0); body.add(head);
+    var skull = mesh(sph(0.13, 16, 12), M); skull.scale.set(0.95, 1.08, 1); head.add(skull);
+    var jaw = mesh(sph(0.1, 12, 8), M, 0, -0.07, 0.03); jaw.scale.set(0.9, 0.7, 0.95); head.add(jaw);
+    /* pauldrons: layered half-domes */
+    [-1, 1].forEach(function (sd) {
+      var p = mesh(new THREE.SphereGeometry(0.16, 14, 8, 0, Math.PI * 2, 0, Math.PI / 2), M, 0.3 * sd, 1.45, 0); p.scale.set(1.05, 0.75, 0.9); p.rotation.z = -0.35 * sd; body.add(p);
+      var p2 = mesh(new THREE.SphereGeometry(0.13, 12, 6, 0, Math.PI * 2, 0, Math.PI / 2), M, 0.34 * sd, 1.38, 0); p2.scale.set(1.05, 0.6, 0.9); p2.rotation.z = -0.55 * sd; body.add(p2);
+      var edge = mesh(new THREE.TorusGeometry(0.155, 0.007, 4, 20, Math.PI), trim, 0.3 * sd, 1.45, 0); edge.rotation.z = -0.35 * sd; edge.scale.set(1.05, 0.9, 0.9); body.add(edge);
+    });
+    /* arms: upper, elbow, forearm, gauntlet */
+    function arm(sd) {
+      var a = new THREE.Group(); a.position.set(0.33 * sd, 1.42, 0);
+      a.add(segment(M, 0.32, 0.068, 0.055));
+      a.add(mesh(sph(0.058, 10, 8), M, 0, -0.32, 0));
+      var fa = segment(M, 0.28, 0.055, 0.048); fa.position.y = -0.33; a.add(fa);
+      var g = mesh(sph(0.058, 10, 8), M, 0, -0.62, 0.01); g.scale.set(1, 1.1, 1.15); a.add(g);
+      return a;
+    }
+    var armL = arm(-1); armL.rotation.z = -0.1; body.add(armL);
+    var armR = arm(1); armR.rotation.z = 0.1; body.add(armR);
     var eyeM = glowMat(opt.eye || 0xffffff);
-    var eL = mesh(box(0.06, 0.016, 0.02), eyeM, -0.055, 0.02, 0.135); head.add(eL);
-    var eR = mesh(box(0.06, 0.016, 0.02), eyeM, 0.055, 0.02, 0.135); head.add(eR);
-    var gl = glowSprite(opt.eyeGlow || opt.color, 0.35); gl.position.set(0, 0.02, 0.16); head.add(gl);
-    return { root: root, body: body, head: head, armL: armL, armR: armR, eyes: [eL, eR], eyeGlow: gl, torso: torso };
+    var eL = mesh(box(0.055, 0.014, 0.02), eyeM, -0.048, 0.015, 0.122); eL.rotation.z = 0.12; head.add(eL);
+    var eR = mesh(box(0.055, 0.014, 0.02), eyeM, 0.048, 0.015, 0.122); eR.rotation.z = -0.12; head.add(eR);
+    var gl = glowSprite(opt.eyeGlow || opt.color, 0.32); gl.position.set(0, 0.015, 0.15); head.add(gl);
+    /* a faint core light in the chest */
+    var core = glowSprite(opt.color, 0.22); core.position.set(0, 1.28, 0.2); core.material.opacity = 0.8; body.add(core);
+    return { root: root, body: body, head: head, armL: armL, armR: armR, eyes: [eL, eR], eyeGlow: gl, torso: torso, core: core };
   }
 
   /* ---------- class builders ---------- */
   var BUILD = {
     Knight: function (M, c, H) {
-      H.head.add(mesh(cyl(0.165, 0.165, 0.26, 12), M, 0, 0.04, 0));
-      H.head.add(mesh(box(0.2, 0.012, 0.02), glowMat(c), 0, 0.02, 0.165));
+      H.head.add(mesh(lathe([[0, 0.17], [0.11, 0.15], [0.15, 0.06], [0.15, -0.12], [0.12, -0.14], [0, -0.14]], 14), M, 0, 0.02, 0));
+      H.head.add(mesh(box(0.18, 0.012, 0.02), glowMat(c), 0, 0.015, 0.15));
       var plume = mesh(box(0.04, 0.24, 0.34), M, 0, 0.28, -0.06); plume.rotation.x = -0.5; H.head.add(plume); H.plume = plume;
-      var cape = mesh(clothPlane(0.72, 1.25), M, 0, 1.52, -0.2); cape.material = rimMat(c, 1, THREE.DoubleSide); H.body.add(cape); H.cape = cape;
+      var cape = mesh(clothPlane(0.72, 1.25), M, 0, 1.52, -0.2); cape.material = rimMat(c, 0.45, THREE.DoubleSide); H.body.add(cape); H.cape = cape;
       var sword = new THREE.Group();
       sword.add(mesh(box(0.06, 1.05, 0.015), M, 0, -0.62, 0));
       sword.add(mesh(box(0.012, 0.95, 0.018), glowMat(c), 0, -0.6, 0.004));
@@ -159,8 +192,8 @@
     Assassin: function (M, c, H) {
       var hood = mesh(sph(0.18, 12, 10), M, 0, 0.02, -0.02); hood.scale.set(1, 1.1, 1.15); H.head.add(hood);
       H.head.add(mesh(box(0.26, 0.09, 0.05), M, 0, -0.05, 0.13));
-      var s1 = mesh(clothPlane(0.1, 0.9, 2, 10), rimMat(c, 1, THREE.DoubleSide), 0.06, 1.6, -0.12); s1.rotation.y = 0.4; H.body.add(s1);
-      var s2 = mesh(clothPlane(0.08, 0.7, 2, 10), rimMat(c, 1, THREE.DoubleSide), -0.04, 1.58, -0.12); s2.rotation.y = -0.3; H.body.add(s2);
+      var s1 = mesh(clothPlane(0.1, 0.9, 2, 10), rimMat(c, 0.6, THREE.DoubleSide), 0.06, 1.6, -0.12); s1.rotation.y = 0.4; H.body.add(s1);
+      var s2 = mesh(clothPlane(0.08, 0.7, 2, 10), rimMat(c, 0.6, THREE.DoubleSide), -0.04, 1.58, -0.12); s2.rotation.y = -0.3; H.body.add(s2);
       H.scarves = [s1, s2];
       [H.armL, H.armR].forEach(function (a, i) {
         var d = new THREE.Group(); d.add(mesh(box(0.035, 0.38, 0.012), M, 0, -0.2, 0)); d.add(mesh(box(0.008, 0.34, 0.016), glowMat(c), 0, -0.2, 0.002));
@@ -249,7 +282,7 @@
       H.root.scale.setScalar(1.3);
       H.head.add(mesh(cyl(0.165, 0.165, 0.24, 12), M, 0, 0.03, 0));
       for (var i = 0; i < 7; i++) { var a = i / 7 * 6.283, sp = mesh(cone(0.035, 0.16 + (i % 2) * 0.08, 6), glowMat(0xffd166), Math.cos(a) * 0.16, 0.24, Math.sin(a) * 0.16); H.head.add(sp); }
-      var cape = mesh(clothPlane(1.05, 1.55, 8, 12), rimMat(0xffd166, 1.1, THREE.DoubleSide), 0, 1.55, -0.22); H.body.add(cape); H.cape = cape;
+      var cape = mesh(clothPlane(1.05, 1.55, 8, 12), rimMat(0xffb84d, 0.4, THREE.DoubleSide), 0, 1.55, -0.24); H.body.add(cape); H.cape = cape;
       var sword = new THREE.Group();
       sword.add(mesh(box(0.08, 1.5, 0.02), M, 0, 0.9, 0)); sword.add(mesh(box(0.016, 1.4, 0.024), glowMat(0xff3b5c), 0, 0.9, 0.004));
       sword.add(mesh(box(0.34, 0.05, 0.06), M, 0, 0.12, 0));
@@ -363,6 +396,8 @@
     var H;
     if (sh.monarch && MON[sh.monarch]) H = MON[sh.monarch](M, c);
     else { H = humanoid(M, { color: c }); (BUILD[sh.cls] || BUILD.Knight)(M, c, H); }
+    var bb = new THREE.Box3().setFromObject(H.root), ctr = bb.getCenter(new THREE.Vector3());
+    H.root.position.x -= ctr.x; H.root.position.z -= ctr.z;
     var fig = new THREE.Group(); fig.add(H.root);
     var auraCols = sh.monarch ? [0xffd166, 0xff3b5c, 0xa855f7, 0xc026d3] : [c, c, 0x2a0a52, 0xffffff];
     var au = aura(sh.monarch ? 110 : 46, auraCols, sh.monarch ? 0.95 : 0.55, sh.monarch ? 3.4 : 2.3);
@@ -441,7 +476,10 @@
     stage: function (el, shadows, onPick) {
       var renderer = makeRenderer(el), B = baseScene(), scene = B.scene;
       var camera = new THREE.PerspectiveCamera(34, 1, 0.1, 60);
-      var figs = [];
+      var figs = [], n = Math.min(shadows.length, SLOTS.length), cxs = 0, czs = 0, spread = 0;
+      for (var q = 0; q < n; q++) { cxs += SLOTS[q][0]; czs += SLOTS[q][1]; }
+      var CX = n ? cxs / n : 0, CZ = n ? czs / n : 0;
+      for (var q2 = 0; q2 < n; q2++) spread = Math.max(spread, Math.abs(SLOTS[q2][0] - CX), Math.abs(SLOTS[q2][1] - CZ));
       shadows.slice(0, SLOTS.length).forEach(function (sh, i) {
         var f = build(sh); f.position.set(SLOTS[i][0], 0, SLOTS[i][1]);
         f.rotation.y = -SLOTS[i][0] * 0.08; scene.add(f); figs.push(f);
@@ -467,10 +505,10 @@
       renderer.domElement.addEventListener("pointercancel", function () { sx = null; });
       var stop = loopFor(el, renderer, scene, camera, function (t, dt) {
         if (sx === null) { dragV *= 0.94; drag += dragV; drag *= 0.995; }
-        var ang = Math.sin(t * 0.18) * 0.32 + drag, R = 7.6;
-        camera.position.set(Math.sin(ang) * R, 2.7, Math.cos(ang) * R - 0.6);
-        camera.lookAt(0, 1.05, -1.0);
-        B.floor.rotation.z = t * 0.05;
+        var ang = Math.sin(t * 0.18) * 0.32 + drag, R = 5.2 + spread * 0.9;
+        camera.position.set(CX + Math.sin(ang) * R, 1.9 + spread * 0.25, CZ + Math.cos(ang) * R);
+        camera.lookAt(CX, 1.05, CZ);
+        B.floor.position.set(CX, 0, CZ); B.floor.rotation.z = t * 0.05;
         B.mist.userData.tick(t, dt);
         for (var i = 0; i < figs.length; i++) figs[i].userData.tick(t, dt);
       });
