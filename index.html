@@ -6320,7 +6320,7 @@
          against the rank minimum, read live from the app via
          window.__ksToday on every rotation. The rest is flavor —
          gate scan, neural link, perimeter, core, comms.
-         Crossfades every 7s; reduced motion swaps instantly.
+         Crossfades every 3.5s; reduced motion swaps instantly.
          Both texts in the bar glitch like the rest of the system:
          every few seconds the bar gets .glitching for a beat and
          "All systems nominal" + the current readout RGB-split and
@@ -6389,7 +6389,7 @@
             setLine(next);
             el.classList.remove("swap");
           }, 360);
-        }, 7000);
+        }, 3500);
         /* glitch loop: fires only while the bar is on screen (the
            showcase is display:none behind the boot screen and
            while a section is open, which nulls offsetParent) */
