@@ -2000,7 +2000,7 @@
          full fill fires the reboot — a plain tap does nothing, so
          the boot sequence can't restart by accident. */
       .replay-btn {
-        appearance: none; margin-top: 20px; position: relative; overflow: hidden;
+        appearance: none; margin-top: 12px; position: relative; overflow: hidden;
         background: var(--field); color: var(--lav);
         border: 1px solid var(--line); padding: 13px 26px;
         font-family: "Orbitron", sans-serif; font-weight: 700; font-size: 13px; letter-spacing: 0.26em; text-indent: 0.26em;
@@ -5193,7 +5193,7 @@
           a.cv.width = Math.round(w * dpr);
           a.cv.height = Math.round(h * dpr);
           a.ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-          var n = Math.max(30, Math.min(128, Math.floor((w * h) / 12800)));
+          var n = Math.max(30, Math.min(128, Math.floor((w * h) / 10240)));
           a.parts = [];
           for (var i = 0; i < n; i++) a.parts.push(ambientDot(w, h, true));
         }
