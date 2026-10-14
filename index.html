@@ -5089,7 +5089,7 @@
           var r = thBar.getBoundingClientRect();
           var cx = r.left + r.width / 2, cy = r.top + r.height / 2;
           var colors = ["#8f5ef8", "#c3b8fe", "#da78f5", "#6f63f6", "#f2ecff", "#ffffff"];
-          for (var bi = 0; bi < 26; bi++) {
+          for (var bi = 0; bi < 12; bi++) {
             var p = document.createElement("span");
             p.className = "w-particle";
             p.style.width = "6px"; p.style.height = "6px";
@@ -5101,18 +5101,15 @@
             p.style.background = c;
             p.style.boxShadow = "0 0 10px " + c;
             document.body.appendChild(p);
-            // bloom outward from the ring, then launch UP through the top edge
-            var bAng = Math.random() * Math.PI * 2, bRad = 14 + Math.random() * 22;
-            var bX = Math.cos(bAng) * bRad, bY = Math.sin(bAng) * bRad;
-            var upX = bX + (Math.random() * 120 - 60);
+            // slow launch UP through the top edge
+            var upX = Math.random() * 120 - 60;
             var upY = -(cy + 160 + Math.random() * 380);
-            var dur = 850 + Math.random() * 350, delay = bi * 10;
+            var dur = 1500 + Math.random() * 500, delay = bi * 18;
             try {
               var anim = p.animate([
                 { transform: "translate(0px, 0px) scale(1)", opacity: 1 },
-                { transform: "translate(" + bX.toFixed(1) + "px," + bY.toFixed(1) + "px) scale(1.25)", opacity: 1, offset: 0.22 },
-                { transform: "translate(" + upX.toFixed(1) + "px," + upY.toFixed(1) + "px) scale(0.35)", opacity: 0 }
-              ], { duration: dur, delay: delay, easing: "cubic-bezier(0.16, 0.7, 0.3, 1)", fill: "forwards" });
+                { transform: "translate(" + upX.toFixed(1) + "px," + upY.toFixed(1) + "px) scale(0.4)", opacity: 0 }
+              ], { duration: dur, delay: delay, easing: "cubic-bezier(0.25, 0.6, 0.35, 1)", fill: "forwards" });
               (function (el, an) { an.onfinish = function () { el.remove(); }; })(p, anim);
             } catch (err) {
               (function (el, dd) { setTimeout(function () { el.remove(); }, dd); })(p, dur + delay + 100);
