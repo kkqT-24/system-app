@@ -1934,6 +1934,7 @@
       }
       .t-input::placeholder { color: var(--ink-faint); text-transform: uppercase; font-size: 11px; letter-spacing: 0.14em; }
       .t-input:focus { outline: none; border-color: var(--line); box-shadow: 0 0 12px rgba(143, 94, 248, 0.3); }
+      textarea.t-input { resize: none; min-height: 64px; }
       .t-confirm, .t-cancel {
         appearance: none; padding: 9px 13px;
         font-family: "Share Tech Mono", monospace; font-size: 11px; letter-spacing: 0.18em; text-transform: uppercase;
@@ -2224,11 +2225,11 @@
               <div class="t-list"></div>
               <button type="button" class="t-add-btn">+ Add</button>
               <form class="t-form is-hidden">
-                <input class="t-input t-name-in" type="text" maxlength="48" placeholder="To do" aria-label="To do item" autocomplete="off" />
+                <textarea class="t-input t-name-in" rows="3" maxlength="600" placeholder="To do — one per line for a list" aria-label="To do items, one per line" autocomplete="off"></textarea>
                 <button type="submit" class="t-confirm">Add</button>
                 <button type="button" class="t-cancel">Cancel</button>
               </form>
-              <div class="t-hint mono">Hold an item to complete it &middot; Swipe left to remove</div>
+              <div class="t-hint mono">Hold to complete / undo &middot; Swipe left to remove &middot; One per line for a list</div>
             </section>
             <section class="section is-hidden" id="sec-workouts" aria-label="Workouts">
               <div class="s-name">Workouts</div>
@@ -4913,6 +4914,13 @@
           if (!RM) disperseTodoParticles(row);
           saveTodo();
         }
+        function undoTodo(idx, row) {
+          var item = TODO.items[idx];
+          if (!item || !item.done) return;
+          item.done = false;
+          row.classList.remove("done");
+          saveTodo();
+        }
         function bindTodoGestures(row, wrap, idx) {
           var pid = null, startX = 0, startY = 0, holdTimer = null, fired = false;
           function cancelHold() {
@@ -4923,7 +4931,7 @@
           row.addEventListener("pointerdown", function (e) {
             if (pid !== null) return;
             var item = TODO.items[idx];
-            if (!item || item.done) return;
+            if (!item) return;
             fired = false;
             pid = e.pointerId;
             startX = e.clientX; startY = e.clientY;
@@ -4933,7 +4941,8 @@
               holdTimer = null;
               row.classList.remove("holding");
               fired = true;
-              completeTodo(idx, row);
+              if (item.done) undoTodo(idx, row);
+              else completeTodo(idx, row);
             }, TODO_HOLD_MS);
           });
           row.addEventListener("pointermove", function (e) {
@@ -5010,10 +5019,14 @@
           });
           form.addEventListener("submit", function (e) {
             e.preventDefault();
-            var name = nameIn.value.trim();
-            if (!name) { nameIn.focus(); return; }
+            var text = nameIn.value.trim();
+            if (!text) { nameIn.focus(); return; }
             todoDayCheck();
-            TODO.items.push({ name: name.slice(0, 48), done: false });
+            var lines = text.split(/\n/);
+            for (var li = 0; li < lines.length; li++) {
+              var nm = lines[li].trim().slice(0, 48);
+              if (nm) TODO.items.push({ name: nm, done: false });
+            }
             saveTodo();
             renderTodo();
             form.classList.add("is-hidden");
