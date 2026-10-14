@@ -25,6 +25,7 @@
   /* ---------------- save ---------------- */
   var STATS = ["STR", "AGI", "VIT", "INT", "PER"];
   var STAT_NAMES = { STR: "Strength", AGI: "Agility", VIT: "Vitality", INT: "Intelligence", PER: "Perception" };
+  var STAT_COLORS = { STR: "#ff5a6e", AGI: "#3ee6a0", VIT: "#ffa24c", INT: "#5aa8ff", PER: "#c77dff" };
   var D = { v: 2, history: [], shadows: [], earned: { STR: 0, AGI: 0, VIT: 0, INT: 0, PER: 0 }, alloc: { STR: 0, AGI: 0, VIT: 0, INT: 0, PER: 0 }, extracted: {}, workoutDays: {}, settings: { sound: false } };
   try {
     var raw = JSON.parse(localStorage.getItem(KEY) || "null");
@@ -235,9 +236,11 @@
     for (var g = 1; g <= 4; g++) grid += '<polygon class="gr" points="' + STATS.map(function (_, i) { return pt(i, R * g / 4).join(","); }).join(" ") + '"/>';
     var axes = STATS.map(function (_, i) { var p = pt(i, R); return '<line class="ax" x1="' + cx + '" y1="' + cy + '" x2="' + p[0] + '" y2="' + p[1] + '"/>'; }).join("");
     var shape = STATS.map(function (k, i) { return pt(i, R * Math.min(1, statValue(k) / max)).join(","); }).join(" ");
-    var labels = STATS.map(function (k, i) { var p = pt(i, R + 16); return '<text x="' + p[0] + '" y="' + (p[1] + 4) + '">' + k + '</text>'; }).join("");
-    var dots = STATS.map(function (k, i) { var p = pt(i, R * Math.min(1, statValue(k) / max)); return '<circle cx="' + p[0] + '" cy="' + p[1] + '" r="3"/>'; }).join("");
-    return '<svg class="mx-radar" viewBox="0 0 220 210" aria-label="Stat chart">' + grid + axes + '<polygon class="sh" points="' + shape + '"/>' + dots + labels + '</svg>';
+    var labels = STATS.map(function (k, i) { var p = pt(i, R + 16); return '<text x="' + p[0] + '" y="' + (p[1] + 4) + '" fill="' + STAT_COLORS[k] + '">' + k + '</text>'; }).join("");
+    var dots = STATS.map(function (k, i) { var p = pt(i, R * Math.min(1, statValue(k) / max)); return '<circle cx="' + p[0] + '" cy="' + p[1] + '" r="3.4" fill="' + STAT_COLORS[k] + '" style="filter:drop-shadow(0 0 4px ' + STAT_COLORS[k] + ')"/>'; }).join("");
+    var spokes = STATS.map(function (k, i) { var p = pt(i, R * Math.min(1, statValue(k) / max)); return '<line x1="' + cx + '" y1="' + cy + '" x2="' + p[0] + '" y2="' + p[1] + '" stroke="' + STAT_COLORS[k] + '" stroke-width="1.4" stroke-opacity="0.7"/>'; }).join("");
+    var defs = '<defs><linearGradient id="mxRadG" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ff5a6e" stop-opacity="0.45"/><stop offset="0.35" stop-color="#c77dff" stop-opacity="0.4"/><stop offset="0.7" stop-color="#5aa8ff" stop-opacity="0.4"/><stop offset="1" stop-color="#3ee6a0" stop-opacity="0.45"/></linearGradient></defs>';
+    return '<svg class="mx-radar" viewBox="0 0 220 210" aria-label="Stat chart">' + defs + grid + axes + '<polygon class="sh" points="' + shape + '"/>' + spokes + dots + labels + '</svg>';
   }
   function fmtTime(t) { var d = new Date(t); return d.toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit" }); }
   function fmtDay(t) {
@@ -267,7 +270,8 @@
     if (stTab === "stats") {
       body = '<div class="mx-st-stats">' + radar() + '<div class="mx-st-list">' +
         STATS.map(function (k) {
-          return '<div class="mx-st-row"><span class="nm"><b>' + k + '</b> ' + STAT_NAMES[k] + '</span><span class="val">' + statValue(k) + '</span>' +
+          var vmax = Math.max.apply(null, STATS.map(statValue));
+          return '<div class="mx-st-row" style="--sc:' + STAT_COLORS[k] + '"><span class="nm"><b>' + k + '</b> ' + STAT_NAMES[k] + '<i class="bar"><i style="width:' + Math.round(statValue(k) / vmax * 100) + '%"></i></i></span><span class="val">' + statValue(k) + '</span>' +
             '<button type="button" class="plus" data-stat="' + k + '"' + (fp ? "" : " disabled") + ' aria-label="Add a point to ' + STAT_NAMES[k] + '">+</button></div>';
         }).join("") +
         '<div class="mx-st-pts">Available points <b>' + fp + '</b></div>' +
@@ -329,7 +333,15 @@
       return '<div class="mx-sh-card" style="--tc:' + T.color + '">' + shadowFigure(sh) +
         '<div class="nm">' + esc(sh.name) + '</div><div class="cl">' + T.name + ' · ' + esc(sh.cls) + '</div><div class="pw">PWR ' + sh.power + '</div></div>';
     }).join("");
-    root.innerHTML = '<div class="mx-sh-grid">' + cards + '</div>' + rules;
+    /* the army itself: your strongest shadows stand in formation, the
+       strongest front and centre, the rest fading back into the mist */
+    var ranked = D.shadows.slice().sort(function (x, y) { return y.power - x.power; }).slice(0, 7);
+    var slots = [[50, 92, 1], [32, 70, 0.8], [68, 70, 0.8], [17, 56, 0.65], [83, 56, 0.65], [6, 46, 0.55], [94, 46, 0.55]];
+    var army = '<div class="mx-army"><div class="cap">Shadow army · ' + D.shadows.length + ' strong</div>' + ranked.map(function (sh, i) {
+      var sl = slots[i];
+      return '<div class="u" style="left:' + sl[0] + '%;width:' + sl[1] + 'px;z-index:' + (10 - i) + ';opacity:' + (0.55 + sl[2] * 0.45).toFixed(2) + ';animation-delay:-' + (i * 0.7).toFixed(1) + 's">' + shadowFigure(sh) + '</div>';
+    }).join("") + '</div>';
+    root.innerHTML = army + '<div class="mx-sh-grid">' + cards + '</div>' + rules;
   }
 
   /* ---------------- tiles ---------------- */
@@ -347,7 +359,12 @@
     if (!headEl) return;
     var s = st();
     if (!s) return;
-    if (!brief) { brief = el("div", "mx-brief"); headEl.appendChild(brief); }
+    if (!brief) {
+      brief = el("div", "mx-brief");
+      /* the briefing lives inside the weather card, under High / Low / Wind */
+      var card = $("#phaseGreet .weather-card"), note = card ? $(".weather-note", card) : null;
+      if (card) card.insertBefore(brief, note); else headEl.appendChild(brief);
+    }
     var dDone = s.daily.filter(function (q) { return q.done; }).length;
     var line;
     if (s.secretActive) line = "A secret quest is waiting for you.";
@@ -558,7 +575,15 @@
   /* panels refresh whenever they open */
   ["sec-status", "sec-shadows"].forEach(function (id) {
     var sec = document.getElementById(id);
-    if (sec) new MutationObserver(function () { if (!sec.classList.contains("is-hidden")) { renderStatus(); renderShadows(); } }).observe(sec, { attributes: true, attributeFilter: ["class"] });
+    /* re-render only when the panel goes from hidden to shown — re-rendering on
+       other class flips (like the swipe-to-close drag) would pull the touched
+       element out from under the finger and break the swipe */
+    if (sec) new MutationObserver(function (list) {
+      list.forEach(function (m) {
+        var was = /\bis-hidden\b/.test(m.oldValue || ""), now = sec.classList.contains("is-hidden");
+        if (was && !now) { renderStatus(); renderShadows(); }
+      });
+    }).observe(sec, { attributes: true, attributeFilter: ["class"], attributeOldValue: true });
   });
   setInterval(function () { checkDaily(); renderTiles(); }, 5000);
   setTimeout(checkDaily, 4000);

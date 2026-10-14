@@ -324,10 +324,38 @@
   }
 
   /* ============ BOOT ============ */
-  function onBootFly() {
+  /* entering: everything launches from the 100% core itself — the zoom is
+     anchored on the core, light streaks burst out of its rim, shockwaves
+     ripple from its center */
+  function coreCenter() {
+    var c = document.getElementById("coreBtn") || document.getElementById("hud");
+    if (!c) return { x: W / 2, y: H * 0.42, r: 60 };
+    var r = c.getBoundingClientRect();
+    return { x: r.left + r.width / 2, y: r.top + r.height / 2, r: Math.min(r.width, r.height) / 2 };
+  }
+  function onBootFly(inner) {
+    var c = coreCenter();
+    if (inner) {
+      var ir = inner.getBoundingClientRect();
+      inner.style.transformOrigin = (c.x - ir.left).toFixed(0) + "px " + (c.y - ir.top).toFixed(0) + "px";
+    }
     flash("rgba(195,184,254,0.9)", 0.35, 500);
-    warp(W / 2, H * 0.42, 1000, 9);
-    ring(W / 2, H * 0.42, { r1: Math.max(W, H), life: 1000, width: 3 });
+    ring(c.x, c.y, { r0: c.r * 0.6, r1: c.r * 1.6, life: 380, width: 4, color: "#ffffff" });
+    ring(c.x, c.y, { r0: c.r, r1: Math.max(W, H), life: 1000, width: 3, delay: 80 });
+    spark(c.x, c.y, { n: 40, min: 6, max: 16, life: 700, gravity: 0, tail: 6, jx: 6, jy: 6 });
+    /* streaks start on the core's rim, not the screen's middle */
+    var t0 = performance.now();
+    (function emit() {
+      var k = (performance.now() - t0) / 900;
+      if (k > 1) return;
+      for (var i = 0; i < 8; i++) {
+        var a = rnd(0, Math.PI * 2), d = c.r * rnd(0.5, 1.05);
+        streaks.push({ x: c.x + Math.cos(a) * d, y: c.y + Math.sin(a) * d, a: a, v: rnd(5, 11) * (1 + k * 2.5), acc: 1.08, len: rnd(16, 50),
+          life: 0, max: rnd(420, 700), c: pick(PAL), w: rnd(0.8, 2.2) });
+      }
+      go();
+      requestAnimationFrame(emit);
+    })();
     buzz(25);
   }
   function onBootDissolve() {
@@ -462,7 +490,7 @@
         } else if (t.id === "main") {
           if (added(m, "arrive") || removed(m, "is-hidden")) onMainArrive();
         } else if (t.classList.contains("boot-inner")) {
-          if (added(m, "fly")) onBootFly();
+          if (added(m, "fly")) onBootFly(t);
           if (added(m, "dissolve")) onBootDissolve();
         } else if (t.classList.contains("q-level")) {
           if (added(m, "level-glow")) onLevelUp(t);
