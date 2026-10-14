@@ -6088,6 +6088,25 @@
         } catch (e) {}
         /* count this launch (deferred a beat so boot doesn't fight the popup) */
         setTimeout(sqCountOpen, 1200);
+        /* hidden test hook: triple-tap the version label to force a quest */
+        (function () {
+          try {
+            var taps = 0, lastTap = 0;
+            document.addEventListener("click", function (e) {
+              var t = e.target;
+              if (t && t.textContent && /Core v1\.1/.test(t.textContent)) {
+                var now = Date.now();
+                taps = (now - lastTap < 800) ? taps + 1 : 1;
+                lastTap = now;
+                if (taps >= 3) {
+                  taps = 0;
+                  if (!SECRET.active) sqTrigger();
+                  else sqShow();
+                }
+              } else { taps = 0; }
+            });
+          } catch (e) {}
+        })();
       })();
     </script>
     <!-- Three.js (classic builds) for the Vehicle tab's 3D viewer -->
