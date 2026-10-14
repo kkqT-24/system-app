@@ -305,3 +305,87 @@ body.tab-open .main-controls .replay-btn { display: none !important; }
 .mx-sh-fig .wisps path:nth-child(3) { animation-delay: -1.8s; animation-duration: 3.4s; }
 @keyframes mxWisp { 0% { stroke-dashoffset: 50; opacity: 0; } 20% { opacity: 0.75; } 100% { stroke-dashoffset: 0; opacity: 0; } }
 .mx-sh-fig.still .wisps { display: none; }
+
+/* boot info card: one steady position, no mid-animation re-measure */
+#phaseGreet .weather-card { translate: 0 -18px !important; }
+/* the dive into the hub: a softer zoom with a gentle blur */
+.boot-inner.fly { animation: mxFly 1.1s cubic-bezier(0.45, 0, 0.2, 1) forwards !important; }
+@keyframes mxFly {
+  0% { transform: scale(1); opacity: 1; filter: blur(0) brightness(1); }
+  40% { opacity: 0.9; filter: blur(0.5px) brightness(1.25); }
+  100% { transform: scale(2.6); opacity: 0; filter: blur(8px) brightness(1.6); }
+}
+#ringBurst.go { animation: mxRingSoft 1.4s cubic-bezier(0.2, 0.7, 0.3, 1) forwards !important; }
+@keyframes mxRingSoft { 0% { opacity: 0.7; transform: scale(0.6); } 100% { opacity: 0; transform: scale(6); } }
+
+/* ---------- Monarch's Guard ---------- */
+.mx-guard { margin: 4px 0 12px; padding: 12px 10px; border: 1px solid rgba(255, 209, 102, 0.4);
+  background: radial-gradient(ellipse at 50% 0%, rgba(255, 209, 102, 0.1), transparent 60%), rgba(10, 4, 20, 0.7);
+  clip-path: polygon(10px 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%, 0 10px); }
+.mx-guard-h { display: flex; justify-content: space-between; font-family: "Share Tech Mono", monospace; font-size: 10px; letter-spacing: 0.26em; text-transform: uppercase; color: rgba(255, 209, 102, 0.7); margin-bottom: 8px; }
+.mx-guard-h span:first-child { color: #ffd166; text-shadow: 0 0 10px rgba(255, 209, 102, 0.6); }
+.mx-guard-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; }
+.mx-guard .g { appearance: none; background: none; border: 0; padding: 0; color: inherit; font: inherit; display: flex; flex-direction: column; align-items: center; text-align: center; cursor: pointer; }
+.mx-guard .g b { font-family: "Rajdhani", sans-serif; font-size: 11.5px; font-weight: 700; color: #fff3cf; letter-spacing: 0.04em; margin-top: 2px; }
+.mx-guard .g i { font-style: normal; font-family: "Share Tech Mono", monospace; font-size: 7.5px; letter-spacing: 0.12em; color: rgba(255, 209, 102, 0.7); text-transform: uppercase; line-height: 1.3; }
+.mx-guard .g.off { opacity: 0.55; cursor: default; }
+.mx-guard .g.off .mx-sh-fig { filter: grayscale(1) brightness(0.45); }
+.mx-guard .g.off b { color: rgba(255, 255, 255, 0.4); }
+.mx-sh-fig.monarch .aura .fl { animation-duration: 1.2s; }
+.mx-sh-fig.monarch .body { filter: drop-shadow(0 0 2px #ffd166) drop-shadow(0 0 8px rgba(168, 85, 247, 0.8)); }
+.mx-sh-fig.monarch .bolts path { opacity: 0; animation: mxBolt 2.6s steps(1) infinite; filter: drop-shadow(0 0 3px #c084fc); }
+.mx-sh-fig.monarch .bolts path:nth-child(2) { animation-delay: -0.9s; }
+.mx-sh-fig.monarch .bolts path:nth-child(3) { animation-delay: -1.7s; }
+@keyframes mxBolt { 0%, 86%, 100% { opacity: 0; } 87%, 89% { opacity: 1; } 88% { opacity: 0.2; } }
+.mx-sh-fig.monarch .eyes { filter: drop-shadow(0 0 2px #fff) drop-shadow(0 0 5px #ffd166) drop-shadow(0 0 9px #a855f7); }
+.mx-sh-fig.monarch .halo { stroke: #ffd166; filter: drop-shadow(0 0 4px #ffd166); }
+.mx-sh-fig .cape, .mx-sh-fig .wingL, .mx-sh-fig .wingR, .mx-sh-fig .raise, .mx-sh-fig .neck, .mx-sh-fig .tail { transform-box: view-box; }
+.mx-sh-fig .cape { transform-origin: 50px 34px; animation: mxCape 3.2s ease-in-out infinite; }
+@keyframes mxCape { 50% { transform: scaleX(1.05) skewX(2deg); } }
+.mx-sh-fig .wingL { transform-origin: 48px 50px; animation: mxWingL 2.4s ease-in-out infinite; }
+.mx-sh-fig .wingR { transform-origin: 52px 50px; animation: mxWingR 2.4s ease-in-out infinite; }
+@keyframes mxWingL { 50% { transform: rotate(8deg) scaleY(0.92); } }
+@keyframes mxWingR { 50% { transform: rotate(-8deg) scaleY(0.92); } }
+.mx-sh-fig .raise { transform-origin: 64px 46px; animation: mxRaise 3s ease-in-out infinite; }
+@keyframes mxRaise { 50% { transform: rotate(-5deg); } }
+.mx-sh-fig .neck { transform-origin: 46px 58px; animation: mxNeck 3.6s ease-in-out infinite; }
+@keyframes mxNeck { 50% { transform: rotate(-4deg); } }
+.mx-sh-fig .tail { transform-origin: 66px 100px; animation: mxTail 2.8s ease-in-out infinite; }
+@keyframes mxTail { 50% { transform: rotate(-7deg); } }
+.mx-arise.monarch { background: radial-gradient(ellipse at 50% 55%, rgba(80, 40, 10, 0.7), rgba(30, 6, 60, 0.85) 40%, rgba(1, 0, 4, 0.97) 75%); }
+.mx-arise.monarch .mx-ar-word { color: #fff6dc; text-shadow: 0 0 18px #ffd166, 0 0 46px #a855f7, 0 0 90px #7c3aed; }
+.mx-arise.monarch .mx-ar-card .mx-sh-fig { width: 200px; }
+
+/* ---------- reboot: CRT power-down / power-up ---------- */
+#main.mx-powerdown { animation: mxPowerDown 1.4s cubic-bezier(0.6, 0, 0.3, 1) forwards; transform-origin: 50% 50vh; }
+@keyframes mxPowerDown {
+  0% { transform: none; filter: none; }
+  12% { transform: translateX(-4px) skewX(-2deg); filter: drop-shadow(-4px 0 0 rgba(255, 0, 128, 0.7)) drop-shadow(4px 0 0 rgba(0, 220, 255, 0.7)); }
+  20% { transform: translateX(3px); filter: none; }
+  44% { transform: scaleY(1); filter: brightness(1.2); }
+  62% { transform: scaleY(0.004) scaleX(1); filter: brightness(4); }
+  78% { transform: scaleY(0.004) scaleX(0.002); filter: brightness(6); }
+  100% { transform: scaleY(0.004) scaleX(0.002); filter: brightness(6); opacity: 0; }
+}
+.mx-reboot { position: fixed; inset: 0; z-index: 120; pointer-events: none; }
+.mx-reboot .msg { position: absolute; left: 0; right: 0; top: 46%; text-align: center; font-family: "Share Tech Mono", monospace; font-size: 12px; letter-spacing: 0.28em; color: #c3b8fe; text-transform: uppercase; text-shadow: 0 0 10px #8f5ef8; opacity: 0; }
+.mx-reboot .msg span { animation: blinkDot 0.5s steps(2) infinite; }
+.mx-reboot.a1 .msg { animation: mxMsg 0.6s steps(6) forwards; }
+@keyframes mxMsg { 0% { opacity: 0; } 30% { opacity: 1; } 60% { opacity: 0.4; } 100% { opacity: 1; } }
+.mx-reboot.a2 .msg { opacity: 0 !important; transition: opacity 0.15s; animation: none; }
+.mx-reboot .line { position: absolute; left: 0; right: 0; top: 50%; height: 2px; margin-top: -1px; background: #fff; box-shadow: 0 0 18px #c3b8fe, 0 0 40px #8f5ef8; opacity: 0; transform: scaleX(1); }
+.mx-reboot.a2 .line { animation: mxLine 0.45s ease-out 0.25s forwards; }
+@keyframes mxLine { from { opacity: 0; } to { opacity: 1; } }
+.mx-reboot.a3 .line { animation: none; opacity: 1; transform: scaleX(0); transition: transform 0.3s cubic-bezier(0.7, 0, 0.3, 1); }
+.mx-reboot .dot { position: absolute; left: 50%; top: 50%; width: 8px; height: 8px; margin: -4px; border-radius: 50%; background: #fff; box-shadow: 0 0 14px #fff, 0 0 34px #c3b8fe, 0 0 60px #8f5ef8; opacity: 0; }
+.mx-reboot.a3 .dot { animation: mxDot 0.6s ease-out 0.25s forwards; }
+@keyframes mxDot { 0% { opacity: 0; transform: scale(0.5); } 30% { opacity: 1; transform: scale(1.4); } 100% { opacity: 0; transform: scale(0.2); } }
+.mx-reboot .top, .mx-reboot .bot { position: absolute; left: 0; right: 0; height: 50%; background: #000; opacity: 0; }
+.mx-reboot .top { top: 0; } .mx-reboot .bot { bottom: 0; }
+.mx-reboot.a4 .top, .mx-reboot.a4 .bot { opacity: 1; transition: opacity 0.2s; }
+.mx-reboot.a5 .top { animation: mxOpenTop 0.8s cubic-bezier(0.7, 0, 0.2, 1) forwards; }
+.mx-reboot.a5 .bot { animation: mxOpenBot 0.8s cubic-bezier(0.7, 0, 0.2, 1) forwards; }
+.mx-reboot.a5 .top { box-shadow: 0 2px 0 #fff, 0 4px 24px #8f5ef8; }
+.mx-reboot.a5 .bot { box-shadow: 0 -2px 0 #fff, 0 -4px 24px #8f5ef8; }
+@keyframes mxOpenTop { from { transform: none; opacity: 1; } to { transform: translateY(-101%); opacity: 1; } }
+@keyframes mxOpenBot { from { transform: none; opacity: 1; } to { transform: translateY(101%); opacity: 1; } }

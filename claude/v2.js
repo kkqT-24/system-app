@@ -84,7 +84,8 @@
     { id: "elite", name: "Elite", min: 3, color: "#6f9bff", base: 250 },
     { id: "knight", name: "Knight", min: 7, color: "#a855f7", base: 600 },
     { id: "commander", name: "Commander", min: 14, color: "#e879f9", base: 1200 },
-    { id: "marshal", name: "Marshal", min: 30, color: "#ffd166", base: 2500 }
+    { id: "marshal", name: "Marshal", min: 30, color: "#ffd166", base: 2500 },
+    { id: "monarch", name: "Monarch", min: Infinity, color: "#ffd166", base: 9000 }
   ];
   function tierFor(streak) {
     var t = 0;
@@ -157,6 +158,7 @@
   };
   var figN = 0;
   function shadowFigure(sh, still) {
+    if (sh.monarch) { var mm = monarchByKey(sh.monarch); if (mm) return monarchFigure(mm, still); }
     var T = TIERS[sh.tier] || TIERS[0], c = T.color, id = "f" + (++figN);
     var body = BODIES[sh.cls] || BODIES.Knight;
     var flames = "";
@@ -179,6 +181,100 @@
       '<ellipse cx="50" cy="109" rx="30" ry="3" fill="#000" opacity="0.8"/>' +
       motes + '</svg>';
   }
+  /* ---------------- MONARCH'S GUARD: four legendary shadows ----------------
+     Not rolled at random — each answers only when you earn it. */
+  var MONARCHS = [
+    { key: "regent", name: "Aurex, the Shadow Regent", cls: "Regent", need: "Reach Rank S", power: 9000,
+      eyes: [[45.5, 23.5], [54.5, 23.5]],
+      body: '<path d="M39 15l3-9 4 6 4-10 4 10 4-6 3 9z"/><path d="M40 17q10-7 20 0v15q-10 8-20 0z"/>' +
+        '<path class="cape" d="M50 34C28 36 8 62 2 110h96C92 62 72 36 50 34z"/>' +
+        '<path d="M37 38h26l4 40-7 30H40l-7-30zM24 46q8-12 20-6l-2 12-20 4zM76 46q-8-12-20-6l2 12 20 4z"/>' +
+        '<g class="raise"><path d="M63 44l24-38 2.2 1.4-24 38z"/><path d="M60 40l10 6-1.4 2.2-10-6z"/></g>',
+      det: "M50 18v12M43 25h14M40 50h20M42 58h16M44 66h12M36 80h28M20 80l-8 28M80 80l8 28M30 70l-10 38M70 70l10 38" },
+    { key: "wyrm", name: "Vorhal, Wyrm of the Abyss", cls: "Wyrm", need: "Hold a 30-day workout streak", power: 12000,
+      eyes: [[33, 17], [38, 16]],
+      body: '<g class="wingL"><path d="M50 52C32 22 10 16 2 28c10 0 16 5 19 13C11 39 5 45 3 54c12-6 22-4 31 6z"/></g>' +
+        '<g class="wingR"><path d="M50 52C68 22 90 16 98 28c-10 0-16 5-19 13 10-2 16 4 18 13-12-6-22-4-31 6z"/></g>' +
+        '<path d="M37 60q13-10 26 0l7 30q-20 17-40 0z"/>' +
+        '<path class="neck" d="M45 58C40 42 47 30 42 21l-14-3 9-3 5-7 4 8c7 8 5 22 9 41z"/>' +
+        '<path class="tail" d="M62 94c14 6 25 1 34 10-12-1-24 5-37-3z"/>',
+      det: "M8 30l14 10M92 30l-14 10M14 46l16 8M86 46l-16 8M40 70h20M38 78h24M40 86h20M30 16l4-2" },
+    { key: "archon", name: "Seraphine, Archon of Night", cls: "Archon", need: "Raise 25 shadows", power: 10500,
+      eyes: [[45.5, 27], [54.5, 27]],
+      body: '<ellipse class="halo" cx="50" cy="9" rx="13" ry="3.4" fill="none" stroke-width="1.6"/>' +
+        '<g class="wingL"><path d="M48 42C34 22 14 6 3 10c6 8 10 17 12 27 8-2 17 0 33 7zM46 54C34 50 18 52 8 62c10 0 18 2 24 8 4-6 8-10 14-12z"/></g>' +
+        '<g class="wingR"><path d="M52 42C66 22 86 6 97 10c-6 8-10 17-12 27-8-2-17 0-33 7zM54 54C66 50 82 52 92 62c-10 0-18 2-24 8-4-6-8-10-14-12z"/></g>' +
+        '<path d="M50 14q12 4 10 22l-5 6H45l-5-6q-2-18 10-22z"/><path d="M36 44h28l11 66H25z"/>',
+      det: "M40 36q10 6 20 0M38 60h24M34 80q16 6 32 0M30 100q20 6 40 0M50 44v64M16 18l18 18M84 18l-18 18" },
+    { key: "fenris", name: "Fenrath, the Black Wolf", cls: "Wolf", need: "Clear every daily quest 7 days in a row", power: 8000,
+      eyes: [[44, 40], [56, 40]],
+      body: '<path d="M28 108c-3-22 0-40 11-52l-6-26 11 13q6-3 12 0l11-13-6 26c11 12 14 30 11 52z"/>' +
+        '<path d="M40 50l-12-4 8 8-10 2 12 4zM60 50l12-4-8 8 10 2-12 4z"/><path d="M44 52l6 12 6-12z"/>' +
+        '<path class="tail" d="M70 104c12-2 22-12 22-28-6 10-14 14-24 16z"/>',
+      det: "M45 46l5 4 5-4M40 62l-6 14M60 62l6 14M50 68v38M36 90h28" }
+  ];
+  function monarchFigure(m, still) {
+    var id = "m" + (++figN), gold = "#ffd166", vio = "#a855f7";
+    var flames = "";
+    for (var i = 0; i < 9; i++) {
+      var x = 10 + i * 10, h = 40 + (i % 3) * 14 + (i === 4 ? 22 : 0);
+      flames += '<path class="fl" style="animation-delay:-' + (i * 0.29).toFixed(2) + 's;transform-origin:' + x + 'px 110px" d="M' + (x - 10) + ' 110 Q' + (x - 6) + ' ' + (110 - h * 0.6) + ' ' + x + ' ' + (110 - h) + ' Q' + (x + 6) + ' ' + (110 - h * 0.6) + ' ' + (x + 10) + ' 110Z" fill="url(#' + id + (i % 2 ? "v" : "g") + ')"/>';
+    }
+    var bolts = '<g class="bolts" fill="none" stroke="#f3e8ff" stroke-width="0.9" stroke-linejoin="round">' +
+      '<path d="M14 40l6 6-4 4 7 8-3 3 6 7"/><path d="M86 34l-5 7 4 4-7 7 3 4-6 8"/><path d="M50 -2l-3 6 4 2-4 6"/></g>';
+    var eyes = m.eyes.map(function (e) { return '<ellipse cx="' + e[0] + '" cy="' + e[1] + '" rx="2.8" ry="1"/>'; }).join("");
+    return '<svg class="mx-sh-fig monarch mon-' + m.key + (still ? " still" : "") + '" viewBox="0 0 100 112" aria-hidden="true" style="--tc:' + gold + ';--tv:' + vio + '">' +
+      '<defs><linearGradient id="' + id + 'g" x1="0" y1="1" x2="0" y2="0"><stop offset="0" stop-color="' + gold + '" stop-opacity="0.85"/><stop offset="0.5" stop-color="#5b1a8a" stop-opacity="0.6"/><stop offset="1" stop-color="#05010d" stop-opacity="0"/></linearGradient>' +
+      '<linearGradient id="' + id + 'v" x1="0" y1="1" x2="0" y2="0"><stop offset="0" stop-color="' + vio + '" stop-opacity="0.85"/><stop offset="0.55" stop-color="#1a0638" stop-opacity="0.5"/><stop offset="1" stop-color="#05010d" stop-opacity="0"/></linearGradient>' +
+      '<radialGradient id="' + id + 'r" cx="50%" cy="58%" r="55%"><stop offset="0" stop-color="' + gold + '" stop-opacity="0.35"/><stop offset="0.6" stop-color="' + vio + '" stop-opacity="0.18"/><stop offset="1" stop-color="' + vio + '" stop-opacity="0"/></radialGradient></defs>' +
+      '<ellipse cx="50" cy="62" rx="52" ry="50" fill="url(#' + id + 'r)"/>' +
+      '<g class="aura">' + flames + '</g>' + bolts +
+      '<g class="body" fill="#020007" stroke="' + gold + '" stroke-opacity="0.85" stroke-width="0.8" stroke-linejoin="round">' + m.body + '</g>' +
+      '<path class="det" d="' + m.det + '" fill="none" stroke="' + gold + '" stroke-width="0.55" stroke-linecap="round"/>' +
+      '<g class="eyes" fill="#fff6d6">' + eyes + '</g>' +
+      '<ellipse cx="50" cy="110" rx="36" ry="3" fill="#000" opacity="0.85"/></svg>';
+  }
+  function monarchByKey(k) { for (var i = 0; i < MONARCHS.length; i++) if (MONARCHS[i].key === k) return MONARCHS[i]; return null; }
+  function bestDayRun() {
+    var days = Object.keys(D.extracted).filter(function (k) { return D.extracted[k] && D.extracted[k] !== "pending"; }).sort();
+    var best = 0, run = 0, prev = null;
+    days.forEach(function (d) {
+      var t = new Date(d + "T12:00:00").getTime();
+      run = prev !== null && Math.round((t - prev) / 86400000) === 1 ? run + 1 : 1;
+      prev = t; if (run > best) best = run;
+    });
+    return best;
+  }
+  function monarchEarned(m, s) {
+    if (m.key === "regent") return s.rank === "S";
+    if (m.key === "wyrm") return (s.streak || 0) >= 30;
+    if (m.key === "archon") return D.shadows.filter(function (x) { return !x.monarch; }).length >= 25;
+    if (m.key === "fenris") return bestDayRun() >= 7;
+    return false;
+  }
+  function hasMonarch(k) { return D.shadows.some(function (x) { return x.monarch === k; }); }
+  function monarchShadow(m, preview) {
+    return { id: "M" + m.key + (preview ? "p" : ""), monarch: m.key, name: m.name, cls: m.cls, tier: 5, power: m.power, t: Date.now(), day: (st() || {}).day || "", preview: !!preview };
+  }
+  var monarchBusy = false;
+  function checkMonarchs() {
+    var s = st(), mainEl = document.getElementById("main");
+    if (!s || monarchBusy || !mainEl || mainEl.classList.contains("is-hidden") || document.hidden || document.querySelector(".mx-arise")) return;
+    for (var i = 0; i < MONARCHS.length; i++) {
+      var m = MONARCHS[i];
+      if (!hasMonarch(m.key) && monarchEarned(m, s)) {
+        var sh = monarchShadow(m, false);
+        D.shadows.push(sh); save();
+        log("shadow", "A Monarch's shadow answered — " + m.name, { tier: 5 });
+        renderShadows(); renderTiles();
+        monarchBusy = true;
+        arise(sh, false);
+        setTimeout(function () { monarchBusy = false; }, 4000);
+        return;
+      }
+    }
+  }
+
   function extract(preview) {
     var s = st() || { streak: 0, day: "" };
     var eff = (s.streak || 0) + 1; /* today's cleared day counts */
@@ -207,11 +303,12 @@
   /* ---------------- ARISE cinematic ---------------- */
   function arise(sh, preview) {
     var T = TIERS[sh.tier];
-    var ov = el("div", "mx-arise" + (RM ? " rm" : ""), '' +
+    var isMon = !!sh.monarch;
+    var ov = el("div", "mx-arise" + (RM ? " rm" : "") + (isMon ? " monarch" : ""), '' +
       '<div class="mx-ar-smoke"><i></i><i></i><i></i><i></i></div>' +
       '<div class="mx-ar-word">Arise</div>' +
       '<div class="mx-ar-card" style="--tc:' + T.color + '">' +
-      '<div class="mx-ar-k">' + (preview ? "Preview · not saved" : "Shadow extraction complete") + '</div>' +
+      '<div class="mx-ar-k">' + (preview ? "Preview · not saved" : isMon ? "A Monarch's shadow answers your call" : "Shadow extraction complete") + '</div>' +
       shadowFigure(sh) +
       '<div class="mx-ar-name">' + esc(sh.name) + '</div>' +
       '<div class="mx-ar-meta">' + esc(T.name) + ' · ' + esc(sh.cls) + ' · Power ' + sh.power + '</div>' +
@@ -385,10 +482,16 @@
     /* the codex: every class × tier is a figure to collect */
     var have = {};
     D.shadows.forEach(function (sh) { have[sh.cls + "|" + sh.tier] = (have[sh.cls + "|" + sh.tier] || 0) + 1; });
-    var found = Object.keys(have).length, total = CLASSES.length * TIERS.length;
-    var codex = '<div class="mx-codex"><div class="mx-codex-h"><span>Codex</span><span><b>' + found + '</b> / ' + total + ' discovered</span></div>' +
+    var found = Object.keys(have).filter(function (k) { return !/\|5$/.test(k); }).length, total = CLASSES.length * 5;
+    var guard = '<div class="mx-guard"><div class="mx-guard-h"><span>Monarch\'s Guard</span><span>' + MONARCHS.filter(function (m) { return hasMonarch(m.key); }).length + ' / ' + MONARCHS.length + '</span></div><div class="mx-guard-row">' +
+      MONARCHS.map(function (m) {
+        var own = hasMonarch(m.key);
+        return own ? '<button type="button" class="g on" data-sh="M' + m.key + '">' + monarchFigure(m) + '<b>' + esc(m.name.split(",")[0]) + '</b><i>' + esc(m.cls) + '</i></button>'
+          : '<div class="g off">' + monarchFigure(m, true) + '<b>???</b><i>' + esc(m.need) + '</i></div>';
+      }).join("") + '</div></div>';
+    var codex = guard + '<div class="mx-codex"><div class="mx-codex-h"><span>Codex</span><span><b>' + found + '</b> / ' + total + ' discovered</span></div>' +
       '<div class="mx-codex-bar"><i style="width:' + (found / total * 100).toFixed(1) + '%"></i></div><div class="mx-codex-grid">' +
-      TIERS.map(function (t, ti) {
+      TIERS.slice(0, 5).map(function (t, ti) {
         return '<div class="mx-codex-tier" style="color:' + t.color + '">' + t.name + '</div>' + CLASSES.map(function (cl) {
           var n = have[cl + "|" + ti];
           return n ? '<div class="cx on" title="' + t.name + " " + cl + '">' + shadowFigure({ id: "c", tier: ti, cls: cl }, true) + (n > 1 ? '<em>×' + n + '</em>' : "") + '</div>'
@@ -629,6 +732,9 @@
       var ab = el("button", "", "Arise"); ab.type = "button";
       ab.addEventListener("click", function (e) { e.stopPropagation(); var sh = $(".mx-console"); if (sh) sh.classList.remove("show"); extract(true); });
       tests.appendChild(ab);
+      var mb = el("button", "", "Monarch"); mb.type = "button";
+      mb.addEventListener("click", function (e) { e.stopPropagation(); var sh2 = $(".mx-console"); if (sh2) sh2.classList.remove("show"); arise(monarchShadow(MONARCHS[(Math.random() * MONARCHS.length) | 0], true), true); });
+      tests.appendChild(mb);
     }
     var row = el("div", "mx-c-row", '<span class="mx-c-k">Sound</span><button type="button" class="mx-c-sound"></button>');
     var row2 = el("div", "mx-c-row col", '<span class="mx-c-k">Save transfer <em>(Safari ↔ home-screen app)</em></span><div class="mx-c-tests"><button type="button" class="mx-c-exp-save">Copy save</button><button type="button" class="mx-c-imp-save">Paste save</button></div>');
@@ -684,6 +790,6 @@
       });
     }).observe(sec, { attributes: true, attributeFilter: ["class"], attributeOldValue: true });
   });
-  setInterval(function () { checkDaily(); renderTiles(); }, 5000);
+  setInterval(function () { checkDaily(); checkMonarchs(); renderTiles(); }, 5000);
   setTimeout(checkDaily, 4000);
 })();

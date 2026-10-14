@@ -344,3 +344,30 @@
     requestAnimationFrame(loop);
   })();
 })();
+
+/* REBOOT: the System powers down like an old CRT — glitch, collapse to
+   a line, then to a point of light, a beat of black — and powers back
+   up into the boot sequence from a bright scanline. */
+(function () {
+  "use strict";
+  window.__mxReboot = function (done) {
+    var main = document.getElementById("main");
+    var ov = document.createElement("div");
+    ov.className = "mx-reboot";
+    ov.innerHTML = '<div class="msg">&gt; System shutdown initiated<span>_</span></div><div class="line"></div><div class="dot"></div><div class="top"></div><div class="bot"></div>';
+    document.body.appendChild(ov);
+    if (window.__mx) window.__mx.buzz([20, 60, 20]);
+    main.classList.add("mx-powerdown");
+    requestAnimationFrame(function () { ov.classList.add("a1"); });
+    setTimeout(function () { ov.classList.add("a2"); }, 620);           /* screen collapses */
+    setTimeout(function () { ov.classList.add("a3"); }, 1050);          /* line → dot */
+    setTimeout(function () { ov.classList.add("a4"); }, 1400);          /* black */
+    setTimeout(function () {
+      main.classList.remove("mx-powerdown");
+      done();                                                           /* boot starts underneath */
+      ov.classList.add("a5");                                           /* power-on scanline opens */
+      if (window.__mx) window.__mx.buzz(15);
+    }, 1750);
+    setTimeout(function () { ov.remove(); }, 2700);
+  };
+})();

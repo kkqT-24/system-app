@@ -339,24 +339,30 @@
       var ir = inner.getBoundingClientRect();
       inner.style.transformOrigin = (c.x - ir.left).toFixed(0) + "px " + (c.y - ir.top).toFixed(0) + "px";
     }
-    flash("rgba(195,184,254,0.9)", 0.35, 500);
-    ring(c.x, c.y, { r0: c.r * 0.6, r1: c.r * 1.6, life: 380, width: 4, color: "#ffffff" });
-    ring(c.x, c.y, { r0: c.r, r1: Math.max(W, H), life: 1000, width: 3, delay: 80 });
-    spark(c.x, c.y, { n: 40, min: 6, max: 16, life: 700, gravity: 0, tail: 6, jx: 6, jy: 6 });
-    /* streaks start on the core's rim, not the screen's middle */
+    /* an elegant entry: a soft bloom, two slow rings, and motes that
+       drift out of the core's rim and fade like dust in light */
+    flash("rgba(195,184,254,0.9)", 0.22, 900);
+    ring(c.x, c.y, { r0: c.r * 0.9, r1: c.r * 2.2, life: 1100, width: 1.5, color: "#ffffff" });
+    ring(c.x, c.y, { r0: c.r, r1: Math.max(W, H) * 0.75, life: 1800, width: 1.2, delay: 160, color: "#c3b8fe" });
+    for (var i = 0; i < 46; i++) {
+      var a = rnd(0, Math.PI * 2), d = c.r * rnd(0.85, 1.05), sp = rnd(0.5, 2.1);
+      sparks.push({ x: c.x + Math.cos(a) * d, y: c.y + Math.sin(a) * d, vx: Math.cos(a) * sp, vy: Math.sin(a) * sp - 0.15,
+        g: -0.004, drag: 0.985, life: -rnd(0, 260), max: rnd(1300, 2000), r: rnd(0.7, 1.9), c: pick(PAL), tail: 0 });
+    }
     var t0 = performance.now();
     (function emit() {
-      var k = (performance.now() - t0) / 900;
+      var k = (performance.now() - t0) / 700;
       if (k > 1) return;
-      for (var i = 0; i < 8; i++) {
-        var a = rnd(0, Math.PI * 2), d = c.r * rnd(0.5, 1.05);
-        streaks.push({ x: c.x + Math.cos(a) * d, y: c.y + Math.sin(a) * d, a: a, v: rnd(5, 11) * (1 + k * 2.5), acc: 1.08, len: rnd(16, 50),
-          life: 0, max: rnd(420, 700), c: pick(PAL), w: rnd(0.8, 2.2) });
+      for (var i = 0; i < 2; i++) {
+        var a = rnd(0, Math.PI * 2), d = c.r * rnd(0.9, 1.05);
+        streaks.push({ x: c.x + Math.cos(a) * d, y: c.y + Math.sin(a) * d, a: a, v: rnd(1.4, 2.8), acc: 1.025, len: rnd(10, 26),
+          life: 0, max: rnd(900, 1300), c: pick(PAL), w: rnd(0.6, 1.2) });
       }
       go();
       requestAnimationFrame(emit);
     })();
-    buzz(25);
+    go();
+    buzz(12);
   }
   function onBootDissolve() {
     flash("rgba(143,94,248,0.9)", 0.4, 800);

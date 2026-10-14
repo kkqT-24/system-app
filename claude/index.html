@@ -3,8 +3,8 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no, viewport-fit=cover" />
-<link rel="apple-touch-icon" href="../apple-touch-icon.png">
-<link rel="icon" type="image/png" href="../icon-512.png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="icon" type="image/png" href="icon-512.png">
     <meta name="color-scheme" content="dark" />
     <title>System v2</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -3494,7 +3494,7 @@
           rbRaf = null;
           replayBtn.classList.remove("holding");
           replayBtn.classList.add("full");
-          setTimeout(function () {
+          var rbGo = function () {
             main.classList.add("is-hidden");
             boot.scrollTop = 0;
             runBoot();
@@ -3502,7 +3502,9 @@
             replayFill.classList.add("draining");
             rbSet(0);
             rbFired = false;
-          }, 180);
+          };
+          /* v2: a CRT power-down plays first (polish.js), then the boot */
+          if (window.__mxReboot && !RM) window.__mxReboot(rbGo); else setTimeout(rbGo, 180);
         }
         replayBtn.addEventListener("pointerdown", rbBegin);
         replayBtn.addEventListener("pointerup", rbCancel);
@@ -7093,8 +7095,7 @@
           if (core) { var hr = core.getBoundingClientRect(); lift = Math.min(lift, Math.max(0, cr.top - hr.bottom - 12)); }
           card.style.setProperty("--wx-lift", (-lift).toFixed(0) + "px");
         }
-        if (greet) new MutationObserver(function () { setTimeout(fit, 30); setTimeout(fit, 1000); }).observe(greet, { attributes: true, attributeFilter: ["class"] });
-        window.addEventListener("resize", fit);
+        /* v2: the card keeps one fixed position — re-measuring it mid-animation made it stutter */
       })();
     </script>
     <script src="motion.js"></script>
