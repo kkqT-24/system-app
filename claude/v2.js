@@ -26,7 +26,7 @@
   var STATS = ["STR", "AGI", "VIT", "INT", "PER"];
   var STAT_NAMES = { STR: "Strength", AGI: "Agility", VIT: "Vitality", INT: "Intelligence", PER: "Perception" };
   var STAT_COLORS = { STR: "#ff5a6e", AGI: "#3ee6a0", VIT: "#ffa24c", INT: "#5aa8ff", PER: "#c77dff" };
-  var D = { v: 2, history: [], shadows: [], earned: { STR: 0, AGI: 0, VIT: 0, INT: 0, PER: 0 }, alloc: { STR: 0, AGI: 0, VIT: 0, INT: 0, PER: 0 }, extracted: {}, workoutDays: {}, settings: { sound: false } };
+  var D = { v: 2, history: [], shadows: [], earned: { STR: 0, AGI: 0, VIT: 0, INT: 0, PER: 0 }, alloc: { STR: 0, AGI: 0, VIT: 0, INT: 0, PER: 0 }, extracted: {}, workoutDays: {}, settings: { sound: false, view3d: true } };
   try {
     var raw = JSON.parse(localStorage.getItem(KEY) || "null");
     if (raw && typeof raw === "object") {
@@ -38,7 +38,7 @@
       });
       if (raw.extracted && typeof raw.extracted === "object") D.extracted = raw.extracted;
       if (raw.workoutDays && typeof raw.workoutDays === "object") D.workoutDays = raw.workoutDays;
-      if (raw.settings && typeof raw.settings === "object") D.settings.sound = !!raw.settings.sound;
+      if (raw.settings && typeof raw.settings === "object") { D.settings.sound = !!raw.settings.sound; if (raw.settings.view3d === false) D.settings.view3d = false; }
     }
   } catch (e) {}
   function save() { try { localStorage.setItem(KEY, JSON.stringify(D)); } catch (e) {} }
@@ -515,6 +515,9 @@
     /* the army: your strongest shadows stand in formation, idling */
     var ranked = D.shadows.slice().sort(function (x, y) { return y.power - x.power; }).slice(0, 9);
     var slots = [[50, 104, 1], [33, 84, 0.85], [67, 84, 0.85], [19, 68, 0.72], [81, 68, 0.72], [8, 56, 0.6], [92, 56, 0.6], [26, 48, 0.5], [74, 48, 0.5]];
+    var use3d = D.settings.view3d && window.__mx3d;
+    var viewSw = '<div class="mx-view"><button type="button" data-view="3d" class="' + (use3d ? "on" : "") + '">3D</button><button type="button" data-view="2d" class="' + (use3d ? "" : "on") + '">2D</button></div>';
+    var army3d = '<div class="mx-army3d"><div class="cap">Shadow army · ' + D.shadows.length + ' strong · drag to turn · tap one to inspect</div><div class="mx-stage" id="mxStage"></div></div>';
     var army = '<div class="mx-army"><div class="cap">Shadow army · ' + D.shadows.length + ' strong · tap one to inspect</div>' + ranked.map(function (sh, i) {
       var sl = slots[i];
       return '<button type="button" class="u" data-sh="' + sh.id + '" style="left:' + sl[0] + '%;width:' + sl[1] + 'px;z-index:' + (20 - i) + ';opacity:' + (0.5 + sl[2] * 0.5).toFixed(2) + ';bottom:' + ((1 - sl[2]) * 34 + 6).toFixed(0) + 'px;animation-delay:-' + (i * 0.7).toFixed(1) + 's" aria-label="' + esc(sh.name) + '">' + shadowFigure(sh) + '</button>';
@@ -524,9 +527,19 @@
       return '<button type="button" class="mx-sh-card" data-sh="' + sh.id + '" style="--tc:' + T.color + '">' + shadowFigure(sh) +
         '<div class="nm">' + esc(sh.name) + '</div><div class="cl">' + T.name + ' · ' + esc(sh.cls) + '</div><div class="pw">PWR ' + sh.power + '</div></button>';
     }).join("");
-    root.innerHTML = army + codex + '<div class="mx-sh-sub">Roster</div><div class="mx-sh-grid">' + cards + '</div>' + rules;
+    if (stage3d) { stage3d.destroy(); stage3d = null; }
+    root.innerHTML = viewSw + (use3d ? army3d : army) + codex + '<div class="mx-sh-sub">Roster</div><div class="mx-sh-grid">' + cards + '</div>' + rules;
     liveCards();
+    if (use3d) {
+      try { stage3d = window.__mx3d.stage($("#mxStage"), ranked, function (id) { inspect(id); }); } catch (err) { stage3d = null; }
+    }
   }
+  var stage3d = null, turn3d = null;
+  document.addEventListener("click", function (e) {
+    var v = e.target.closest ? e.target.closest("#mxShadows [data-view]") : null;
+    if (!v) return;
+    D.settings.view3d = v.getAttribute("data-view") === "3d"; save(); renderShadows();
+  });
   /* only cards on screen animate, so a big army stays smooth */
   var liveIO = "IntersectionObserver" in window ? new IntersectionObserver(function (es) {
     es.forEach(function (e) { e.target.classList.toggle("live", e.isIntersecting); });
@@ -547,9 +560,14 @@
       '<div class="mx-in-stats"><span><b>' + sh.power + '</b>Power</span><span><b>#' + rank + '</b>In army</span><span><b>' + (sh.streak || 1) + '</b>Streak</span></div>' +
       '<div class="mx-ar-meta">Extracted ' + esc(when || "") + '</div><div class="mx-ar-tap">Tap to close</div></div>');
     document.body.appendChild(ov);
+    if (D.settings.view3d && window.__mx3d) {
+      var fig = ov.querySelector(".mx-sh-fig");
+      var box = el("div", "mx-turn"); fig.parentNode.replaceChild(box, fig);
+      try { turn3d = window.__mx3d.turntable(box, sh); } catch (err) { turn3d = null; }
+    }
     requestAnimationFrame(function () { ov.classList.add("on"); });
     snd("tick");
-    ov.addEventListener("click", function () { ov.classList.remove("on"); setTimeout(function () { ov.remove(); }, 300); });
+    ov.addEventListener("click", function () { ov.classList.remove("on"); if (turn3d) { turn3d.destroy(); turn3d = null; } setTimeout(function () { ov.remove(); }, 300); });
   }
   document.addEventListener("click", function (e) {
     var b = e.target.closest ? e.target.closest("#mxShadows [data-sh]") : null;
@@ -797,6 +815,7 @@
       list.forEach(function (m) {
         var was = /\bis-hidden\b/.test(m.oldValue || ""), now = sec.classList.contains("is-hidden");
         if (was && !now) { renderStatus(); renderShadows(); }
+        if (!was && now && id === "sec-shadows" && stage3d) { stage3d.destroy(); stage3d = null; }
       });
     }).observe(sec, { attributes: true, attributeFilter: ["class"], attributeOldValue: true });
   });

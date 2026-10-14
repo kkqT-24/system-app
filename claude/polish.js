@@ -345,26 +345,44 @@
   })();
 })();
 
-/* REBOOT (modern): the interface sinks behind frosted glass, the System
-   mark draws itself — a ring tracing round, the star turning in — then
-   it blooms white and the boot sequence fades up from it. */
+/* REBOOT: the interface is pulled apart into the void — every element
+   lifts off and is drawn into a dark rift at the centre while a rune
+   circle spins up around it; the rift spirals shut, a ring of light
+   ripples out once (no white flash), and the boot fades up from black. */
 (function () {
   "use strict";
   window.__mxReboot = function (done) {
     var main = document.getElementById("main");
+    var cx = innerWidth / 2, cy = innerHeight * 0.45;
+    var parts = main.querySelectorAll(".main-top, .main-rings-wrap, #mainTitle, #mainGreet, .showcase-label, .tab-tile, .showcase-status, .verse-line, .main-controls, .main-inner > .main-top:last-child");
+    for (var i = 0; i < parts.length; i++) {
+      var el = parts[i], r = el.getBoundingClientRect();
+      if (!r.width) continue;
+      var dx = cx - (r.left + r.width / 2), dy = cy - (r.top + r.height / 2), d = Math.sqrt(dx * dx + dy * dy);
+      try {
+        el.animate([
+          { transform: "none", opacity: 1, filter: "none" },
+          { transform: "translate(" + (-dx * 0.04).toFixed(1) + "px," + (-dy * 0.04 - 6).toFixed(1) + "px) scale(1.02)", opacity: 1, filter: "brightness(1.3)", offset: 0.25 },
+          { transform: "translate(" + dx.toFixed(1) + "px," + dy.toFixed(1) + "px) rotate(" + (dx > 0 ? 160 : -160) + "deg) scale(0.02)", opacity: 0, filter: "blur(6px) brightness(0.4)" }
+        ], { duration: 900, delay: Math.max(0, 260 - d * 0.35) + Math.random() * 60, easing: "cubic-bezier(0.55, 0, 0.75, 0.3)", fill: "forwards" });
+      } catch (e) {}
+    }
     var ov = document.createElement("div");
-    ov.className = "mx-rb";
-    ov.innerHTML = '<div class="glass"></div><div class="mark"><svg viewBox="0 0 200 200" aria-hidden="true"><defs>' +
-      '<linearGradient id="mxRbG" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#7dd3fc"/><stop offset="0.5" stop-color="#a78bfa"/><stop offset="1" stop-color="#f472b6"/></linearGradient></defs>' +
-      '<circle class="trk" cx="100" cy="100" r="70"/><circle class="arc" cx="100" cy="100" r="70"/>' +
-      '<path class="star" d="M100 62C103 92 108 97 138 100 108 103 103 108 100 138 97 108 92 103 62 100 92 97 97 92 100 62Z"/></svg>' +
-      '<div class="lbl">Restarting<span class="d"><i></i><i></i><i></i></span></div></div><div class="bloom"></div>';
+    ov.className = "mx-rift";
+    ov.style.setProperty("--cx", cx + "px"); ov.style.setProperty("--cy", cy + "px");
+    ov.innerHTML = '<div class="void"></div><div class="sig">' + (window.__mxSigil ? window.__mxSigil("mx-sigil") : "") + '</div><div class="core"></div><div class="wave"></div>' +
+      '<div class="txt"><b>Reinitializing</b><span class="pct">00</span></div>';
     document.body.appendChild(ov);
-    if (window.__mx) window.__mx.buzz(12);
-    main.classList.add("mx-sink");
+    var pct = ov.querySelector(".pct"), t0 = performance.now();
+    (function count(now) { var k = Math.min(1, (now - t0) / 1500); pct.textContent = String(Math.round(k * 100)).padStart(2, "0"); if (k < 1 && ov.isConnected) requestAnimationFrame(count); })(t0);
+    if (window.__mx) { window.__mx.converge(cx, cy, 60, 1300, "#a855f7"); window.__mx.buzz([10, 80, 10]); }
     requestAnimationFrame(function () { ov.classList.add("in"); });
-    setTimeout(function () { ov.classList.add("bloom-on"); if (window.__mx) window.__mx.buzz(18); }, 1650);
-    setTimeout(function () { main.classList.remove("mx-sink"); done(); ov.classList.add("out"); }, 1950);
-    setTimeout(function () { ov.remove(); }, 2900);
+    setTimeout(function () { ov.classList.add("shut"); if (window.__mx) window.__mx.buzz(25); }, 1500);
+    setTimeout(function () {
+      for (var i = 0; i < parts.length; i++) try { parts[i].getAnimations().forEach(function (a) { a.cancel(); }); } catch (e) {}
+      done();
+      ov.classList.add("out");
+    }, 1950);
+    setTimeout(function () { ov.remove(); }, 3000);
   };
 })();
