@@ -395,6 +395,9 @@
       #phaseGreetHead { text-align: center; align-items: center; animation: greetFromTop 0.9s cubic-bezier(0.22, 1, 0.36, 1) both; }
       @keyframes greetFromTop { from { opacity: 0; transform: translateY(-42px); } to { opacity: 1; transform: none; } }
       #phaseGreet { text-align: center; align-items: center; animation: greetRise 0.9s cubic-bezier(0.22, 1, 0.36, 1) 0.14s both; }
+      @media (max-width: 560px) {
+        #phaseGreet .weather-card { transform: translateY(-18px); }
+      }
       @keyframes greetRise { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: none; } }
       .greet-kicker {
         font-family: "Share Tech Mono", monospace; font-size: 11px;
