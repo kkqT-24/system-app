@@ -4485,6 +4485,7 @@
             wrap.setAttribute("data-flame-level", HUNTER.level);
           }
           var meta = sec.querySelectorAll(".q-level-meta span");
+          if (meta[0]) { meta[0].style.color = "#fff"; meta[0].style.fontWeight = "700"; meta[0].style.textShadow = "0 0 10px rgba(143,94,248,0.4)"; }
           if (meta[2]) meta[2].textContent = LAST_PENALTY > 0 ? "Last penalty — −" + LAST_PENALTY + " EXP" : "Penalties — None";
           if (isMax) {
             meta[0].textContent = MAX_CAP + " / " + MAX_CAP + " EXP" + (HUNTER.bank > 0 ? " · +" + HUNTER.bank + " BANKED" : "");
