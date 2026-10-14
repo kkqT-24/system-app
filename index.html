@@ -902,10 +902,10 @@
       .showcase.expanding .showcase-label { animation: cascadeIn 0.38s cubic-bezier(0.22, 1, 0.36, 1) 0.1s both; }
       .showcase.expanding .showcase-status { animation: cascadeIn 0.38s cubic-bezier(0.22, 1, 0.36, 1) 0.34s both; }
       /* an open section dismisses with a short settle before the tiles return */
-      .section.closing { animation: panelDismiss 0.24s ease-in both; }
+      .section.closing { animation: panelDismiss 0.32s ease-in both; }
       @keyframes panelDismiss {
         from { opacity: 1; transform: none; }
-        to { opacity: 0; transform: translateY(10px) scale(0.97); }
+        to { opacity: 0; transform: translateY(100vh); }
       }
       /* showcase entrance: label, tiles, then the status bar cascade in */
       .showcase.enter .showcase-label { animation: cascadeIn 0.38s cubic-bezier(0.22, 1, 0.36, 1) both; }
@@ -920,6 +920,7 @@
       /* the recall handle: a grab-bar pill sitting directly above the
          section panel box, shown only while a section panel is open */
       .handle-row { height: 40px; margin-top: 14px; display: flex; justify-content: center; align-items: center; }
+      body.tab-open .handle-row { margin-top: 0; }
       .top-handle {
         appearance: none; display: inline-flex; align-items: center;
         background: rgba(9, 7, 36, 0.62); border: 1px solid var(--line-soft); border-radius: 999px;
@@ -5065,7 +5066,7 @@
               document.body.classList.remove("tab-open");
               navBusy = false;
               expandShowcase();
-            }, 240);
+            }, 320);
           } else {
             for (var j2 = 0; j2 < sections.length; j2++) sections[j2].classList.add("is-hidden");
             document.body.classList.remove("tab-open");
