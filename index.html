@@ -702,6 +702,14 @@
       #sec-weather .wx-day .t {
         color: var(--ink); font-weight: 700;
       }
+      /* important numbers across the app pop like the weather tab:
+         bright, bold, faint purple glow — easier to read */
+      .q-level-meta .exp,
+      .q-row .v,
+      .w-life-row b {
+        color: var(--ink) !important; font-weight: 700;
+        text-shadow: 0 0 10px rgba(143, 94, 248, 0.35);
+      }
       .weather-icon[data-icon="tstormsDay"] { color: #c3cdea; animation: cloudGlow 5.2s ease-in-out infinite; }
       .weather-icon[data-icon="showerDay"] { color: #a9c6ff; animation: cloudGlow 5.2s ease-in-out infinite; }
       /* glyph reference: every condition glyph the front-page icon and
@@ -4484,7 +4492,10 @@
           /* the EXP bar always flows; at max level it turns
              deep purple and black with a shine (the .flowing look) */
           var fillEl = sec.querySelector(".q-bar-fill");
-          if (fillEl) fillEl.classList.toggle("flowing", isMax);
+          if (fillEl) {
+            fillEl.classList.toggle("flowing", isMax);
+            fillEl.style.width = isMax ? "100%" : (HUNTER.exp / HUNTER.cap * 100) + "%";
+          }
           /* a rank change re-prices the workout minimum / base EXP:
              the tracker settles any difference the new rank earns
              (grants only — it never claws back on a rank change) */
