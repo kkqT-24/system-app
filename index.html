@@ -4433,6 +4433,17 @@
         /* paint the EXP bar from the restored hunter right away so it
            never shows empty on load */
         try { updateHunterTexts(); } catch (e) {}
+        /* re-assert the fill width after layout settles — a late style
+           recalc can otherwise leave the bar at its 0% CSS default */
+        try {
+          requestAnimationFrame(function () {
+            try {
+              var s2 = document.getElementById("sec-quests");
+              var f2 = s2 && s2.querySelector(".q-bar-fill");
+              if (f2) f2.style.width = HUNTER.level >= MAX_LEVEL ? "100%" : (HUNTER.exp / HUNTER.cap * 100) + "%";
+            } catch (e2) {}
+          });
+        } catch (e3) {}
         function rankFor(level) {
           if (level >= 50) return "S";
           if (level >= 40) return "A";
