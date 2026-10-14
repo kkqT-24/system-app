@@ -494,5 +494,8 @@
       }
     }
   });
+  /* shared with quests.js */
+  window.__mx = { spark: spark, ring: ring, flash: flash, banner: banner, shake: shake, warp: warp, converge: converge, buzz: buzz };
+
   mo.observe(document.body, { attributes: true, attributeFilter: ["class"], attributeOldValue: true, subtree: true, childList: true });
 })();

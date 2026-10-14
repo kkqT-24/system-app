@@ -2297,6 +2297,7 @@
       }
     </style>
       <link rel="stylesheet" href="motion.css" />
+    <link rel="stylesheet" href="quests.css" />
   </head>
   <body>
     <!-- ================= MAIN (step 2: shell + section navigation) ================= -->
@@ -2837,7 +2838,7 @@
             try { if (typeof QUEST_WEEK !== "undefined") data.questWeek = QUEST_WEEK; } catch (e) {}
             try { if (typeof TODO !== "undefined" && TODO) data.todo = JSON.parse(JSON.stringify({ items: TODO.items, day: TODO.day })); } catch (e) {}
             try { if (window.__ksMaintEntries) data.maintEntries = JSON.parse(JSON.stringify(window.__ksMaintEntries)); } catch (e) {}
-            try { if (typeof SECRET !== "undefined" && SECRET) data.secret = JSON.parse(JSON.stringify({ openCount: SECRET.openCount, targetOpens: SECRET.targetOpens, active: SECRET.active, lastType: SECRET.lastType, lastTime: SECRET.lastTime })); } catch (e) {}
+            try { if (typeof SECRET !== "undefined" && SECRET) data.secret = JSON.parse(JSON.stringify({ openCount: SECRET.openCount, targetOpens: SECRET.targetOpens, active: (SECRET.active && SECRET.active.test) ? null : SECRET.active, lastType: SECRET.lastType, lastTime: SECRET.lastTime })); } catch (e) {}
             store.set(PERSIST_KEY, JSON.stringify(data));
           } catch (e) {}
         };
@@ -6125,17 +6126,26 @@
           if (!SECRET.active) return;
           var q = SECRET_POOL[SECRET.active.idx];
           var color = q.white ? "#ffe9a3" : "#ff2d55";
+          var isTest = !!SECRET.active.test;
+          /* Claude build: cinematic fulfill (falls back to the old particles) */
+          var fxDone = false;
+          try { if (window.__mxSqFx) fxDone = window.__mxSqFx("fulfill", q, sqCard) !== false; } catch (e) {}
           sqHide();
-          sqParticles(color, true);
+          if (!fxDone) sqParticles(color, true);
+          if (isTest) { SECRET.active = null; secretSave(); return; }
           if (q.exp > 0) { try { gainExp(q.exp); } catch (e) {} }
           sqClearAfter(q.type);
         }
         function sqDefy(penalize) {
           if (!SECRET.active) return;
           var q = SECRET_POOL[SECRET.active.idx];
+          var isTest = !!SECRET.active.test;
+          var fxDone = false;
+          try { if (window.__mxSqFx) fxDone = window.__mxSqFx(penalize ? "defy" : "expire", q, sqCard) !== false; } catch (e) {}
           sqHide();
           /* shatter: red burst outward */
-          sqParticles("#ff2d55", false);
+          if (!fxDone) sqParticles("#ff2d55", false);
+          if (isTest) { SECRET.active = null; secretSave(); return; }
           if (penalize) { try { subtractExp(10); } catch (e) {} }
           sqClearAfter(q.type);
         }
@@ -6159,6 +6169,33 @@
           if (!secretCooldownOk()) return;
           sqTrigger();
         }
+        /* Claude build: System Console hooks — set level / EXP directly
+           and preview the secret / prayer quest without touching its
+           schedule or giving / taking EXP */
+        window.__mxHunter = {
+          get: function () { return { level: HUNTER.level, exp: HUNTER.exp, cap: HUNTER.cap, max: MAX_LEVEL, rank: rankFor(HUNTER.level) }; },
+          set: function (level, exp) {
+            level = Math.max(1, Math.min(MAX_LEVEL, Math.round(level)));
+            LEVEL_ANIM_TOKEN++;
+            HUNTER.level = level;
+            if (level >= MAX_LEVEL) { HUNTER.cap = MAX_CAP; HUNTER.exp = 0; }
+            else { HUNTER.cap = capForLevel(level); HUNTER.exp = Math.max(0, Math.min(HUNTER.cap - 1, Math.round(exp || 0))); }
+            updateHunterTexts();
+            var f = document.querySelector("#sec-quests .q-bar-fill");
+            if (f) f.style.width = level >= MAX_LEVEL ? "100%" : (HUNTER.exp / HUNTER.cap * 100) + "%";
+            try { renderWorkouts(); } catch (e) {}
+            if (window.__ksSaveState) window.__ksSaveState();
+          }
+        };
+        window.__mxSqTest = function (white) {
+          if (SECRET.active && !SECRET.active.test) return false;
+          var pool = [];
+          for (var i = 0; i < SECRET_POOL.length; i++) if (!!SECRET_POOL[i].white === !!white) pool.push(i);
+          var idx = pool[(Math.random() * pool.length) | 0];
+          SECRET.active = { idx: idx, expiresAt: Date.now() + 15 * 60 * 1000, seen: true, test: true, verse: white ? Math.floor(Math.random() * SECRET_VERSES.length) : 0 };
+          sqShow();
+          return true;
+        };
         /* hold-to-activate for FULFILL / DEFY (1s each) */
         function sqBindHold(btn, fn) {
           var timer = null, pid = null, fillEl = btn.querySelector(".sq-fill");
@@ -7029,5 +7066,7 @@
     </script>
     <script src="motion.js"></script>
     <script src="bolts.js"></script>
+    <script src="aura.js"></script>
+    <script src="quests.js"></script>
   </body>
 </html>
