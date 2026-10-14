@@ -1,0 +1,169 @@
+/* ==========================================================
+   CINEMATIC MOTION LAYER (Claude build)
+   Sits on top of the original app without changing its logic.
+   motion.js adds the classes / elements styled here.
+   Everything is skipped under prefers-reduced-motion.
+   ========================================================== */
+
+/* full-screen effects canvas + flash layer */
+#mxFx {
+  position: fixed; inset: 0; width: 100vw; height: 100vh;
+  z-index: 95; pointer-events: none;
+}
+#mxFlash {
+  position: fixed; inset: 0; z-index: 96; pointer-events: none; opacity: 0;
+  mix-blend-mode: screen;
+}
+
+/* ---------- cinematic letterbox (rank up) ---------- */
+.mx-bars { position: fixed; inset: 0; z-index: 97; pointer-events: none; }
+.mx-bars::before, .mx-bars::after {
+  content: ""; position: absolute; left: 0; right: 0; height: 13vh; background: #000;
+  transition: transform 0.55s cubic-bezier(0.7, 0, 0.2, 1);
+}
+.mx-bars::before { top: 0; transform: translateY(-101%); }
+.mx-bars::after { bottom: 0; transform: translateY(101%); }
+.mx-bars.on::before, .mx-bars.on::after { transform: none; }
+
+/* ---------- holographic banner (level up / rank up / quest clear) ---------- */
+.mx-banner {
+  position: fixed; left: 0; right: 0; top: 50%; z-index: 98; pointer-events: none;
+  transform: translateY(-50%);
+  display: flex; flex-direction: column; align-items: center; gap: 8px;
+  padding: 22px 16px; text-align: center;
+  --mx-c: #c3b8fe;
+}
+.mx-banner::before {
+  content: ""; position: absolute; left: 0; right: 0; top: 0; bottom: 0; z-index: -1;
+  background: linear-gradient(90deg, transparent, rgba(8, 6, 30, 0.82) 18%, rgba(8, 6, 30, 0.82) 82%, transparent);
+  transform: scaleY(0); animation: mxBandOpen 0.42s cubic-bezier(0.2, 0.9, 0.2, 1) forwards;
+}
+.mx-banner .mx-line {
+  position: absolute; left: 0; right: 0; height: 1px;
+  background: linear-gradient(90deg, transparent, var(--mx-c), #fff, var(--mx-c), transparent);
+  box-shadow: 0 0 14px var(--mx-c), 0 0 30px var(--mx-c);
+  transform: scaleX(0); animation: mxLineOpen 0.6s cubic-bezier(0.2, 0.9, 0.2, 1) forwards;
+}
+.mx-banner .mx-line.t { top: 0; }
+.mx-banner .mx-line.b { bottom: 0; animation-delay: 0.08s; }
+.mx-banner .mx-k {
+  font-family: "Share Tech Mono", monospace; font-size: 11px; letter-spacing: 0.42em; text-indent: 0.42em;
+  color: var(--mx-c); text-transform: uppercase; opacity: 0.9;
+}
+.mx-banner .mx-main {
+  font-family: "Orbitron", sans-serif; font-weight: 900;
+  font-size: clamp(30px, 10vw, 54px); letter-spacing: 0.16em; text-indent: 0.16em; line-height: 1.05;
+  color: #fff;
+  text-shadow: 0 0 10px var(--mx-c), 0 0 28px var(--mx-c), 0 0 60px var(--mx-c);
+}
+.mx-banner .mx-sub {
+  font-family: "Share Tech Mono", monospace; font-size: 12px; letter-spacing: 0.24em; text-indent: 0.24em;
+  color: rgba(238, 240, 255, 0.8); text-transform: uppercase;
+}
+.mx-banner.out { animation: mxBannerOut 0.42s ease-in forwards; }
+@keyframes mxBandOpen { to { transform: scaleY(1); } }
+@keyframes mxLineOpen { to { transform: scaleX(1); } }
+@keyframes mxBannerOut {
+  0% { opacity: 1; filter: none; transform: translateY(-50%); }
+  30% { opacity: 1; filter: drop-shadow(-4px 0 0 rgba(255, 0, 128, 0.9)) drop-shadow(4px 0 0 rgba(0, 220, 255, 0.9)); transform: translateY(-50%) skewX(-8deg); }
+  100% { opacity: 0; filter: blur(6px); transform: translateY(-50%) scaleY(0.05) scaleX(1.3); }
+}
+
+/* ---------- camera moves ---------- */
+.mx-shake { animation: mxShake 0.5s cubic-bezier(0.36, 0.07, 0.19, 0.97) both; }
+@keyframes mxShake {
+  10%, 90% { translate: -1px 1px; }
+  20%, 80% { translate: 3px -2px; }
+  30%, 50%, 70% { translate: -5px 2px; }
+  40%, 60% { translate: 5px -1px; }
+  100% { translate: 0 0; }
+}
+.mx-punch { animation: mxPunch 0.55s cubic-bezier(0.2, 0.9, 0.25, 1) both; }
+@keyframes mxPunch { 0% { scale: 1; } 18% { scale: 1.018; } 100% { scale: 1; } }
+
+/* ---------- RGB split flash on panels ---------- */
+.mx-chroma { animation: mxChroma 0.42s steps(6) both; }
+@keyframes mxChroma {
+  0% { filter: drop-shadow(-6px 0 0 rgba(255, 0, 128, 0.55)) drop-shadow(6px 0 0 rgba(0, 220, 255, 0.55)); }
+  40% { filter: drop-shadow(3px 0 0 rgba(255, 0, 128, 0.45)) drop-shadow(-3px 0 0 rgba(0, 220, 255, 0.45)); }
+  100% { filter: none; }
+}
+/* glitch-out when a panel closes: horizontal slices tear before it drops */
+.section.closing.mx-tear { animation: mxTear 0.24s steps(5) both !important; }
+@keyframes mxTear {
+  0% { opacity: 1; transform: none; clip-path: inset(0 0 0 0); filter: none; }
+  25% { transform: translateX(-6px); clip-path: inset(8% 0 52% 0); filter: drop-shadow(-5px 0 0 rgba(255,0,128,.8)) drop-shadow(5px 0 0 rgba(0,220,255,.8)); }
+  50% { transform: translateX(7px) translateY(20px); clip-path: inset(40% 0 18% 0); }
+  75% { transform: translateY(60px) scaleY(0.6); clip-path: inset(48% 0 46% 0); opacity: 0.8; }
+  100% { transform: translateY(80px) scaleY(0.02); clip-path: inset(49% 0 49% 0); opacity: 0; }
+}
+
+/* ---------- holographic module tiles ---------- */
+.showcase-grid { perspective: 700px; }
+.tab-tile {
+  position: relative; overflow: hidden;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease, transform 0.15s ease, rotate 0.5s cubic-bezier(0.2, 0.9, 0.25, 1);
+  rotate: 0 0 1 0deg;
+}
+.tab-tile.mx-tilting { transition: border-color 0.2s ease, box-shadow 0.2s ease, transform 0.15s ease, rotate 0.08s linear; }
+.tab-tile > * { position: relative; z-index: 1; }
+.tab-tile > .mx-sheen {
+  position: absolute; inset: 0; z-index: 0; pointer-events: none;
+  background:
+    radial-gradient(circle 120px at var(--mx-x, 50%) var(--mx-y, 50%), rgba(195, 184, 254, 0.28), transparent 70%),
+    linear-gradient(115deg, transparent 30%, rgba(125, 215, 255, 0.10) 45%, rgba(218, 120, 245, 0.14) 55%, transparent 70%);
+  background-size: 100% 100%, 260% 100%;
+  background-position: 0 0, var(--mx-h, 100%) 0;
+  opacity: 0; transition: opacity 0.35s ease;
+  mix-blend-mode: screen;
+}
+.tab-tile.mx-tilting > .mx-sheen, .tab-tile:hover > .mx-sheen { opacity: 1; }
+/* periodic light sweep across the tiles */
+.tab-tile > .mx-glint {
+  position: absolute; top: -20%; bottom: -20%; left: 0; width: 46%; z-index: 0; pointer-events: none;
+  background: linear-gradient(100deg, transparent, rgba(255, 255, 255, 0.09) 40%, rgba(195, 184, 254, 0.22) 50%, rgba(255, 255, 255, 0.09) 60%, transparent);
+  transform: translateX(-120%) skewX(-18deg);
+}
+.tab-tile.mx-shine > .mx-glint { animation: mxGlint 0.95s cubic-bezier(0.4, 0, 0.2, 1) both; }
+@keyframes mxGlint { to { transform: translateX(330%) skewX(-18deg); } }
+/* tiles flicker on like a hologram warming up */
+.showcase.enter .tab-tile { animation-name: mxHoloIn !important; animation-duration: 0.62s !important; }
+@keyframes mxHoloIn {
+  0% { opacity: 0; transform: translateY(14px) scaleY(0.04); filter: brightness(3); }
+  35% { opacity: 1; transform: translateY(0) scaleY(1.06); filter: brightness(2.2); }
+  45% { opacity: 0.35; }
+  55% { opacity: 1; filter: brightness(1.4); }
+  70% { opacity: 0.7; }
+  100% { opacity: 1; transform: none; filter: none; }
+}
+
+/* ---------- workouts: floating +N and count pop ---------- */
+.mx-float {
+  position: fixed; z-index: 94; pointer-events: none;
+  font-family: "Orbitron", sans-serif; font-weight: 900; font-size: 20px; letter-spacing: 0.06em;
+  color: #fff; text-shadow: 0 0 8px #c3b8fe, 0 0 22px #8f5ef8, 0 0 40px #8f5ef8;
+  transform: translate(-50%, -50%);
+}
+.mx-pop { display: inline-block; animation: mxPop 0.42s cubic-bezier(0.2, 1.6, 0.4, 1) both; }
+@keyframes mxPop {
+  0% { transform: scale(1); text-shadow: none; }
+  35% { transform: scale(1.55); color: #fff; text-shadow: 0 0 10px #c3b8fe, 0 0 24px #8f5ef8; }
+  100% { transform: scale(1); }
+}
+/* bar energy sweep when EXP lands */
+.mx-surge { position: relative; }
+.mx-surge::after {
+  content: ""; position: absolute; top: -3px; bottom: -3px; left: 0; width: 30%; pointer-events: none;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.85), transparent);
+  filter: blur(2px); mix-blend-mode: screen;
+  animation: mxSurge 0.75s cubic-bezier(0.4, 0, 0.2, 1) both;
+}
+@keyframes mxSurge { from { transform: translateX(-100%); opacity: 1; } to { transform: translateX(340%); opacity: 0; } }
+
+/* ---------- depth: background layers drift with your finger ---------- */
+#main .bg-glow, #main canvas.ambient { will-change: translate; }
+
+@media (prefers-reduced-motion: reduce) {
+  #mxFx, #mxFlash, .mx-bars, .mx-banner, .mx-float, .tab-tile > .mx-sheen, .tab-tile > .mx-glint { display: none !important; }
+  .mx-shake, .mx-punch, .mx-chroma, .mx-pop { animation: none !important; }
+}
