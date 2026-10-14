@@ -5067,12 +5067,21 @@
             dragSec.style.transform = "translateY(" + Math.round(mdy * 0.85) + "px)";
             if (thBar) {
               var mp = Math.min(mdy / 200, 1);
-              thBar.style.width = Math.round(46 - 26 * mp) + "px";
-              thBar.style.height = Math.round(5 + 15 * mp) + "px";
+              thBar.style.animation = "none";
+              thBar.style.width = Math.round(40 - 16 * mp) + "px";
+              thBar.style.height = Math.round(6 + 18 * mp) + "px";
+              thBar.style.background = "transparent";
+              thBar.style.border = "3px solid var(--violet)";
+              thBar.style.borderRadius = "50%";
+              thBar.style.boxShadow = "0 0 14px var(--glow)";
             }
           } else {
             dragSec.style.transform = "";
-            if (thBar) { thBar.style.width = ""; thBar.style.height = ""; }
+            if (thBar) {
+              thBar.style.animation = ""; thBar.style.width = ""; thBar.style.height = "";
+              thBar.style.background = ""; thBar.style.border = "";
+              thBar.style.borderRadius = ""; thBar.style.boxShadow = "";
+            }
           }
         }, { passive: true });
         document.addEventListener("touchend", function (e) {
@@ -5087,7 +5096,12 @@
             setTimeout(function () {
               sec.style.transition = "";
               sec.style.transform = "";
-              if (thBar) { thBar.style.transition = ""; thBar.style.width = ""; thBar.style.height = ""; }
+              if (thBar) {
+                thBar.style.transition = ""; thBar.style.animation = "";
+                thBar.style.width = ""; thBar.style.height = "";
+                thBar.style.background = ""; thBar.style.border = "";
+                thBar.style.borderRadius = ""; thBar.style.boxShadow = "";
+              }
               sec.classList.add("is-hidden");
               document.body.classList.remove("tab-open");
               tabsHandle.classList.remove("show");
@@ -5099,8 +5113,9 @@
             sec.style.transform = "translateY(0px)";
             if (thBar) {
               thBar.style.transition = "width 0.32s cubic-bezier(0.22, 1, 0.36, 1), height 0.32s cubic-bezier(0.22, 1, 0.36, 1)";
-              thBar.style.width = "";
-              thBar.style.height = "";
+              thBar.style.animation = ""; thBar.style.width = ""; thBar.style.height = "";
+              thBar.style.background = ""; thBar.style.border = "";
+              thBar.style.borderRadius = ""; thBar.style.boxShadow = "";
             }
             setTimeout(function () {
               sec.style.transition = "";
