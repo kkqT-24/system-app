@@ -5054,6 +5054,7 @@
             dragStartX = e.touches[0].clientX;
             dragSec.classList.remove("assembling");
             dragSec.style.transition = "none";
+            tabsHandle.style.transition = "none";
           } else {
             dragSec = null;
           }
@@ -5061,8 +5062,13 @@
         document.addEventListener("touchmove", function (e) {
           if (!dragSec) return;
           var mdy = e.touches[0].clientY - dragStartY;
-          if (mdy > 0) dragSec.style.transform = "translateY(" + Math.round(mdy * 0.85) + "px)";
-          else dragSec.style.transform = "";
+          if (mdy > 0) {
+            dragSec.style.transform = "translateY(" + Math.round(mdy * 0.85) + "px)";
+            tabsHandle.style.transform = "rotate(" + Math.round(mdy * 1.8) + "deg)";
+          } else {
+            dragSec.style.transform = "";
+            tabsHandle.style.transform = "";
+          }
         }, { passive: true });
         document.addEventListener("touchend", function (e) {
           if (!dragSec) return;
@@ -5070,12 +5076,14 @@
           var dy = e.changedTouches[0].clientY - dragStartY;
           var dx = Math.abs(e.changedTouches[0].clientX - dragStartX);
           dragSec = null;
-          if (dy > 160 && dx < 70) {
+          if (dy > 200 && dx < 70) {
             sec.style.transition = "transform 0.28s ease-in";
             sec.style.transform = "translateY(110vh)";
             setTimeout(function () {
               sec.style.transition = "";
               sec.style.transform = "";
+              tabsHandle.style.transition = "";
+              tabsHandle.style.transform = "";
               sec.classList.add("is-hidden");
               document.body.classList.remove("tab-open");
               tabsHandle.classList.remove("show");
@@ -5085,9 +5093,13 @@
           } else {
             sec.style.transition = "transform 0.32s cubic-bezier(0.22, 1, 0.36, 1)";
             sec.style.transform = "translateY(0px)";
+            tabsHandle.style.transition = "transform 0.32s cubic-bezier(0.22, 1, 0.36, 1)";
+            tabsHandle.style.transform = "rotate(0deg)";
             setTimeout(function () {
               sec.style.transition = "";
               sec.style.transform = "";
+              tabsHandle.style.transition = "";
+              tabsHandle.style.transform = "";
             }, 340);
           }
         }, { passive: true });
