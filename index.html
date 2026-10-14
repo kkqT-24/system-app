@@ -2041,10 +2041,56 @@
       .sq-overlay.show { opacity: 1; pointer-events: auto; }
       .sq-card {
         position: relative; width: 100%; max-width: 380px;
-        background: #0a0a0f; border: 1px solid var(--red);
+        background: linear-gradient(160deg, #0d0d14 0%, #080810 60%, #0a0a12 100%);
+        border: 1px solid var(--red);
         box-shadow: 0 0 32px rgba(255, 45, 85, 0.35), inset 0 0 24px rgba(255, 45, 85, 0.08);
-        padding: 28px 24px 24px; text-align: center;
+        padding: 30px 24px 24px; text-align: center;
         font-family: "Share Tech Mono", monospace; text-transform: uppercase;
+        animation: sqPulse 2.4s ease-in-out infinite;
+      }
+      .sq-card::before {
+        content: ""; position: absolute; inset: 6px; pointer-events: none;
+        border: 1px solid rgba(255, 45, 85, 0.25);
+      }
+      /* corner ticks */
+      .sq-card::after {
+        content: ""; position: absolute; inset: -1px; pointer-events: none;
+        background:
+          linear-gradient(var(--red), var(--red)) left top / 18px 2px,
+          linear-gradient(var(--red), var(--red)) left top / 2px 18px,
+          linear-gradient(var(--red), var(--red)) right top / 18px 2px,
+          linear-gradient(var(--red), var(--red)) right top / 2px 18px,
+          linear-gradient(var(--red), var(--red)) left bottom / 18px 2px,
+          linear-gradient(var(--red), var(--red)) left bottom / 2px 18px,
+          linear-gradient(var(--red), var(--red)) right bottom / 18px 2px,
+          linear-gradient(var(--red), var(--red)) right bottom / 2px 18px;
+        background-repeat: no-repeat;
+      }
+      .sq-card.white::after {
+        background:
+          linear-gradient(#fff, #fff) left top / 18px 2px,
+          linear-gradient(#fff, #fff) left top / 2px 18px,
+          linear-gradient(#fff, #fff) right top / 18px 2px,
+          linear-gradient(#fff, #fff) right top / 2px 18px,
+          linear-gradient(#fff, #fff) left bottom / 18px 2px,
+          linear-gradient(#fff, #fff) left bottom / 2px 18px,
+          linear-gradient(#fff, #fff) right bottom / 18px 2px,
+          linear-gradient(#fff, #fff) right bottom / 2px 18px;
+        background-repeat: no-repeat;
+      }
+      @keyframes sqPulse {
+        0%, 100% { box-shadow: 0 0 28px rgba(255, 45, 85, 0.3), inset 0 0 24px rgba(255, 45, 85, 0.07); }
+        50% { box-shadow: 0 0 44px rgba(255, 45, 85, 0.45), inset 0 0 32px rgba(255, 45, 85, 0.12); }
+      }
+      .sq-card.white { animation-name: sqPulseW; }
+      @keyframes sqPulseW {
+        0%, 100% { box-shadow: 0 0 28px rgba(255,255,255,0.32), inset 0 0 24px rgba(255,255,255,0.08); }
+        50% { box-shadow: 0 0 48px rgba(255,255,255,0.5), inset 0 0 32px rgba(255,255,255,0.14); }
+      }
+      /* live dissolve while FULFILL is held */
+      .sq-card.fulfilling {
+        animation: none;
+        transition: opacity 0.15s linear, filter 0.15s linear;
       }
       .sq-card.white {
         border-color: #fff;
@@ -5870,7 +5916,7 @@
             if (window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
             var r = sqCard.getBoundingClientRect();
             var cx = r.left + r.width / 2, cy = r.top + r.height / 2;
-            for (var i = 0; i < 28; i++) {
+            for (var i = 0; i < 70; i++) {
               (function () {
                 var p = document.createElement("div");
                 p.className = "sq-particle";
@@ -5881,10 +5927,10 @@
                 p.style.left = cx + "px"; p.style.top = cy + "px";
                 document.body.appendChild(p);
                 var ang = Math.random() * Math.PI * 2;
-                var dist = 60 + Math.random() * 140;
+                var dist = 90 + Math.random() * 220;
                 var dx = Math.cos(ang) * dist;
                 var dy = up ? -(40 + Math.random() * 160) : Math.sin(ang) * dist;
-                var dur = 700 + Math.random() * 600;
+                var dur = 1600 + Math.random() * 1200;
                 try {
                   var anim = p.animate([
                     { transform: "translate(-50%,-50%) scale(1)", opacity: 1 },
@@ -5896,12 +5942,24 @@
             }
           } catch (e) {}
         }
+        var sqShieldUntil = 0;
         function sqHide() {
           if (sqTickId) { clearInterval(sqTickId); sqTickId = null; }
           sqOverlay.classList.remove("show");
           sqOverlay.setAttribute("aria-hidden", "true");
           sqCard.classList.remove("cracking");
+          sqCard.classList.remove("fulfilling");
+          sqCard.style.opacity = "";
+          sqCard.style.filter = "";
+          /* ghost-click shield: swallow the tap that lands after the
+             popup vanishes under the user's still-down finger */
+          sqShieldUntil = Date.now() + 600;
         }
+        document.addEventListener("click", function (e) {
+          if (Date.now() < sqShieldUntil) {
+            e.preventDefault(); e.stopPropagation();
+          }
+        }, true);
         function sqShow() {
           var q = SECRET_POOL[SECRET.active.idx];
           sqTask.textContent = q.text;
@@ -5969,14 +6027,24 @@
           function progress() {
             var p = Math.min(1, (Date.now() - startT) / HOLD);
             if (fillEl) fillEl.style.width = (p * 100) + "%";
+            if (btn === sqFulfillBtn) {
+              sqCard.classList.add("fulfilling");
+              var glow = q_white() ? "255,255,255" : "255,45,85";
+              sqCard.style.filter = "brightness(" + (1 + p * 0.9).toFixed(2) + ") saturate(" + (1 + p * 0.4).toFixed(2) + ")";
+              sqCard.style.opacity = (1 - p * 0.45).toFixed(2);
+            }
             if (p >= 1) { cancel(); fn(); return; }
             raf = requestAnimationFrame(progress);
+          }
+          function q_white() {
+            return SECRET.active && SECRET_POOL[SECRET.active.idx] && SECRET_POOL[SECRET.active.idx].white;
           }
           function cancel() {
             if (timer) { clearTimeout(timer); timer = null; }
             if (raf) { cancelAnimationFrame(raf); raf = null; }
             if (fillEl) fillEl.style.width = "0%";
             if (btn === sqDefyBtn) sqCard.classList.remove("cracking");
+            if (btn === sqFulfillBtn) { sqCard.classList.remove("fulfilling"); sqCard.style.opacity = ""; sqCard.style.filter = ""; }
             pid = null;
           }
           btn.addEventListener("pointerdown", function (e) {
