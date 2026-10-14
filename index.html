@@ -5090,7 +5090,7 @@
           var dy = e.changedTouches[0].clientY - dragStartY;
           var dx = Math.abs(e.changedTouches[0].clientX - dragStartX);
           dragSec = null;
-          if (dy >= 160 && dx < 70) {
+          if (dy >= 160 && dy > dx) {
             sec.style.transition = "transform 0.28s ease-in";
             sec.style.transform = "translateY(110vh)";
             setTimeout(function () {
