@@ -300,48 +300,19 @@
   }
 
   /* ============ PANELS ============ */
+  /* module open/close: no particles — RGB-split flash, decoding title, glitch tear */
   function onPanelOpen(sec) {
-    var c = center(sec);
-    var top = c.r.top;
-    /* light streak across the top edge, sparks thrown off it */
-    for (var i = 0; i < 3; i++) {
-      streaks.push({ x: c.r.left - 20, y: top + 1, a: 0, v: 18 + i * 4, acc: 1.06, len: 80, life: -i * 40, max: 520, c: i ? "#da78f5" : "#ffffff", w: 2 - i * 0.5 });
-    }
-    spark(c.x, top + 2, { n: 18, min: 1, max: 5, angle: -Math.PI / 2, spread: 1.2, jx: c.w / 2, life: 650, gravity: 0.12 });
-    go();
     restartClass(sec, "mx-chroma", 460);
     punch();
-    var nm = sec.querySelector(".s-name");
-    var st = sec.querySelector(".s-state");
-    decode(nm, { dur: 520, delay: 180 });
-    decode(st, { dur: 520, delay: 300 });
+    decode(sec.querySelector(".s-name"), { dur: 520, delay: 180 });
+    decode(sec.querySelector(".s-state"), { dur: 520, delay: 300 });
   }
   function onPanelClose(sec) {
     sec.classList.add("mx-tear");
     setTimeout(function () { sec.classList.remove("mx-tear"); }, 300);
-    var c = center(sec);
-    spark(c.x, Math.min(H * 0.6, c.y), { n: 22, min: 2, max: 7, jx: c.w / 2, jy: 40, life: 500, gravity: 0.15 });
   }
-  function onCollapse() {
-    var grid = document.querySelector(".showcase-grid");
-    if (!grid) return;
-    var c = center(grid);
-    converge(c.x, c.y, 34, 460);
-    setTimeout(function () {
-      ring(c.x, c.y, { r1: 140, life: 420, width: 2.5 });
-      spark(c.x, c.y, { n: 20, min: 2, max: 8, life: 500 });
-      flash("rgba(195,184,254,0.7)", 0.3, 380);
-    }, 330);
-    buzz(10);
-  }
-  function onExpand() {
-    var grid = document.querySelector(".showcase-grid");
-    if (!grid) return;
-    var c = center(grid);
-    ring(c.x, c.y, { r1: c.w * 0.75, life: 600, width: 2 });
-    spark(c.x, c.y, { n: 24, min: 3, max: 9, life: 600, gravity: 0 });
-    setTimeout(shineTiles, 500);
-  }
+  function onCollapse() { buzz(10); }
+  function onExpand() { setTimeout(shineTiles, 500); }
   function onShowcaseEnter() {
     var names = document.querySelectorAll(".tab-tile .t-name");
     for (var i = 0; i < names.length; i++) decode(names[i], { dur: 480, delay: 60 + i * 60 });
@@ -412,6 +383,8 @@
   document.addEventListener("pointerdown", function (e) {
     var t = e.target.closest ? e.target.closest(TAPPABLE) : null;
     if (!t || t.closest("canvas")) return;
+    /* tiles and the handle open/close modules — no particles there */
+    if (t.classList.contains("tab-tile") || t.id === "tabsHandle") return;
     ring(e.clientX, e.clientY, { r0: 2, r1: 30, life: 380, width: 1.5 });
     spark(e.clientX, e.clientY, { n: 6, min: 1, max: 3.5, life: 380, gravity: 0, tail: 2, rmax: 1.6 });
   }, { passive: true, capture: true });

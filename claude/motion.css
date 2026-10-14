@@ -167,3 +167,26 @@
   #mxFx, #mxFlash, .mx-bars, .mx-banner, .mx-float, .tab-tile > .mx-sheen, .tab-tile > .mx-glint { display: none !important; }
   .mx-shake, .mx-punch, .mx-chroma, .mx-pop { animation: none !important; }
 }
+
+/* ---------- in-app Sports Desk ---------- */
+.section.mx-embed { padding: 12px 10px 10px; margin-bottom: 10px; }
+.mx-embed-bar { display: flex; align-items: center; justify-content: space-between; padding: 2px 6px 10px; }
+.mx-embed-bar .s-name { text-indent: 0; font-size: 15px; }
+.mx-embed-out {
+  font-size: 10px; letter-spacing: 0.18em; color: var(--lav); text-decoration: none; text-transform: uppercase;
+  border: 1px solid var(--line-soft); padding: 6px 10px;
+}
+.mx-embed-frame {
+  height: calc(100dvh - 140px - env(safe-area-inset-top) - env(safe-area-inset-bottom));
+  min-height: 420px; border: 1px solid var(--line-soft); background: #05040f;
+}
+.mx-embed-frame iframe { display: block; width: 100%; height: 100%; border: 0; background: #05040f; }
+
+/* ---------- RANK S lightning (procedural, drawn by motion.js) ---------- */
+/* retire the old tiled-SVG arcs; the canvas bolts replace them */
+.q-bar-shell.mx-bolts::before, .q-bar-shell.mx-bolts::after,
+.q-bar-shell.mx-bolts .q-shock-row2::before, .q-bar-shell.mx-bolts .q-shock-row2::after { display: none !important; }
+.q-bar-shell.mx-bolts { animation: none !important; box-shadow: 0 0 10px rgba(76, 29, 149, 0.35); transition: box-shadow 0.25s ease; }
+.q-bar-shell.mx-bolts.mx-zap { box-shadow: 0 0 20px rgba(20, 2, 48, 0.95), 0 0 36px rgba(124, 58, 237, 0.55); transition: none; }
+.mx-bolt-cv { position: absolute; pointer-events: none; z-index: 3; }
+.tab-tile .t-letter.mx-zap .t-glyph { filter: brightness(1.6) drop-shadow(0 0 6px #a855f7); }

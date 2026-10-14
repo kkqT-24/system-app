@@ -396,7 +396,7 @@
       @keyframes greetFromTop { from { opacity: 0; transform: translateY(-42px); } to { opacity: 1; transform: none; } }
       #phaseGreet { text-align: center; align-items: center; animation: greetRise 0.9s cubic-bezier(0.22, 1, 0.36, 1) 0.14s both; }
       @media (max-width: 560px) {
-        #phaseGreet .weather-card { transform: translateY(-64px); }
+        #phaseGreet .weather-card { translate: 0 var(--wx-lift, -40px); }
       }
       @keyframes greetRise { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: none; } }
       .greet-kicker {
@@ -2342,7 +2342,7 @@
               <button type="button" class="tab-tile" data-section="weather"><span class="t-name">Weather</span><span class="t-state wx-tile-state"><span class="weather-icon wx-tile-icon" id="wxTileIcon" data-icon="sun" aria-hidden="true"></span><span id="wxTileState">80° · Sunny</span></span></button>
               <button type="button" class="tab-tile" data-section="vehicle"><span class="t-name">Vehicle</span><span class="t-state">Mercedes AMG GT S</span></button>
               <button type="button" class="tab-tile" data-external="https://claude.ai/artifact/X2M1Z3DAPcH5gBRC8dX4hM"><span class="t-name">Trading Desk</span><span class="t-state">External &#8599;</span></button>
-              <button type="button" class="tab-tile" data-external="https://kkqt-24.github.io/sports-desk/?r=1791914492410#desk"><span class="t-name">Sports Desk</span><span class="t-state">External &#8599;</span></button>
+              <button type="button" class="tab-tile" data-section="sports"><span class="t-name">Sports Desk</span><span class="t-state">Live desk</span></button>
             </div>
             <div class="showcase-status mono">
               <span><span class="status-dot"></span><span class="gl" data-g="All systems nominal">All systems nominal</span></span>
@@ -2592,6 +2592,11 @@
                 <div class="maint-empty mono" id="maintEmpty">No service logged yet</div>
                 <div id="maintLog"></div>
               </div>
+            </section>
+            <!-- Claude build: Sports Desk opens inside the app -->
+            <section class="section is-hidden mx-embed" id="sec-sports" aria-label="Sports Desk">
+              <div class="mx-embed-bar"><span class="s-name">Sports Desk</span><a class="mx-embed-out mono" href="https://kkqt-24.github.io/sports-desk/#desk" target="_blank" rel="noopener">Open &#8599;</a></div>
+              <div class="mx-embed-frame"><iframe id="sportsFrame" title="Sports Desk" data-src="https://kkqt-24.github.io/sports-desk/#desk" loading="eager" allow="clipboard-write; fullscreen"></iframe></div>
             </section>
             <!-- weather panel: opened from the Weather tile (slot 03);
                  the grab-bar handle above the panel returns to the
@@ -2853,9 +2858,9 @@
         /* ---------- greeting by time of day ---------- */
         function greetingWord(d) {
           var h = d.getHours();
-          if (h >= 5 && h < 12) return "Good morning";
-          if (h >= 12 && h < 17) return "Good afternoon";
-          if (h >= 17 && h < 22) return "Good evening";
+          if (h >= 5 && h < 12) return "Good Morning";
+          if (h >= 12 && h < 17) return "Good Afternoon";
+          if (h >= 17 && h < 22) return "Good Evening";
           return "Up late";
         }
         function dateLine(d) {
@@ -5576,6 +5581,7 @@
           }
         }, { passive: true });
         function burstRingUp() {
+          return; /* Claude build: no particles when a module closes */
           if (!thBar) return;
           var r = thBar.getBoundingClientRect();
           var cx = r.left + r.width / 2, cy = r.top + r.height / 2;
@@ -6990,6 +6996,38 @@
         }, { passive: false });
       })();
     </script>
-      <script src="motion.js"></script>
+      <script>
+      /* Claude build helpers: lazy-load the in-app Sports Desk, keep the
+         boot weather card clear of the status lines at the bottom */
+      (function () {
+        var sec = document.getElementById("sec-sports");
+        var fr = document.getElementById("sportsFrame");
+        if (sec && fr) {
+          new MutationObserver(function () {
+            if (!sec.classList.contains("is-hidden") && !fr.getAttribute("src")) fr.setAttribute("src", fr.getAttribute("data-src") + "");
+          }).observe(sec, { attributes: true, attributeFilter: ["class"] });
+        }
+        var greet = document.getElementById("phaseGreet");
+        var card = greet ? greet.querySelector(".weather-card") : null;
+        var chatter = document.getElementById("chatter");
+        var core = document.getElementById("hud");
+        function fit() {
+          if (!card || greet.classList.contains("is-hidden")) return;
+          card.style.setProperty("--wx-lift", "0px");
+          var cr = card.getBoundingClientRect();
+          var limitBottom = window.innerHeight - 60;
+          var ch = chatter && chatter.offsetParent ? chatter.getBoundingClientRect() : null;
+          if (ch && ch.height) limitBottom = Math.min(limitBottom, ch.top - 14);
+          else if (ch) limitBottom = Math.min(limitBottom, ch.bottom - 4 * 19 - 14);
+          var lift = Math.max(40, cr.bottom - limitBottom);
+          if (core) { var hr = core.getBoundingClientRect(); lift = Math.min(lift, Math.max(0, cr.top - hr.bottom - 12)); }
+          card.style.setProperty("--wx-lift", (-lift).toFixed(0) + "px");
+        }
+        if (greet) new MutationObserver(function () { setTimeout(fit, 30); setTimeout(fit, 1000); }).observe(greet, { attributes: true, attributeFilter: ["class"] });
+        window.addEventListener("resize", fit);
+      })();
+    </script>
+    <script src="motion.js"></script>
+    <script src="bolts.js"></script>
   </body>
 </html>
