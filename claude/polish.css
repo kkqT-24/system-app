@@ -496,3 +496,10 @@ body.tab-open .main-controls .replay-btn { display: none !important; }
 .mx-rs.open .shB { animation: mxRsDown 0.85s cubic-bezier(0.7, 0, 0.2, 1) forwards; box-shadow: 0 -1px 0 rgba(196, 181, 253, 0.8), 0 0 18px rgba(143, 94, 248, 0.5); }
 @keyframes mxRsUp { to { transform: translateY(-101%); } }
 @keyframes mxRsDown { to { transform: translateY(101%); } }
+/* monarch-specific glow in 2D */
+.mx-sh-fig.mon-wyrm .body { filter: drop-shadow(0 0 1.5px #ff7a2e) drop-shadow(0 0 6px rgba(255, 45, 26, 0.6)) drop-shadow(0 0 14px rgba(255, 122, 46, 0.7)) !important; }
+.mx-sh-fig.mon-archon .body { filter: drop-shadow(0 0 1.5px #e0f2ff) drop-shadow(0 0 6px rgba(125, 211, 252, 0.6)) drop-shadow(0 0 14px rgba(191, 233, 255, 0.7)) !important; }
+.mx-sh-fig.mon-fenris .body { filter: drop-shadow(0 0 1.5px #34f5a0) drop-shadow(0 0 6px rgba(16, 185, 129, 0.6)) drop-shadow(0 0 14px rgba(52, 245, 160, 0.6)) !important; }
+.mx-sh-fig.mon-regent .body { filter: drop-shadow(0 0 1.5px #ffc94d) drop-shadow(0 0 6px rgba(255, 42, 61, 0.6)) drop-shadow(0 0 14px rgba(255, 201, 77, 0.7)) !important; }
+.mx-sh-fig.mon-archon .bolts path { stroke: #e0f2ff; } .mx-sh-fig.mon-fenris .bolts path { stroke: #a7f3d0; } .mx-sh-fig.mon-wyrm .bolts path { stroke: #ffd2a8; }
+.mx-stage { height: 280px !important; }

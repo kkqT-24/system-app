@@ -184,14 +184,14 @@
   /* ---------------- MONARCH'S GUARD: four legendary shadows ----------------
      Not rolled at random — each answers only when you earn it. */
   var MONARCHS = [
-    { key: "regent", name: "Aurex, the Shadow Regent", cls: "Regent", need: "Reach Rank S", power: 9000,
+    { key: "regent", c1: "#ffc94d", c2: "#ff2a3d", ce: "#ff3b5c", name: "Aurex, the Shadow Regent", cls: "Regent", need: "Reach Rank S", power: 9000,
       eyes: [[45.5, 23.5], [54.5, 23.5]],
       body: '<path d="M39 15l3-9 4 6 4-10 4 10 4-6 3 9z"/><path d="M40 17q10-7 20 0v15q-10 8-20 0z"/>' +
         '<path class="cape" d="M50 34C28 36 8 62 2 110h96C92 62 72 36 50 34z"/>' +
         '<path d="M37 38h26l4 40-7 30H40l-7-30zM24 46q8-12 20-6l-2 12-20 4zM76 46q-8-12-20-6l2 12 20 4z"/>' +
         '<g class="raise"><path d="M63 44l24-38 2.2 1.4-24 38z"/><path d="M60 40l10 6-1.4 2.2-10-6z"/></g>',
       det: "M50 18v12M43 25h14M40 50h20M42 58h16M44 66h12M36 80h28M20 80l-8 28M80 80l8 28M30 70l-10 38M70 70l10 38" },
-    { key: "wyrm", name: "Vorhal, Wyrm of the Abyss", cls: "Wyrm", need: "Hold a 30-day workout streak", power: 12000,
+    { key: "wyrm", c1: "#ff7a2e", c2: "#ff2d1a", ce: "#ffb020", name: "Vorhal, Wyrm of the Abyss", cls: "Wyrm", need: "Hold a 30-day workout streak", power: 12000,
       eyes: [[33, 17], [38, 16]],
       body: '<g class="wingL"><path d="M50 52C32 22 10 16 2 28c10 0 16 5 19 13C11 39 5 45 3 54c12-6 22-4 31 6z"/></g>' +
         '<g class="wingR"><path d="M50 52C68 22 90 16 98 28c-10 0-16 5-19 13 10-2 16 4 18 13-12-6-22-4-31 6z"/></g>' +
@@ -199,14 +199,14 @@
         '<path class="neck" d="M45 58C40 42 47 30 42 21l-14-3 9-3 5-7 4 8c7 8 5 22 9 41z"/>' +
         '<path class="tail" d="M62 94c14 6 25 1 34 10-12-1-24 5-37-3z"/>',
       det: "M8 30l14 10M92 30l-14 10M14 46l16 8M86 46l-16 8M40 70h20M38 78h24M40 86h20M30 16l4-2" },
-    { key: "archon", name: "Seraphine, Archon of Night", cls: "Archon", need: "Raise 25 shadows", power: 10500,
+    { key: "archon", c1: "#bfe9ff", c2: "#7dd3fc", ce: "#e0f2ff", name: "Seraphine, Archon of Night", cls: "Archon", need: "Raise 25 shadows", power: 10500,
       eyes: [[45.5, 27], [54.5, 27]],
       body: '<ellipse class="halo" cx="50" cy="9" rx="13" ry="3.4" fill="none" stroke-width="1.6"/>' +
         '<g class="wingL"><path d="M48 42C34 22 14 6 3 10c6 8 10 17 12 27 8-2 17 0 33 7zM46 54C34 50 18 52 8 62c10 0 18 2 24 8 4-6 8-10 14-12z"/></g>' +
         '<g class="wingR"><path d="M52 42C66 22 86 6 97 10c-6 8-10 17-12 27-8-2-17 0-33 7zM54 54C66 50 82 52 92 62c-10 0-18 2-24 8-4-6-8-10-14-12z"/></g>' +
         '<path d="M50 14q12 4 10 22l-5 6H45l-5-6q-2-18 10-22z"/><path d="M36 44h28l11 66H25z"/>',
       det: "M40 36q10 6 20 0M38 60h24M34 80q16 6 32 0M30 100q20 6 40 0M50 44v64M16 18l18 18M84 18l-18 18" },
-    { key: "fenris", name: "Fenrath, the Black Wolf", cls: "Wolf", need: "Clear every daily quest 7 days in a row", power: 8000,
+    { key: "fenris", c1: "#34f5a0", c2: "#10b981", ce: "#6effc8", name: "Fenrath, the Black Wolf", cls: "Wolf", need: "Clear every daily quest 7 days in a row", power: 8000,
       eyes: [[44, 40], [56, 40]],
       body: '<path d="M28 108c-3-22 0-40 11-52l-6-26 11 13q6-3 12 0l11-13-6 26c11 12 14 30 11 52z"/>' +
         '<path d="M40 50l-12-4 8 8-10 2 12 4zM60 50l12-4-8 8 10 2-12 4z"/><path d="M44 52l6 12 6-12z"/>' +
@@ -214,7 +214,7 @@
       det: "M45 46l5 4 5-4M40 62l-6 14M60 62l6 14M50 68v38M36 90h28" }
   ];
   function monarchFigure(m, still) {
-    var id = "m" + (++figN), gold = "#ffd166", vio = "#a855f7";
+    var id = "m" + (++figN), gold = m.c1 || "#ffd166", vio = m.c2 || "#a855f7";
     /* three aura layers: a towering violet-gold blaze, a black smoke
        curtain licking through it, and a crimson heat at the base */
     var flames = "", smoke = "";
@@ -229,19 +229,19 @@
     var bolts = '<g class="bolts" fill="none" stroke="#f3e8ff" stroke-width="0.9" stroke-linejoin="round">' +
       '<path d="M8 34l7 6-5 5 8 9-4 4 7 8"/><path d="M92 28l-6 8 5 4-8 8 4 5-7 9"/><path d="M50 -10l-4 7 5 3-5 8"/><path d="M22 6l4 8-4 3 5 6"/><path d="M80 4l-3 7 4 3-4 7"/></g>';
     var embers = "";
-    for (var e2 = 0; e2 < 8; e2++) embers += '<circle class="mt" cx="' + (12 + e2 * 11) + '" cy="108" r="' + (0.9 + (e2 % 3) * 0.5) + '" fill="' + (e2 % 2 ? gold : "#ff4d6d") + '" style="animation-delay:-' + (e2 * 0.6).toFixed(1) + 's"/>';
+    for (var e2 = 0; e2 < 8; e2++) embers += '<circle class="mt" cx="' + (12 + e2 * 11) + '" cy="108" r="' + (0.9 + (e2 % 3) * 0.5) + '" fill="' + (e2 % 2 ? gold : vio) + '" style="animation-delay:-' + (e2 * 0.6).toFixed(1) + 's"/>';
     var eyes = m.eyes.map(function (e) { return '<ellipse cx="' + e[0] + '" cy="' + e[1] + '" rx="3" ry="1.1"/>'; }).join("");
     return '<svg class="mx-sh-fig monarch mon-' + m.key + (still ? " still" : "") + '" viewBox="0 0 100 112" aria-hidden="true" style="--tc:' + gold + ';--tv:' + vio + '">' +
-      '<defs><linearGradient id="' + id + 'g" x1="0" y1="1" x2="0" y2="0"><stop offset="0" stop-color="#ff5a3c" stop-opacity="0.9"/><stop offset="0.25" stop-color="' + gold + '" stop-opacity="0.75"/><stop offset="0.6" stop-color="#5b1a8a" stop-opacity="0.55"/><stop offset="1" stop-color="#05010d" stop-opacity="0"/></linearGradient>' +
-      '<linearGradient id="' + id + 'v" x1="0" y1="1" x2="0" y2="0"><stop offset="0" stop-color="#c026d3" stop-opacity="0.9"/><stop offset="0.4" stop-color="' + vio + '" stop-opacity="0.7"/><stop offset="0.75" stop-color="#1a0638" stop-opacity="0.45"/><stop offset="1" stop-color="#05010d" stop-opacity="0"/></linearGradient>' +
+      '<defs><linearGradient id="' + id + 'g" x1="0" y1="1" x2="0" y2="0"><stop offset="0" stop-color="' + vio + '" stop-opacity="0.9"/><stop offset="0.25" stop-color="' + gold + '" stop-opacity="0.75"/><stop offset="0.6" stop-color="#14062a" stop-opacity="0.55"/><stop offset="1" stop-color="#05010d" stop-opacity="0"/></linearGradient>' +
+      '<linearGradient id="' + id + 'v" x1="0" y1="1" x2="0" y2="0"><stop offset="0" stop-color="' + gold + '" stop-opacity="0.8"/><stop offset="0.4" stop-color="' + vio + '" stop-opacity="0.7"/><stop offset="0.75" stop-color="#1a0638" stop-opacity="0.45"/><stop offset="1" stop-color="#05010d" stop-opacity="0"/></linearGradient>' +
       '<linearGradient id="' + id + 's" x1="0" y1="1" x2="0" y2="0"><stop offset="0" stop-color="#000" stop-opacity="0.95"/><stop offset="0.6" stop-color="#0b0216" stop-opacity="0.7"/><stop offset="1" stop-color="#000" stop-opacity="0"/></linearGradient>' +
-      '<radialGradient id="' + id + 'r" cx="50%" cy="60%" r="58%"><stop offset="0" stop-color="#ff3b5c" stop-opacity="0.28"/><stop offset="0.35" stop-color="' + vio + '" stop-opacity="0.28"/><stop offset="1" stop-color="' + vio + '" stop-opacity="0"/></radialGradient></defs>' +
+      '<radialGradient id="' + id + 'r" cx="50%" cy="60%" r="58%"><stop offset="0" stop-color="' + gold + '" stop-opacity="0.3"/><stop offset="0.35" stop-color="' + vio + '" stop-opacity="0.28"/><stop offset="1" stop-color="' + vio + '" stop-opacity="0"/></radialGradient></defs>' +
       '<ellipse class="dome" cx="50" cy="64" rx="56" ry="56" fill="url(#' + id + 'r)"/>' +
-      '<ellipse class="quake" cx="50" cy="110" rx="40" ry="5" fill="none" stroke="#ff4d6d" stroke-width="1"/>' +
+      '<ellipse class="quake" cx="50" cy="110" rx="40" ry="5" fill="none" stroke="' + vio + '" stroke-width="1"/>' +
       '<g class="aura">' + flames + '</g><g class="smoke">' + smoke + '</g>' + bolts +
       '<g class="body" fill="#010005" stroke="' + gold + '" stroke-opacity="0.9" stroke-width="0.8" stroke-linejoin="round">' + m.body + '</g>' +
       '<path class="det" d="' + m.det + '" fill="none" stroke="' + gold + '" stroke-width="0.55" stroke-linecap="round"/>' +
-      '<g class="eyes" fill="#ffe2e8">' + eyes + '</g>' + embers +
+      '<g class="eyes" fill="#fff6f0" style="filter:drop-shadow(0 0 2px #fff) drop-shadow(0 0 5px ' + (m.ce || vio) + ') drop-shadow(0 0 12px ' + (m.ce || vio) + ')">' + eyes + '</g>' + embers +
       '<ellipse cx="50" cy="111" rx="38" ry="3" fill="#000" opacity="0.9"/></svg>';
   }
   function monarchByKey(k) { for (var i = 0; i < MONARCHS.length; i++) if (MONARCHS[i].key === k) return MONARCHS[i]; return null; }
@@ -313,6 +313,7 @@
   /* ---------------- ARISE cinematic ---------------- */
   function arise(sh, preview) {
     var T = TIERS[sh.tier];
+    if (sh.monarch) { var mk = monarchByKey(sh.monarch); if (mk) T = { name: T.name, color: mk.c1 }; }
     var isMon = !!sh.monarch;
     var ov = el("div", "mx-arise" + (RM ? " rm" : "") + (isMon ? " monarch" : ""), '' +
       '<div class="mx-ar-smoke"><i></i><i></i><i></i><i></i></div>' +
@@ -517,7 +518,7 @@
     var slots = [[50, 104, 1], [33, 84, 0.85], [67, 84, 0.85], [19, 68, 0.72], [81, 68, 0.72], [8, 56, 0.6], [92, 56, 0.6], [26, 48, 0.5], [74, 48, 0.5]];
     var use3d = D.settings.view3d && window.__mx3d;
     var viewSw = '<div class="mx-view"><button type="button" data-view="3d" class="' + (use3d ? "on" : "") + '">3D</button><button type="button" data-view="2d" class="' + (use3d ? "" : "on") + '">2D</button></div>';
-    var army3d = '<div class="mx-army3d"><div class="cap">Shadow army · ' + D.shadows.length + ' strong · drag to turn · tap one to inspect</div><div class="mx-stage" id="mxStage"></div></div>';
+    var army3d = '<div class="mx-army3d"><div class="cap">Shadow army · ' + D.shadows.length + ' strong · tap one to inspect</div><div class="mx-stage" id="mxStage"></div></div>';
     var army = '<div class="mx-army"><div class="cap">Shadow army · ' + D.shadows.length + ' strong · tap one to inspect</div>' + ranked.map(function (sh, i) {
       var sl = slots[i];
       return '<button type="button" class="u" data-sh="' + sh.id + '" style="left:' + sl[0] + '%;width:' + sl[1] + 'px;z-index:' + (20 - i) + ';opacity:' + (0.5 + sl[2] * 0.5).toFixed(2) + ';bottom:' + ((1 - sl[2]) * 34 + 6).toFixed(0) + 'px;animation-delay:-' + (i * 0.7).toFixed(1) + 's" aria-label="' + esc(sh.name) + '">' + shadowFigure(sh) + '</button>';
@@ -553,6 +554,7 @@
     D.shadows.forEach(function (x) { if (x.id === id) sh = x; });
     if (!sh) return;
     var T = TIERS[sh.tier] || TIERS[0];
+    if (sh.monarch) { var mk2 = monarchByKey(sh.monarch); if (mk2) T = { name: T.name, color: mk2.c1 }; }
     var when = sh.t ? new Date(sh.t).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" }) : sh.day;
     var rank = D.shadows.slice().sort(function (a, b) { return b.power - a.power; }).indexOf(sh) + 1;
     var ov = el("div", "mx-inspect", '<div class="mx-ar-card" style="--tc:' + T.color + '"><div class="mx-ar-k">' + T.name + ' · ' + esc(sh.cls) + '</div>' + shadowFigure(sh) +

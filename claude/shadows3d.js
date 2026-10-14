@@ -115,12 +115,21 @@
         hip.rotation.z = -0.03 * sd;
       });
       var pelvis = mesh(sph(0.2, 14, 10), M, 0, 0.92, 0); pelvis.scale.set(1.05, 0.62, 0.72); body.add(pelvis);
+      /* tabard hanging from the belt, trimmed in glow */
+      var tab = mesh(box(0.2, 0.44, 0.014), M, 0, 0.7, 0.155); tab.rotation.x = -0.06; body.add(tab);
+      var tg = glowMat(opt.color);
+      [-1, 1].forEach(function (sd) { var e = mesh(box(0.008, 0.42, 0.018), tg, 0.098 * sd, 0.7, 0.158); e.rotation.x = -0.06; body.add(e); });
+      body.add(mesh(box(0.2, 0.008, 0.018), tg, 0, 0.485, 0.17));
       /* tasset plates over the hips */
       [-1, 1].forEach(function (sd) { var t = mesh(box(0.16, 0.2, 0.03), M, 0.13 * sd, 0.8, 0.13); t.rotation.z = 0.12 * sd; t.rotation.x = -0.12; body.add(t); });
     }
     /* torso: waist → chest → shoulders, one smooth lathe */
     var torso = mesh(lathe([[0, 0], [0.17, 0], [0.18, 0.08], [0.24, 0.26], [0.27, 0.42], [0.25, 0.52], [0.16, 0.6], [0.08, 0.64], [0, 0.64]], 18), M, 0, 0.94, 0);
     torso.scale.z = 0.7; body.add(torso);
+    /* breastplate over the chest with a glowing keel */
+    var plate = mesh(new THREE.SphereGeometry(0.27, 18, 10, 0, Math.PI, Math.PI * 0.28, Math.PI * 0.42), M, 0, 1.3, 0); plate.scale.set(1.02, 1.05, 0.78); body.add(plate);
+    body.add(mesh(box(0.012, 0.28, 0.012), glowMat(opt.color), 0, 1.28, 0.205));
+    [-1, 1].forEach(function (sd) { var r = mesh(box(0.1, 0.008, 0.012), glowMat(opt.color), 0.07 * sd, 1.2, 0.19); r.rotation.z = 0.35 * sd; body.add(r); });
     var trim = glowMat(opt.color);
     var belt = mesh(new THREE.TorusGeometry(0.175, 0.012, 6, 24), trim, 0, 0.97, 0); belt.rotation.x = Math.PI / 2; belt.scale.y = 0.7; body.add(belt);
     var collar = mesh(new THREE.TorusGeometry(0.12, 0.012, 6, 20), trim, 0, 1.53, 0); collar.rotation.x = Math.PI / 2; collar.scale.y = 0.7; body.add(collar);
@@ -247,6 +256,13 @@
     }
   };
 
+  /* ---------- monarchs: each with its own aura scheme ---------- */
+  var MPAL = {
+    regent: { rim: 0xffc94d, trim: 0xffd166, accent: 0xff2a3d, eye: 0xff3b5c, aura: [0xffd166, 0xff2a3d, 0xffb84d, 0x7a0a1a], flame: [0xffc94d, 0xff2a3d, 0x9b1c1c] },
+    wyrm:   { rim: 0xff7a2e, trim: 0xff8a3d, accent: 0xff3b1f, eye: 0xffb020, aura: [0xff6a1a, 0xff2d1a, 0xffc04d, 0x3a0a00], flame: [0xff7a2e, 0xff2d1a, 0x5a0f00] },
+    archon: { rim: 0xbfe9ff, trim: 0xe8f7ff, accent: 0x7dd3fc, eye: 0xe0f2ff, aura: [0xe0f2ff, 0x7dd3fc, 0xa5b4fc, 0xffffff], flame: [0xbfe9ff, 0x7dd3fc, 0x6366f1] },
+    fenris: { rim: 0x34f5a0, trim: 0x5effc0, accent: 0x10b981, eye: 0x6effc8, aura: [0x34f5a0, 0x10b981, 0x064e3b, 0xa7f3d0], flame: [0x34f5a0, 0x059669, 0x022c22] }
+  };
   /* ---------- monarchs ---------- */
   function wingGeo(span, drop, spread) {
     var s = new THREE.Shape();
@@ -277,34 +293,34 @@
     return g;
   }
   var MON = {
-    regent: function (M, c) {
-      var H = humanoid(M, { color: c, eye: 0xffe2e8, eyeGlow: 0xff3b5c });
+    regent: function (M, c, P) {
+      var H = humanoid(M, { color: P.trim, eye: 0xfff0f0, eyeGlow: P.eye });
       H.root.scale.setScalar(1.3);
       H.head.add(mesh(cyl(0.165, 0.165, 0.24, 12), M, 0, 0.03, 0));
-      for (var i = 0; i < 7; i++) { var a = i / 7 * 6.283, sp = mesh(cone(0.035, 0.16 + (i % 2) * 0.08, 6), glowMat(0xffd166), Math.cos(a) * 0.16, 0.24, Math.sin(a) * 0.16); H.head.add(sp); }
-      var cape = mesh(clothPlane(1.05, 1.55, 8, 12), rimMat(0xffb84d, 0.4, THREE.DoubleSide), 0, 1.55, -0.24); H.body.add(cape); H.cape = cape;
+      for (var i = 0; i < 7; i++) { var a = i / 7 * 6.283, sp = mesh(cone(0.035, 0.16 + (i % 2) * 0.08, 6), glowMat(P.trim), Math.cos(a) * 0.15, 0.2, Math.sin(a) * 0.15); H.head.add(sp); }
+      var cape = mesh(clothPlane(1.05, 1.55, 8, 12), rimMat(P.accent, 0.5, THREE.DoubleSide), 0, 1.55, -0.24); H.body.add(cape); H.cape = cape;
       var sword = new THREE.Group();
-      sword.add(mesh(box(0.08, 1.5, 0.02), M, 0, 0.9, 0)); sword.add(mesh(box(0.016, 1.4, 0.024), glowMat(0xff3b5c), 0, 0.9, 0.004));
+      sword.add(mesh(box(0.08, 1.5, 0.02), M, 0, 0.9, 0)); sword.add(mesh(box(0.016, 1.4, 0.024), glowMat(P.accent), 0, 0.9, 0.004));
       sword.add(mesh(box(0.34, 0.05, 0.06), M, 0, 0.12, 0));
       sword.position.set(0, -0.62, 0); H.armR.add(sword); H.weapon = sword;
       H.armR.rotation.z = 0.25; H.armR.rotation.x = -0.15; H.raise = true;
       return H;
     },
-    archon: function (M, c) {
-      var H = humanoid(M, { color: c, robe: true, eye: 0xffe2e8, eyeGlow: 0xff3b5c });
+    archon: function (M, c, P) {
+      var H = humanoid(M, { color: P.trim, robe: true, eye: 0xffffff, eyeGlow: P.eye });
       H.root.scale.setScalar(1.2);
       var hood = mesh(sph(0.18, 12, 10), M, 0, 0.03, -0.02); hood.scale.set(1, 1.15, 1.1); H.head.add(hood);
-      var halo = mesh(new THREE.TorusGeometry(0.22, 0.02, 8, 32), glowMat(0xffd166), 0, 0.36, -0.05); halo.rotation.x = Math.PI / 2 - 0.3; H.head.add(halo); H.halo = halo;
+      var halo = mesh(new THREE.TorusGeometry(0.22, 0.02, 8, 32), glowMat(P.trim), 0, 0.36, -0.05); halo.rotation.x = Math.PI / 2 - 0.3; H.head.add(halo); H.halo = halo;
       H.wings = [];
       [[1, 0.0, 0.9], [1, -0.35, 0.7]].forEach(function (cfg) {
         [-1, 1].forEach(function (sd) {
-          var w = wing(cfg[2], 0.5 + cfg[1], 5, 0xffd166); w.position.set(0.12 * sd, 1.42 + cfg[1] * 0.6, -0.22); w.scale.x = sd;
+          var w = wing(cfg[2], 0.5 + cfg[1], 5, P.trim); w.position.set(0.12 * sd, 1.42 + cfg[1] * 0.6, -0.22); w.scale.x = sd;
           w.rotation.y = sd * 0.35; H.body.add(w); H.wings.push({ m: w, sd: sd, base: w.rotation.y });
         });
       });
       return H;
     },
-    wyrm: function (M, c) {
+    wyrm: function (M, c, P) {
       var root = new THREE.Group(), body = new THREE.Group(); root.add(body);
       root.scale.setScalar(1.15); body.rotation.y = 0.85;
       var torso = mesh(sph(0.5, 16, 12), M, 0, 0.85, 0); torso.scale.set(0.75, 0.62, 1.15); body.add(torso);
@@ -315,32 +331,34 @@
       var skull = mesh(box(0.26, 0.2, 0.46), M, 0, 0, 0.08); head.add(skull);
       head.add(mesh(box(0.22, 0.08, 0.3), M, 0, -0.1, 0.25));
       [-1, 1].forEach(function (sd) { var h = mesh(cone(0.04, 0.34, 6), M, 0.1 * sd, 0.16, -0.12); h.rotation.x = -1.0; h.rotation.z = 0.3 * sd; head.add(h); });
-      var eM = glowMat(0xffe2e8), e1 = mesh(box(0.05, 0.02, 0.06), eM, -0.1, 0.04, 0.24), e2 = mesh(box(0.05, 0.02, 0.06), eM, 0.1, 0.04, 0.24);
+      var eM = glowMat(0xfff4d6), e1 = mesh(box(0.05, 0.02, 0.06), eM, -0.1, 0.04, 0.24), e2 = mesh(box(0.05, 0.02, 0.06), eM, 0.1, 0.04, 0.24);
       head.add(e1); head.add(e2);
-      var eg = glowSprite(0xff3b5c, 0.5); eg.position.set(0, 0.04, 0.3); head.add(eg);
+      var eg = glowSprite(P.eye, 0.5); eg.position.set(0, 0.04, 0.3); head.add(eg);
       var tailCurve = new THREE.CatmullRomCurve3([new THREE.Vector3(0, 0.8, -0.5), new THREE.Vector3(0.2, 0.6, -1.0), new THREE.Vector3(-0.1, 0.4, -1.5), new THREE.Vector3(0.25, 0.3, -1.9)]);
       var tail = mesh(new THREE.TubeGeometry(tailCurve, 16, 0.08, 6, false), M); body.add(tail);
       var wings = [];
       [-1, 1].forEach(function (sd) {
-        var w = wing(1.15, 0.75, 4, 0xff6b4a); w.position.set(0.18 * sd, 1.2, 0.05); w.scale.x = sd; w.rotation.y = sd * 0.2; body.add(w);
+        var w = wing(1.15, 0.75, 4, P.trim); w.position.set(0.18 * sd, 1.2, 0.05); w.scale.x = sd; w.rotation.y = sd * 0.2; body.add(w);
         wings.push({ m: w, sd: sd, base: w.rotation.y });
       });
       return { root: root, body: body, head: head, eyes: [e1, e2], eyeGlow: eg, wings: wings, tail: tail, dragon: true };
     },
-    fenris: function (M, c) {
+    fenris: function (M, c, P) {
       var root = new THREE.Group(), body = new THREE.Group(); root.add(body);
       root.scale.setScalar(1.25); body.rotation.y = 0.7;
-      var torso = mesh(sph(0.42, 16, 12), M, 0, 0.78, 0); torso.scale.set(0.72, 0.75, 1.35); body.add(torso);
-      var chest = mesh(sph(0.36, 14, 10), M, 0, 0.9, 0.38); chest.scale.set(0.95, 1, 0.9); body.add(chest);
-      for (var i = 0; i < 4; i++) { var lg = mesh(cyl(0.06, 0.08, 0.6), M, (i % 2 ? 0.2 : -0.2), 0.3, (i < 2 ? 0.42 : -0.42)); body.add(lg); }
-      var head = new THREE.Group(); head.position.set(0, 1.22, 0.62); body.add(head);
-      head.add(mesh(sph(0.2, 14, 10), M));
-      var snout = mesh(cone(0.11, 0.34, 8), M, 0, -0.04, 0.24); snout.rotation.x = Math.PI / 2; head.add(snout);
+      var torso = mesh(sph(0.42, 16, 12), M, 0, 0.86, -0.05); torso.scale.set(0.5, 0.55, 1.45); body.add(torso);
+      var chest = mesh(sph(0.3, 14, 10), M, 0, 0.98, 0.42); chest.scale.set(0.82, 1.05, 0.95); body.add(chest);
+      var ruff = mesh(sph(0.26, 12, 8), M, 0, 1.1, 0.55); ruff.scale.set(1.05, 0.9, 0.7); body.add(ruff);
+      for (var i = 0; i < 4; i++) { var lg = mesh(cyl(0.045, 0.06, 0.72), M, (i % 2 ? 0.14 : -0.14), 0.36, (i < 2 ? 0.45 : -0.5)); body.add(lg); body.add(mesh(sph(0.06, 8, 6), M, (i % 2 ? 0.14 : -0.14), 0.02, (i < 2 ? 0.5 : -0.45))); }
+      var head = new THREE.Group(); head.position.set(0, 1.28, 0.78); body.add(head);
+      var hd = mesh(sph(0.17, 14, 10), M); hd.scale.set(0.95, 0.9, 1.1); head.add(hd);
+      var snout = mesh(cone(0.085, 0.36, 8), M, 0, -0.05, 0.26); snout.rotation.x = Math.PI / 2; head.add(snout);
+      var jaw2 = mesh(cone(0.06, 0.28, 6), M, 0, -0.1, 0.22); jaw2.rotation.x = Math.PI / 2 + 0.2; head.add(jaw2);
       [-1, 1].forEach(function (sd) { head.add(mesh(cone(0.06, 0.2, 5), M, 0.11 * sd, 0.22, -0.02)); });
-      var eM = glowMat(0xffe2e8), e1 = mesh(box(0.05, 0.018, 0.02), eM, -0.08, 0.05, 0.17), e2 = mesh(box(0.05, 0.018, 0.02), eM, 0.08, 0.05, 0.17);
+      var eM = glowMat(0xe8fff4), e1 = mesh(box(0.05, 0.018, 0.02), eM, -0.08, 0.05, 0.17), e2 = mesh(box(0.05, 0.018, 0.02), eM, 0.08, 0.05, 0.17);
       head.add(e1); head.add(e2);
-      var eg = glowSprite(0xff3b5c, 0.45); eg.position.set(0, 0.05, 0.2); head.add(eg);
-      var tail = mesh(cone(0.1, 0.8, 8), M, 0, 0.98, -0.78); tail.rotation.x = -2.1; body.add(tail);
+      var eg = glowSprite(P.eye, 0.45); eg.position.set(0, 0.05, 0.2); head.add(eg);
+      var tail = mesh(cone(0.09, 0.85, 8), M, 0, 0.92, -0.95); tail.rotation.x = -2.35; body.add(tail);
       for (var m2 = 0; m2 < 6; m2++) { var sp = mesh(cone(0.05, 0.2, 5), M, 0, 1.12 - m2 * 0.02, 0.3 - m2 * 0.15); sp.rotation.x = -0.5; body.add(sp); }
       return { root: root, body: body, head: head, eyes: [e1, e2], eyeGlow: eg, tail: tail, wolf: true };
     }
@@ -390,41 +408,49 @@
 
   /* ---------- build any shadow ---------- */
   var TIER_COLORS = ["#8f86c9", "#6f9bff", "#a855f7", "#e879f9", "#ffd166", "#ffd166"];
-  function build(sh) {
-    var c = sh.monarch ? 0xffd166 : new THREE.Color(TIER_COLORS[sh.tier] || TIER_COLORS[0]).getHex();
-    var M = rimMat(sh.monarch ? 0xffb84d : c, sh.monarch ? 1.25 : 1);
+  function build(sh, opts) {
+    opts = opts || {};
+    var P = sh.monarch ? MPAL[sh.monarch] || MPAL.regent : null;
+    var c = P ? P.trim : new THREE.Color(TIER_COLORS[sh.tier] || TIER_COLORS[0]).getHex();
+    if (opts.ghost) c = 0x4c4380;
+    var M = rimMat(P ? P.rim : c, P ? 1.2 : opts.ghost ? 0.4 : 1);
     var H;
-    if (sh.monarch && MON[sh.monarch]) H = MON[sh.monarch](M, c);
+    if (sh.monarch && MON[sh.monarch]) H = MON[sh.monarch](M, c, P);
     else { H = humanoid(M, { color: c }); (BUILD[sh.cls] || BUILD.Knight)(M, c, H); }
     var bb = new THREE.Box3().setFromObject(H.root), ctr = bb.getCenter(new THREE.Vector3());
     H.root.position.x -= ctr.x; H.root.position.z -= ctr.z;
     var fig = new THREE.Group(); fig.add(H.root);
-    var auraCols = sh.monarch ? [0xffd166, 0xff3b5c, 0xa855f7, 0xc026d3] : [c, c, 0x2a0a52, 0xffffff];
-    var au = aura(sh.monarch ? 110 : 46, auraCols, sh.monarch ? 0.95 : 0.55, sh.monarch ? 3.4 : 2.3);
+    var auraCols = P ? P.aura : [c, c, 0x2a0a52, 0xffffff];
+    var au = aura(opts.ghost ? 6 : sh.monarch ? 110 : 46, auraCols, sh.monarch ? 0.95 : 0.55, sh.monarch ? 3.4 : 2.3);
     fig.add(au);
-    var fl = sh.monarch ? flames(14, [0xffb84d, 0xff3b5c, 0xa855f7], 0.62, 2.8) : (sh.tier >= 2 ? flames(8, [c, 0x6d28d9], 0.42, 1.6) : null);
+    var fl = opts.ghost ? null : P ? flames(14, P.flame, 0.62, 2.8) : (sh.tier >= 2 ? flames(8, [c, 0x6d28d9], 0.42, 1.6) : null);
     if (fl) fig.add(fl);
-    var base = glowSprite(c, sh.monarch ? 3.2 : 1.8); base.position.y = 0.05; base.material.opacity = 0.45; fig.add(base);
+    var base = glowSprite(c, sh.monarch ? 3.2 : 1.8); base.position.y = 0.05; base.material.opacity = opts.ghost ? 0.12 : 0.45; fig.add(base);
+    if (opts.ghost && H.eyeGlow) { H.eyeGlow.material.opacity = 0.15; H.eyes.forEach(function (m) { m.visible = false; }); H.eyeGlow.visible = false; }
     if (sh.monarch) {
-      var ringM = new THREE.MeshBasicMaterial({ color: 0xff3b5c, transparent: true, opacity: 0, blending: THREE.AdditiveBlending, depthWrite: false, side: THREE.DoubleSide });
+      var ringM = new THREE.MeshBasicMaterial({ color: P.accent, transparent: true, opacity: 0, blending: THREE.AdditiveBlending, depthWrite: false, side: THREE.DoubleSide });
       var quake = new THREE.Mesh(new THREE.RingGeometry(0.9, 1.0, 48), ringM); quake.rotation.x = -Math.PI / 2; quake.position.y = 0.02; fig.add(quake); H.quake = quake;
     }
-    var phase = Math.random() * 6.283;
+    var phase = Math.random() * 6.283, still = !!opts.attention;
+    if (still && H.armL && !H.raise && !H.scarves) {
+      if (!H.weapon || H.weapon.parent !== H.armL) { H.armL.rotation.set(0, 0, -0.07); }
+      if (!H.weapon || H.weapon.parent !== H.armR) { H.armR.rotation.set(0, 0, 0.07); }
+    }
     fig.userData = { id: sh.id, tick: function (t, dt) {
       var tt = t + phase;
       au.userData.tick(tt, dt); if (fl) fl.userData.tick(tt);
       if (H.body && !H.dragon && !H.wolf) H.body.scale.y = (H.body.userData.sy || (H.body.userData.sy = H.body.scale.y)) * (1 + Math.sin(tt * 1.6) * 0.012);
-      if (H.head) H.head.rotation.y = Math.sin(tt * 0.5) * 0.18;
-      if (H.cape) wave(H.cape.geometry, tt, 0.12, 2.2);
-      if (H.scarves) H.scarves.forEach(function (s, i) { wave(s.geometry, tt + i, 0.35, 5); });
-      if (H.plume) H.plume.rotation.z = Math.sin(tt * 3) * 0.12;
-      if (H.weapon && !H.raise) H.weapon.rotation.z = Math.sin(tt * 1.1) * 0.06;
-      if (H.raise && H.armR) H.armR.rotation.z = 0.25 + Math.sin(tt * 0.9) * 0.08;
-      if (H.string) H.string.position.x = -0.04 - Math.max(0, Math.sin(tt * 1.2)) * 0.18;
+      if (H.head && !still) H.head.rotation.y = Math.sin(tt * 0.5) * 0.18;
+      if (H.cape) wave(H.cape.geometry, tt, still ? 0.05 : 0.12, 2.2);
+      if (H.scarves) H.scarves.forEach(function (s, i) { wave(s.geometry, tt + i, still ? 0.18 : 0.35, 5); });
+      if (H.plume) H.plume.rotation.z = Math.sin(tt * 3) * (still ? 0.05 : 0.12);
+      if (H.weapon && !H.raise && !still) H.weapon.rotation.z = Math.sin(tt * 1.1) * 0.06;
+      if (H.raise && H.armR && !still) H.armR.rotation.z = 0.25 + Math.sin(tt * 0.9) * 0.08;
+      if (H.string && !still) H.string.position.x = -0.04 - Math.max(0, Math.sin(tt * 1.2)) * 0.18;
       if (H.orb) { var k = 0.6 + Math.sin(tt * 3) * 0.12; H.orb.scale.set(k, k, 1); }
       if (H.ring) H.ring.rotation.y = tt * 1.5;
       if (H.halo) H.halo.rotation.z = tt * 0.6;
-      if (H.wings) H.wings.forEach(function (w, i) { w.m.rotation.y = w.base + w.sd * Math.sin(tt * (H.dragon ? 2.2 : 1.4) + i * 0.3) * (H.dragon ? 0.45 : 0.22); });
+      if (H.wings) H.wings.forEach(function (w, i) { w.m.rotation.y = w.base + w.sd * Math.sin(tt * (H.dragon ? 2.2 : 1.4) + i * 0.3) * (H.dragon ? 0.45 : 0.22) * (still ? 0.35 : 1); });
       if (H.tail) H.tail.rotation.y = Math.sin(tt * 1.3) * 0.25;
       if (H.eyeGlow) { var e = (Math.sin(tt * 0.9) > 0.97) ? 0.05 : 1; H.eyes.forEach(function (m) { m.scale.y = e; }); H.eyeGlow.material.opacity = 0.7 + Math.sin(tt * 2) * 0.3; }
       if (H.quake) { var q = (tt * 0.45) % 1; H.quake.scale.setScalar(0.4 + q * 1.4); H.quake.material.opacity = (1 - q) * 0.75; }
@@ -471,44 +497,47 @@
     return { scene: scene, floor: floor, mist: mist };
   }
 
-  var SLOTS = [[0, 0], [-1.15, -0.9], [1.15, -0.9], [-2.2, -1.75], [2.2, -1.75], [-3.1, -2.6], [3.1, -2.6], [-1.05, -2.6], [1.05, -2.6]];
+  /* ranks: a leader out front, then rows that widen behind */
+  var RANKS = [[0, 0.4]];
+  [[4, -0.9, 1.2], [5, -2.0, 1.2], [6, -3.1, 1.2]].forEach(function (r) {
+    for (var i = 0; i < r[0]; i++) RANKS.push([(i - (r[0] - 1) / 2) * r[2], r[1]]);
+  });
+  /* fill order: front and centre first */
+  var ORDER = RANKS.map(function (p, i) { return i; }).sort(function (a, b) {
+    var A = RANKS[a], B2 = RANKS[b]; return (B2[1] - A[1]) * 10 + (Math.abs(A[0]) - Math.abs(B2[0]));
+  });
   window.__mx3d = {
     stage: function (el, shadows, onPick) {
       var renderer = makeRenderer(el), B = baseScene(), scene = B.scene;
-      var camera = new THREE.PerspectiveCamera(34, 1, 0.1, 60);
-      var figs = [], n = Math.min(shadows.length, SLOTS.length), cxs = 0, czs = 0, spread = 0;
-      for (var q = 0; q < n; q++) { cxs += SLOTS[q][0]; czs += SLOTS[q][1]; }
-      var CX = n ? cxs / n : 0, CZ = n ? czs / n : 0;
-      for (var q2 = 0; q2 < n; q2++) spread = Math.max(spread, Math.abs(SLOTS[q2][0] - CX), Math.abs(SLOTS[q2][1] - CZ));
-      shadows.slice(0, SLOTS.length).forEach(function (sh, i) {
-        var f = build(sh); f.position.set(SLOTS[i][0], 0, SLOTS[i][1]);
-        f.rotation.y = -SLOTS[i][0] * 0.08; scene.add(f); figs.push(f);
+      var camera = new THREE.PerspectiveCamera(30, 1, 0.1, 60);
+      var figs = [];
+      ORDER.forEach(function (slot, k) {
+        var sh = shadows[k], p = RANKS[slot];
+        var f = sh ? build(sh, { attention: true }) : build({ id: "", cls: "Knight", tier: 0 }, { attention: true, ghost: true });
+        f.position.set(p[0], 0, p[1]);
+        if (!sh) f.userData.id = "";
+        scene.add(f); figs.push(f);
       });
-      var ray = new THREE.Raycaster(), v = new THREE.Vector2();
-      function pick(e) {
+      B.floor.position.set(0, 0, -1.3); B.floor.scale.setScalar(1.25);
+      var ray = new THREE.Raycaster(), v = new THREE.Vector2(), down = null;
+      renderer.domElement.addEventListener("pointerdown", function (e) { down = [e.clientX, e.clientY]; });
+      renderer.domElement.addEventListener("pointerup", function (e) {
+        if (!down || Math.abs(e.clientX - down[0]) + Math.abs(e.clientY - down[1]) > 8) { down = null; return; }
+        down = null;
         var r = renderer.domElement.getBoundingClientRect();
         v.x = ((e.clientX - r.left) / r.width) * 2 - 1; v.y = -((e.clientY - r.top) / r.height) * 2 + 1;
         ray.setFromCamera(v, camera);
         var hits = ray.intersectObjects(figs, true);
         for (var i = 0; i < hits.length; i++) {
           var o = hits[i].object; if (o.type === "Points" || o.type === "Sprite") continue;
-          while (o && !(o.userData && o.userData.id)) o = o.parent;
-          if (o && onPick) { onPick(o.userData.id); return; }
+          while (o && !(o.userData && o.userData.tick)) o = o.parent;
+          if (o && o.userData.id && onPick) { onPick(o.userData.id); return; }
         }
-      }
-      /* drag to swing the camera round the army */
-      var drag = 0, dragV = 0, sx = null, moved = false;
-      renderer.domElement.style.touchAction = "pan-y";
-      renderer.domElement.addEventListener("pointerdown", function (e) { sx = e.clientX; moved = false; });
-      renderer.domElement.addEventListener("pointermove", function (e) { if (sx === null) return; var d = e.clientX - sx; if (Math.abs(d) > 4) moved = true; dragV = d * 0.006; drag += dragV; sx = e.clientX; });
-      renderer.domElement.addEventListener("pointerup", function (e) { if (!moved) pick(e); sx = null; });
-      renderer.domElement.addEventListener("pointercancel", function () { sx = null; });
+      });
       var stop = loopFor(el, renderer, scene, camera, function (t, dt) {
-        if (sx === null) { dragV *= 0.94; drag += dragV; drag *= 0.995; }
-        var ang = Math.sin(t * 0.18) * 0.32 + drag, R = 5.2 + spread * 0.9;
-        camera.position.set(CX + Math.sin(ang) * R, 1.9 + spread * 0.25, CZ + Math.cos(ang) * R);
-        camera.lookAt(CX, 1.05, CZ);
-        B.floor.position.set(CX, 0, CZ); B.floor.rotation.z = t * 0.05;
+        camera.position.set(Math.sin(t * 0.12) * 0.25, 3.1, 9.4);
+        camera.lookAt(0, 0.75, -1.3);
+        B.floor.rotation.z = t * 0.03;
         B.mist.userData.tick(t, dt);
         for (var i = 0; i < figs.length; i++) figs[i].userData.tick(t, dt);
       });
@@ -526,7 +555,7 @@
       renderer.domElement.addEventListener("pointerup", function (e) { sx = null; e.stopPropagation(); });
       renderer.domElement.addEventListener("click", function (e) { e.stopPropagation(); });
       var stop = loopFor(el, renderer, scene, camera, function (t, dt) {
-        if (sx === null) { vel += (0.5 - vel) * 0.03; spin += vel * dt; }
+        if (sx === null) { spin += (Math.sin(t * 0.4) * 0.25 - spin) * 0.03; }
         f.rotation.y = spin;
         camera.position.set(0, big ? 2.2 : 1.6, big ? 7.4 : 5.4); camera.lookAt(0, big ? 1.5 : 1.05, 0);
         B.floor.rotation.z = t * 0.08; B.mist.userData.tick(t, dt);
