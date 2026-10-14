@@ -694,6 +694,14 @@
       .wx-day .weather-icon { width: 20px; height: 20px; flex: none; }
       .wx-day .c { color: var(--ink); flex: 1; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
       .wx-day .t { color: var(--ink-faint); white-space: nowrap; }
+      /* highlight the important numbers: values pop bright instead of faint */
+      #sec-weather .s-row .v {
+        color: var(--ink); font-weight: 700;
+        text-shadow: 0 0 10px rgba(143, 94, 248, 0.4);
+      }
+      #sec-weather .wx-day .t {
+        color: var(--ink); font-weight: 700;
+      }
       .weather-icon[data-icon="tstormsDay"] { color: #c3cdea; animation: cloudGlow 5.2s ease-in-out infinite; }
       .weather-icon[data-icon="showerDay"] { color: #a9c6ff; animation: cloudGlow 5.2s ease-in-out infinite; }
       /* glyph reference: every condition glyph the front-page icon and
