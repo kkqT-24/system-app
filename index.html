@@ -2028,6 +2028,77 @@
       }
       .q-hidden-veil:hover { filter: brightness(1.18); }
       .q-hidden-veil:focus-visible { outline: 2px solid var(--red); outline-offset: 2px; }
+      /* ---------- SECRET QUEST (urgent random popup) ----------
+         Red on black like the hidden box; the prayer quest glows
+         white instead. FULFILL dissolves up into particles;
+         DEFY cracks the card then shatters it. */
+      .sq-overlay {
+        position: fixed; inset: 0; z-index: 90;
+        display: flex; align-items: center; justify-content: center; padding: 24px;
+        background: rgba(2, 0, 4, 0.82);
+        opacity: 0; pointer-events: none; transition: opacity 0.3s ease;
+      }
+      .sq-overlay.show { opacity: 1; pointer-events: auto; }
+      .sq-card {
+        position: relative; width: 100%; max-width: 380px;
+        background: #0a0a0f; border: 1px solid var(--red);
+        box-shadow: 0 0 32px rgba(255, 45, 85, 0.35), inset 0 0 24px rgba(255, 45, 85, 0.08);
+        padding: 28px 24px 24px; text-align: center;
+        font-family: "Share Tech Mono", monospace; text-transform: uppercase;
+      }
+      .sq-card.white {
+        border-color: #fff;
+        box-shadow: 0 0 32px rgba(255, 255, 255, 0.4), inset 0 0 24px rgba(255, 255, 255, 0.1);
+      }
+      .sq-head {
+        font-size: 11px; letter-spacing: 0.4em; text-indent: 0.4em;
+        color: var(--red); margin-bottom: 16px;
+      }
+      .sq-card.white .sq-head { color: #fff; }
+      .sq-task {
+        font-size: 17px; letter-spacing: 0.08em; line-height: 1.5;
+        color: var(--ink); margin-bottom: 12px;
+      }
+      .sq-exp {
+        font-size: 13px; letter-spacing: 0.2em; color: var(--red-soft); margin-bottom: 18px;
+      }
+      .sq-card.white .sq-exp { color: #ccc; }
+      .sq-timer {
+        font-family: "Orbitron", sans-serif; font-size: 32px; font-weight: 700;
+        color: var(--red); margin-bottom: 22px; letter-spacing: 0.1em;
+        text-shadow: 0 0 16px rgba(255, 45, 85, 0.5);
+      }
+      .sq-card.white .sq-timer { color: #fff; text-shadow: 0 0 16px rgba(255,255,255,0.5); }
+      .sq-actions { display: flex; gap: 12px; }
+      .sq-btn {
+        appearance: none; flex: 1; padding: 14px 8px; cursor: pointer;
+        font-family: "Share Tech Mono", monospace; font-size: 12px; letter-spacing: 0.24em; text-indent: 0.24em; text-transform: uppercase;
+        border: 1px solid; background: none; position: relative; overflow: hidden;
+        touch-action: none; user-select: none; -webkit-user-select: none;
+      }
+      .sq-fulfill { border-color: var(--red); color: var(--red); }
+      .sq-card.white .sq-fulfill { border-color: #fff; color: #fff; }
+      .sq-defy { border-color: #5a1622; color: #8a2438; }
+      .sq-btn .sq-fill {
+        position: absolute; inset: 0; width: 0%;
+        background: rgba(255, 45, 85, 0.25); pointer-events: none;
+      }
+      .sq-card.white .sq-fulfill .sq-fill { background: rgba(255,255,255,0.25); }
+      .sq-defy .sq-fill { background: rgba(255, 45, 85, 0.35); }
+      .sq-btn span.lbl { position: relative; z-index: 1; }
+      /* cracks that spread while DEFY is held */
+      .sq-cracks {
+        position: absolute; inset: 0; pointer-events: none; opacity: 0;
+        background:
+          linear-gradient(63deg, transparent 46%, rgba(255,45,85,0.7) 47%, rgba(255,45,85,0.7) 48%, transparent 49%),
+          linear-gradient(117deg, transparent 42%, rgba(255,45,85,0.6) 43%, rgba(255,45,85,0.6) 44%, transparent 45%),
+          linear-gradient(24deg, transparent 58%, rgba(255,45,85,0.65) 59%, rgba(255,45,85,0.65) 60%, transparent 61%);
+        transition: opacity 0.2s;
+      }
+      .sq-card.cracking .sq-cracks { opacity: 1; }
+      .sq-particle {
+        position: fixed; z-index: 95; pointer-events: none; border-radius: 50%;
+      }
       .q-hidden-qmarks {
         font-size: 22px; letter-spacing: 0.32em; text-indent: 0.32em; color: var(--red-soft);
         text-shadow: 0 0 12px rgba(255, 77, 94, 0.75);
@@ -2218,15 +2289,15 @@
                 </form>
               </div>
               <div class="q-group q-hidden sealed" data-qgroup="hidden">
-                <div class="q-head"><span>Secret Quest</span><span class="q-reset">Sealed</span></div>
-                <button type="button" class="q-hidden-veil" id="hiddenVeil" aria-label="Reveal secret quest"><span class="q-hidden-qmarks" aria-hidden="true">????????</span></button>
+                <div class="q-head"><span>Hidden Quest</span><span class="q-reset">Sealed</span></div>
+                <button type="button" class="q-hidden-veil" id="hiddenVeil" aria-label="Reveal hidden quest"><span class="q-hidden-qmarks" aria-hidden="true">????????</span></button>
                 <div class="q-list"></div>
                 <div class="q-earned" id="secretEarned">
                   <div class="q-earned-head"><span>Rewards Earned</span><span class="q-earned-count" id="secretEarnedCount">0 CLAIMED</span></div>
                   <div class="q-earned-list" id="secretEarnedList"></div>
-                  <div class="q-earned-empty" id="secretEarnedEmpty">No rewards earned yet — complete a secret quest to claim its reward</div>
+                  <div class="q-earned-empty" id="secretEarnedEmpty">No rewards earned yet — complete a hidden quest to claim its reward</div>
                 </div>
-                <button type="button" class="q-add-btn">+ Add Secret Quest</button>
+                <button type="button" class="q-add-btn">+ Add Hidden Quest</button>
                 <form class="q-form is-hidden">
                   <input class="q-input q-name-in" type="text" maxlength="48" placeholder="Quest name" aria-label="Quest name" autocomplete="off" />
                   <input class="q-input q-reward-in" type="text" maxlength="40" placeholder="Reward" aria-label="Stated reward" autocomplete="off" />
@@ -2450,6 +2521,20 @@
 
     </main>
 
+    <!-- ================= SECRET QUEST popup ================= -->
+    <div class="sq-overlay" id="sqOverlay" aria-hidden="true" role="dialog" aria-label="Secret Quest">
+      <div class="sq-card" id="sqCard">
+        <div class="sq-cracks" aria-hidden="true"></div>
+        <div class="sq-head">Secret Quest</div>
+        <div class="sq-task" id="sqTask">—</div>
+        <div class="sq-exp" id="sqExp">—</div>
+        <div class="sq-timer" id="sqTimer">15:00</div>
+        <div class="sq-actions">
+          <button type="button" class="sq-btn sq-fulfill" id="sqFulfill"><span class="sq-fill"></span><span class="lbl">Fulfill</span></button>
+          <button type="button" class="sq-btn sq-defy" id="sqDefy"><span class="sq-fill"></span><span class="lbl">Defy</span></button>
+        </div>
+      </div>
+    </div>
     <!-- ================= BOOT overlay ================= -->
     <section id="boot" aria-label="System boot sequence">
       <div class="bg-glow"></div>
@@ -2632,6 +2717,7 @@
             try { if (typeof QUEST_WEEK !== "undefined") data.questWeek = QUEST_WEEK; } catch (e) {}
             try { if (typeof TODO !== "undefined" && TODO) data.todo = JSON.parse(JSON.stringify({ items: TODO.items, day: TODO.day })); } catch (e) {}
             try { if (window.__ksMaintEntries) data.maintEntries = JSON.parse(JSON.stringify(window.__ksMaintEntries)); } catch (e) {}
+            try { if (typeof SECRET !== "undefined" && SECRET) data.secret = JSON.parse(JSON.stringify({ openCount: SECRET.openCount, targetOpens: SECRET.targetOpens, active: SECRET.active, lastType: SECRET.lastType, lastTime: SECRET.lastTime })); } catch (e) {}
             store.set(PERSIST_KEY, JSON.stringify(data));
           } catch (e) {}
         };
@@ -5718,6 +5804,222 @@
         } else {
           runBoot();
         }
+
+        /* ================= SECRET QUEST (urgent random) =================
+           A surprise quest that appears on random app opens. 15 minutes
+           to FULFILL it or DEFY it (both hold 1s). Fulfill: +EXP, box
+           dissolves up into matching particles. Defy/expire-seen: -10
+           EXP, box shatters. Expire-unseen: silent vanish, no penalty.
+           Trigger: open counter hits a random target (first demo on 3rd
+           open, then 15-30) AND cooldown elapsed (48h after workout,
+           24h after other). */
+        var SECRET_POOL = [
+          { text: "20 pushups OR 20 sit-ups \u2014 your choice", exp: 25, type: "workout" },
+          { text: "30 bodyweight squats", exp: 25, type: "workout" },
+          { text: "1-minute plank", exp: 30, type: "workout" },
+          { text: "50 jumping jacks", exp: 25, type: "workout" },
+          { text: "1 minute of high knees", exp: 25, type: "workout" },
+          { text: "Drink a full glass of water", exp: 10, type: "other" },
+          { text: "10 slow deep breaths", exp: 10, type: "other" },
+          { text: "Stretch for 2 minutes", exp: 15, type: "other" },
+          { text: "Text someone you haven\u2019t talked to in a while", exp: 10, type: "other" },
+          { text: "Clean something", exp: 15, type: "other" },
+          { text: "Make a prayer", exp: 10, type: "other", white: true }
+        ];
+        var SECRET = { openCount: 0, targetOpens: 3, active: null, lastType: null, lastTime: 0 };
+        (function () {
+          try {
+            var s = window.__ksPersisted && window.__ksPersisted.secret;
+            if (s && typeof s === "object") {
+              if (isFinite(+s.openCount)) SECRET.openCount = Math.max(0, Math.floor(+s.openCount));
+              if (isFinite(+s.targetOpens)) SECRET.targetOpens = Math.max(1, Math.floor(+s.targetOpens));
+              if (s.active && typeof s.active === "object" && isFinite(+s.active.expiresAt) && isFinite(+s.active.idx)) {
+                SECRET.active = { idx: Math.max(0, Math.min(SECRET_POOL.length - 1, s.active.idx | 0)), expiresAt: +s.active.expiresAt, seen: !!s.active.seen };
+              }
+              if (s.lastType === "workout" || s.lastType === "other") SECRET.lastType = s.lastType;
+              if (isFinite(+s.lastTime)) SECRET.lastTime = Math.max(0, +s.lastTime);
+            }
+          } catch (e) {}
+        })();
+        function secretSave() { try { if (window.__ksSaveState) window.__ksSaveState(); } catch (e) {} }
+        function secretPickTarget() {
+          SECRET.targetOpens = SECRET.openCount + 15 + Math.floor(Math.random() * 16);
+          secretSave();
+        }
+        function secretCooldownOk() {
+          if (!SECRET.lastTime) return true;
+          var hours = SECRET.lastType === "workout" ? 48 : 24;
+          return Date.now() - SECRET.lastTime >= hours * 3600 * 1000;
+        }
+        var sqOverlay = document.getElementById("sqOverlay");
+        var sqCard = document.getElementById("sqCard");
+        var sqTask = document.getElementById("sqTask");
+        var sqExp = document.getElementById("sqExp");
+        var sqTimer = document.getElementById("sqTimer");
+        var sqFulfillBtn = document.getElementById("sqFulfill");
+        var sqDefyBtn = document.getElementById("sqDefy");
+        var sqTickId = null;
+        function sqFmt(ms) {
+          var s = Math.max(0, Math.ceil(ms / 1000));
+          var m = Math.floor(s / 60);
+          s = s % 60;
+          return m + ":" + (s < 10 ? "0" : "") + s;
+        }
+        function sqParticles(color, up) {
+          try {
+            if (window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+            var r = sqCard.getBoundingClientRect();
+            var cx = r.left + r.width / 2, cy = r.top + r.height / 2;
+            for (var i = 0; i < 28; i++) {
+              (function () {
+                var p = document.createElement("div");
+                p.className = "sq-particle";
+                var sz = 3 + Math.random() * 5;
+                p.style.width = sz + "px"; p.style.height = sz + "px";
+                p.style.background = color;
+                p.style.boxShadow = "0 0 8px " + color;
+                p.style.left = cx + "px"; p.style.top = cy + "px";
+                document.body.appendChild(p);
+                var ang = Math.random() * Math.PI * 2;
+                var dist = 60 + Math.random() * 140;
+                var dx = Math.cos(ang) * dist;
+                var dy = up ? -(40 + Math.random() * 160) : Math.sin(ang) * dist;
+                var dur = 700 + Math.random() * 600;
+                try {
+                  var anim = p.animate([
+                    { transform: "translate(-50%,-50%) scale(1)", opacity: 1 },
+                    { transform: "translate(calc(-50% + " + dx.toFixed(0) + "px), calc(-50% + " + dy.toFixed(0) + "px)) scale(0.2)", opacity: 0 }
+                  ], { duration: dur, easing: "cubic-bezier(0.2,0.7,0.3,1)" });
+                  anim.onfinish = function () { p.remove(); };
+                } catch (e) { setTimeout(function () { p.remove(); }, dur + 50); }
+              })();
+            }
+          } catch (e) {}
+        }
+        function sqHide() {
+          if (sqTickId) { clearInterval(sqTickId); sqTickId = null; }
+          sqOverlay.classList.remove("show");
+          sqOverlay.setAttribute("aria-hidden", "true");
+          sqCard.classList.remove("cracking");
+        }
+        function sqShow() {
+          var q = SECRET_POOL[SECRET.active.idx];
+          sqTask.textContent = q.text;
+          sqExp.textContent = "+" + q.exp + " EXP";
+          sqCard.classList.toggle("white", !!q.white);
+          sqOverlay.classList.add("show");
+          sqOverlay.setAttribute("aria-hidden", "false");
+          SECRET.active.seen = true;
+          secretSave();
+          if (sqTickId) clearInterval(sqTickId);
+          var tick = function () {
+            var left = SECRET.active ? SECRET.active.expiresAt - Date.now() : 0;
+            if (left <= 0) { sqExpire(); return; }
+            sqTimer.textContent = sqFmt(left);
+          };
+          tick();
+          sqTickId = setInterval(tick, 1000);
+        }
+        function sqClearAfter(type) {
+          SECRET.lastType = type;
+          SECRET.lastTime = Date.now();
+          SECRET.active = null;
+          secretPickTarget();
+        }
+        function sqFulfill() {
+          if (!SECRET.active) return;
+          var q = SECRET_POOL[SECRET.active.idx];
+          var color = q.white ? "#ffffff" : "#ff2d55";
+          sqHide();
+          sqParticles(color, true);
+          try { gainExp(q.exp); } catch (e) {}
+          sqClearAfter(q.type);
+        }
+        function sqDefy(penalize) {
+          if (!SECRET.active) return;
+          var q = SECRET_POOL[SECRET.active.idx];
+          sqHide();
+          /* shatter: red burst outward */
+          sqParticles("#ff2d55", false);
+          if (penalize) { try { subtractExp(10); } catch (e) {} }
+          sqClearAfter(q.type);
+        }
+        function sqExpire() {
+          if (!SECRET.active) { sqHide(); return; }
+          var seen = SECRET.active.seen;
+          /* seen (popup was shown) -> penalty; never seen -> silent */
+          sqDefy(seen);
+        }
+        function sqTrigger() {
+          var idx = Math.floor(Math.random() * SECRET_POOL.length);
+          SECRET.active = { idx: idx, expiresAt: Date.now() + 15 * 60 * 1000, seen: false };
+          secretSave();
+          sqShow();
+        }
+        function sqCheckTrigger() {
+          if (SECRET.active) return;
+          if (SECRET.openCount < SECRET.targetOpens) return;
+          if (!secretCooldownOk()) return;
+          sqTrigger();
+        }
+        /* hold-to-activate for FULFILL / DEFY (1s each) */
+        function sqBindHold(btn, fn) {
+          var timer = null, pid = null, fillEl = btn.querySelector(".sq-fill");
+          var HOLD = 1000, startT = 0, raf = null;
+          function progress() {
+            var p = Math.min(1, (Date.now() - startT) / HOLD);
+            if (fillEl) fillEl.style.width = (p * 100) + "%";
+            if (p >= 1) { cancel(); fn(); return; }
+            raf = requestAnimationFrame(progress);
+          }
+          function cancel() {
+            if (timer) { clearTimeout(timer); timer = null; }
+            if (raf) { cancelAnimationFrame(raf); raf = null; }
+            if (fillEl) fillEl.style.width = "0%";
+            if (btn === sqDefyBtn) sqCard.classList.remove("cracking");
+            pid = null;
+          }
+          btn.addEventListener("pointerdown", function (e) {
+            if (pid !== null) return;
+            pid = e.pointerId;
+            try { btn.setPointerCapture(pid); } catch (err) {}
+            startT = Date.now();
+            if (btn === sqDefyBtn) sqCard.classList.add("cracking");
+            raf = requestAnimationFrame(progress);
+          });
+          btn.addEventListener("pointerup", cancel);
+          btn.addEventListener("pointercancel", cancel);
+        }
+        sqBindHold(sqFulfillBtn, sqFulfill);
+        sqBindHold(sqDefyBtn, function () { sqDefy(true); });
+        /* open counting: page load counts; foreground after 60s hidden counts */
+        var sqHiddenAt = 0;
+        function sqCountOpen() {
+          SECRET.openCount++;
+          secretSave();
+          /* resolve any active quest first (expire -> penalty/silent) */
+          if (SECRET.active) {
+            if (Date.now() >= SECRET.active.expiresAt) {
+              var wasSeen = SECRET.active.seen;
+              var q = SECRET_POOL[SECRET.active.idx];
+              SECRET.active = null;
+              if (wasSeen) { try { subtractExp(10); } catch (e) {} }
+              sqClearAfter(q.type);
+            } else {
+              sqShow();
+              return;
+            }
+          }
+          sqCheckTrigger();
+        }
+        try {
+          document.addEventListener("visibilitychange", function () {
+            if (document.hidden) { sqHiddenAt = Date.now(); }
+            else if (sqHiddenAt && Date.now() - sqHiddenAt >= 60000) { sqHiddenAt = 0; sqCountOpen(); }
+          });
+        } catch (e) {}
+        /* count this launch (deferred a beat so boot doesn't fight the popup) */
+        setTimeout(sqCountOpen, 1200);
       })();
     </script>
     <!-- Three.js (classic builds) for the Vehicle tab's 3D viewer -->
