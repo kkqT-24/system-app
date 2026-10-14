@@ -849,6 +849,7 @@
         color: var(--ink-dim); text-transform: uppercase;
       }
       .showcase-status > span:first-child { flex: none; white-space: nowrap; }
+      .showcase-status { cursor: pointer; }
       /* JARVIS flavor: the bar's right side is a rotating systems
          readout (live session uptime, the Today summary, gate scan,
          neural link, …) — pure immersion, crossfaded by the script
@@ -1892,6 +1893,53 @@
       .q-add-btn:hover { border-color: var(--line); color: var(--ink); box-shadow: 0 0 14px rgba(143, 94, 248, 0.25); }
       .q-add-btn:focus-visible { outline: 2px solid var(--lav); outline-offset: 2px; }
       .q-form { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 12px; }
+      /* ---------- to-do tab ---------- */
+      .t-list { display: flex; flex-direction: column; gap: 8px; margin-top: 14px; }
+      .t-swipe { position: relative; overflow: hidden; }
+      .t-row {
+        position: relative; display: flex; align-items: center; gap: 10px;
+        padding: 11px 12px; background: var(--field); border: 1px solid var(--line-soft);
+        font-family: "Share Tech Mono", monospace; font-size: 13px; letter-spacing: 0.05em;
+        clip-path: polygon(8px 0, 100% 0, 100% calc(100% - 8px), calc(100% - 8px) 100%, 0 100%, 0 8px);
+        cursor: pointer; user-select: none; -webkit-user-select: none; touch-action: pan-y;
+        transition: opacity 0.3s ease;
+      }
+      .t-row .t-name { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+      .t-row.holding { border-color: var(--lav); box-shadow: 0 0 14px rgba(143, 94, 248, 0.35); }
+      .t-row.done { opacity: 0.35; }
+      .t-row.done .t-name { text-decoration: line-through; }
+      .t-row.bursting { animation: tBurst 0.5s ease-out both; }
+      @keyframes tBurst {
+        0% { transform: scale(1); filter: brightness(1); }
+        40% { transform: scale(1.04); filter: brightness(1.6); }
+        100% { transform: scale(0.96); filter: brightness(1); }
+      }
+      .t-add-btn {
+        appearance: none; margin-top: 12px; padding: 9px 13px; width: 100%;
+        background: transparent; border: 1px dashed var(--line-soft); color: var(--ink-faint);
+        font-family: "Share Tech Mono", monospace; font-size: 11px; letter-spacing: 0.18em; text-transform: uppercase;
+        cursor: pointer;
+        clip-path: polygon(8px 0, 100% 0, 100% calc(100% - 8px), calc(100% - 8px) 100%, 0 100%, 0 8px);
+      }
+      .t-add-btn:hover { border-color: var(--line); color: var(--ink); }
+      .t-form { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 12px; }
+      .t-input {
+        appearance: none; background: var(--field); border: 1px solid var(--line-soft); color: var(--ink);
+        font-family: "Share Tech Mono", monospace; font-size: 16px; letter-spacing: 0.04em;
+        padding: 9px 10px; min-width: 0; flex: 1 1 130px;
+        clip-path: polygon(6px 0, 100% 0, 100% calc(100% - 6px), calc(100% - 6px) 100%, 0 100%, 0 6px);
+      }
+      .t-input::placeholder { color: var(--ink-faint); text-transform: uppercase; font-size: 11px; letter-spacing: 0.14em; }
+      .t-input:focus { outline: none; border-color: var(--line); box-shadow: 0 0 12px rgba(143, 94, 248, 0.3); }
+      .t-confirm, .t-cancel {
+        appearance: none; padding: 9px 13px;
+        font-family: "Share Tech Mono", monospace; font-size: 11px; letter-spacing: 0.18em; text-transform: uppercase;
+        clip-path: polygon(6px 0, 100% 0, 100% calc(100% - 6px), calc(100% - 6px) 100%, 0 100%, 0 6px);
+        cursor: pointer;
+      }
+      .t-confirm { background: var(--violet); border: 1px solid var(--violet); color: #fff; }
+      .t-cancel { background: transparent; border: 1px solid var(--line-soft); color: var(--ink-faint); }
+      .t-hint { margin-top: 14px; font-size: 10px; letter-spacing: 0.12em; color: var(--ink-faint); text-transform: uppercase; }
       .q-input {
         appearance: none; background: var(--field); border: 1px solid var(--line-soft); color: var(--ink);
         /* 16px minimum: iOS Safari auto-zooms the page on focus
@@ -2167,6 +2215,17 @@
                 </form>
               </div>
               <div class="q-hint mono">Hold a quest to claim its EXP &middot; Swipe left to remove &middot; Hold a header to reorder</div>
+            </section>
+            <section class="section is-hidden" id="sec-todo" aria-label="To Do">
+              <div class="s-name">To Do</div>
+              <div class="t-list"></div>
+              <button type="button" class="t-add-btn">+ Add</button>
+              <form class="t-form is-hidden">
+                <input class="t-input t-name-in" type="text" maxlength="48" placeholder="To do" aria-label="To do item" autocomplete="off" />
+                <button type="submit" class="t-confirm">Add</button>
+                <button type="button" class="t-cancel">Cancel</button>
+              </form>
+              <div class="t-hint mono">Hold an item to complete it &middot; Swipe left to remove</div>
             </section>
             <section class="section is-hidden" id="sec-workouts" aria-label="Workouts">
               <div class="s-name">Workouts</div>
@@ -2551,6 +2610,7 @@
             try { if (typeof STREAK !== "undefined" && STREAK) data.streak = { count: STREAK.count || 0, lastMet: STREAK.lastMet || null }; } catch (e) {}
             try { if (typeof QUEST_DAY !== "undefined") data.questDay = QUEST_DAY; } catch (e) {}
             try { if (typeof QUEST_WEEK !== "undefined") data.questWeek = QUEST_WEEK; } catch (e) {}
+            try { if (typeof TODO !== "undefined" && TODO) data.todo = JSON.parse(JSON.stringify({ items: TODO.items, day: TODO.day })); } catch (e) {}
             try { if (window.__ksMaintEntries) data.maintEntries = JSON.parse(JSON.stringify(window.__ksMaintEntries)); } catch (e) {}
             store.set(PERSIST_KEY, JSON.stringify(data));
           } catch (e) {}
@@ -4782,6 +4842,185 @@
           })(qGroups[qi]);
         }
 
+        /* ---------- to-do tab ---------- */
+        /* No EXP here — just a list. Completed items dim, disperse
+           into particles, and clear out at the 7am day rollover. */
+        var TODO = { items: [], day: todayKey() };
+        (function () {
+          try {
+            var p = window.__ksPersisted;
+            if (!p || typeof p !== "object") return;
+            var t = p.todo;
+            if (t && typeof t === "object" && Array.isArray(t.items)) {
+              for (var i = 0; i < t.items.length; i++) {
+                var it = t.items[i];
+                if (it && typeof it.name === "string" && it.name) {
+                  TODO.items.push({ name: it.name.slice(0, 48), done: it.done === true });
+                }
+              }
+              if (t.day !== todayKey()) {
+                TODO.items = TODO.items.filter(function (x) { return !x.done; });
+              }
+              TODO.day = todayKey();
+            }
+          } catch (e) {}
+        })();
+        function saveTodo() { if (window.__ksSaveState) window.__ksSaveState(); }
+        function todoDayCheck() {
+          if (TODO.day !== todayKey()) {
+            TODO.items = TODO.items.filter(function (x) { return !x.done; });
+            TODO.day = todayKey();
+            saveTodo();
+            renderTodo();
+          }
+        }
+        var TODO_HOLD_MS = 300;
+        function disperseTodoParticles(row) {
+          var r = row.getBoundingClientRect();
+          var colors = ["#8f5ef8", "#c3b8fe", "#da78f5", "#6f63f6", "#f2ecff"];
+          for (var i = 0; i < 14; i++) {
+            var p = document.createElement("span");
+            p.className = "w-particle";
+            p.style.left = (r.left + Math.random() * r.width) + "px";
+            p.style.top = (r.top + r.height / 2 + (Math.random() * 10 - 5)) + "px";
+            var c = colors[(Math.random() * colors.length) | 0];
+            p.style.background = c;
+            p.style.boxShadow = "0 0 8px " + c;
+            document.body.appendChild(p);
+            var dx = Math.random() * 160 - 80;
+            var dy = -(40 + Math.random() * 120);
+            var dur = 600 + Math.random() * 300, delay = i * 14;
+            try {
+              var anim = p.animate([
+                { transform: "translate(0px, 0px) scale(1)", opacity: 1 },
+                { transform: "translate(" + dx.toFixed(1) + "px," + dy.toFixed(1) + "px) scale(0.3)", opacity: 0 }
+              ], { duration: dur, delay: delay, easing: "cubic-bezier(0.2, 0.7, 0.3, 1)", fill: "forwards" });
+              (function (el, an) { an.onfinish = function () { el.remove(); }; })(p, anim);
+            } catch (err) {
+              (function (el, dd) { setTimeout(function () { el.remove(); }, dd); })(p, dur + delay + 100);
+            }
+          }
+        }
+        function completeTodo(idx, row) {
+          var item = TODO.items[idx];
+          if (!item || item.done) return;
+          item.done = true;
+          row.classList.add("done", "bursting");
+          setTimeout(function () { row.classList.remove("bursting"); }, 500);
+          if (!RM) disperseTodoParticles(row);
+          saveTodo();
+        }
+        function bindTodoGestures(row, wrap, idx) {
+          var pid = null, startX = 0, startY = 0, holdTimer = null, fired = false;
+          function cancelHold() {
+            if (holdTimer) { clearTimeout(holdTimer); holdTimer = null; }
+            row.classList.remove("holding");
+          }
+          row.addEventListener("contextmenu", function (e) { e.preventDefault(); });
+          row.addEventListener("pointerdown", function (e) {
+            if (pid !== null) return;
+            var item = TODO.items[idx];
+            if (!item || item.done) return;
+            fired = false;
+            pid = e.pointerId;
+            startX = e.clientX; startY = e.clientY;
+            try { row.setPointerCapture(pid); } catch (err) {}
+            if (!RM) row.classList.add("holding");
+            holdTimer = setTimeout(function () {
+              holdTimer = null;
+              row.classList.remove("holding");
+              fired = true;
+              completeTodo(idx, row);
+            }, TODO_HOLD_MS);
+          });
+          row.addEventListener("pointermove", function (e) {
+            if (pid === null || pid !== e.pointerId) return;
+            var dx = e.clientX - startX, dy = e.clientY - startY;
+            if (Math.abs(dx) > 12 || Math.abs(dy) > 12) {
+              cancelHold();
+              if (dx < 0) {
+                wrap.style.transform = "translateX(" + Math.max(dx, -120) + "px)";
+                wrap.style.opacity = Math.max(0.25, 1 + dx / 160);
+              } else {
+                wrap.style.transform = "";
+                wrap.style.opacity = "";
+              }
+            }
+          });
+          function endGesture(e) {
+            if (pid === null) return;
+            if (e.pointerId !== undefined && e.pointerId !== pid) return;
+            pid = null;
+            var dx = e.clientX - startX;
+            cancelHold();
+            if (!fired && dx < -84) {
+              TODO.items.splice(idx, 1);
+              saveTodo();
+              renderTodo();
+            } else {
+              wrap.style.transform = "";
+              wrap.style.opacity = "";
+            }
+          }
+          row.addEventListener("pointerup", endGesture);
+          row.addEventListener("pointercancel", endGesture);
+        }
+        function renderTodo() {
+          todoDayCheck();
+          var list = document.querySelector("#sec-todo .t-list");
+          if (!list) return;
+          list.innerHTML = "";
+          for (var i = 0; i < TODO.items.length; i++) {
+            (function (item, idx) {
+              var wrap = document.createElement("div");
+              wrap.className = "t-swipe";
+              var row = document.createElement("div");
+              row.className = "t-row" + (item.done ? " done" : "");
+              row.setAttribute("role", "button");
+              row.setAttribute("aria-label", item.done ? "Completed: " + item.name : "Hold to complete: " + item.name);
+              var nm = document.createElement("span");
+              nm.className = "t-name";
+              nm.textContent = item.name;
+              row.appendChild(nm);
+              wrap.appendChild(row);
+              list.appendChild(wrap);
+              bindTodoGestures(row, wrap, idx);
+            })(TODO.items[i], i);
+          }
+        }
+        (function () {
+          var sec = document.getElementById("sec-todo");
+          if (!sec) return;
+          var addBtn = sec.querySelector(".t-add-btn");
+          var form = sec.querySelector(".t-form");
+          var nameIn = sec.querySelector(".t-name-in");
+          var cancelBtn = sec.querySelector(".t-cancel");
+          addBtn.addEventListener("click", function () {
+            form.classList.remove("is-hidden");
+            addBtn.classList.add("is-hidden");
+            nameIn.focus();
+          });
+          cancelBtn.addEventListener("click", function () {
+            form.classList.add("is-hidden");
+            addBtn.classList.remove("is-hidden");
+            nameIn.value = "";
+          });
+          form.addEventListener("submit", function (e) {
+            e.preventDefault();
+            var name = nameIn.value.trim();
+            if (!name) { nameIn.focus(); return; }
+            todoDayCheck();
+            TODO.items.push({ name: name.slice(0, 48), done: false });
+            saveTodo();
+            renderTodo();
+            form.classList.add("is-hidden");
+            addBtn.classList.remove("is-hidden");
+            nameIn.value = "";
+          });
+          renderTodo();
+          setInterval(todoDayCheck, 60000);
+        })();
+
         /* ---------- workouts tab: stepper wiring ---------- */
         var stepBtns = document.querySelectorAll("#sec-workouts .w-step[data-delta]");
         for (var si = 0; si < stepBtns.length; si++) {
@@ -6064,6 +6303,12 @@
         var el = document.getElementById("jarvisLine");
         if (!el) return;
         var bar = el.parentElement;
+        /* the status bar doubles as the to-do tab: tapping it opens the list */
+        bar.addEventListener("click", function () {
+          if (typeof selectSection === "function" && !document.body.classList.contains("tab-open")) {
+            selectSection("todo", null);
+          }
+        });
         var t0 = Date.now();
         var reduce = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
         var SEP = " \u00B7 ";
@@ -6084,6 +6329,13 @@
           var list = [uptime()];
           var today = todayLine();
           if (today) list.push(today);
+          try {
+            if (typeof TODO !== "undefined" && TODO && TODO.items) {
+              var open = 0;
+              for (var ti = 0; ti < TODO.items.length; ti++) if (!TODO.items[ti].done) open++;
+              if (open > 0) list.push("To Do" + SEP + open + " open");
+            }
+          } catch (err) {}
           list.push(
             "Gate scan" + SEP + "clear",
             "Neural link" + SEP + "stable",
