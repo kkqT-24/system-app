@@ -5066,7 +5066,7 @@
           if (mdy > 0) {
             dragSec.style.transform = "translateY(" + Math.round(mdy * 0.85) + "px)";
             if (thBar) {
-              var mp = Math.min(mdy / 200, 1);
+              var mp = Math.min(mdy / 160, 1);
               thBar.style.animation = "none";
               thBar.style.width = Math.round(40 - 16 * mp) + "px";
               thBar.style.height = Math.round(6 + 18 * mp) + "px";
@@ -5084,13 +5084,13 @@
             }
           }
         }, { passive: true });
-        document.addEventListener("touchend", function (e) {
+        function endDrag(e) {
           if (!dragSec) return;
           var sec = dragSec;
           var dy = e.changedTouches[0].clientY - dragStartY;
           var dx = Math.abs(e.changedTouches[0].clientX - dragStartX);
           dragSec = null;
-          if (dy > 200 && dx < 70) {
+          if (dy >= 160 && dx < 70) {
             sec.style.transition = "transform 0.28s ease-in";
             sec.style.transform = "translateY(110vh)";
             setTimeout(function () {
@@ -5123,7 +5123,9 @@
               if (thBar) thBar.style.transition = "";
             }, 340);
           }
-        }, { passive: true });
+        }
+        document.addEventListener("touchend", endDrag, { passive: true });
+        document.addEventListener("touchcancel", endDrag, { passive: true });
         function enterShowcase() {
           if (navBusy) return;
           var open = null;
