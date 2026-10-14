@@ -2096,6 +2096,14 @@
         border-color: #fff;
         box-shadow: 0 0 32px rgba(255, 255, 255, 0.4), inset 0 0 24px rgba(255, 255, 255, 0.1);
       }
+      .sq-card.white {
+        animation: sqFloat 4s ease-in-out infinite, sqPulseW 3s ease-in-out infinite;
+        box-shadow: 0 0 48px rgba(255, 255, 255, 0.35), 0 0 120px rgba(255, 255, 255, 0.15), inset 0 0 32px rgba(255, 255, 255, 0.08);
+      }
+      @keyframes sqFloat {
+        0%, 100% { transform: translateY(0); }
+        50% { transform: translateY(-8px); }
+      }
       .sq-head {
         font-family: "Orbitron", sans-serif;
         font-size: 21px; font-weight: 900; letter-spacing: 0.18em; text-indent: 0.18em;
@@ -5937,7 +5945,7 @@
           { text: "Stretch for 2 minutes", exp: 15, type: "other" },
           { text: "Text someone you haven\u2019t talked to in a while", exp: 10, type: "other" },
           { text: "Clean something", exp: 15, type: "other" },
-          { text: "Make a prayer", exp: 10, type: "other", white: true }
+          { text: "Make a prayer", exp: 0, type: "other", white: true }
         ];
         var SECRET = { openCount: 0, targetOpens: 3, active: null, lastType: null, lastTime: 0 };
         (function () {
@@ -6010,7 +6018,41 @@
           } catch (e) {}
         }
         var sqShieldUntil = 0;
+        var sqAmbientId = null;
+        function sqAmbientTick() {
+          try {
+            if (window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+            var r = sqCard.getBoundingClientRect();
+            for (var i = 0; i < 3; i++) {
+              (function () {
+                var p = document.createElement("div");
+                p.className = "sq-particle";
+                var sz = 2 + Math.random() * 4;
+                p.style.width = sz + "px"; p.style.height = sz + "px";
+                p.style.background = "#fff";
+                p.style.boxShadow = "0 0 10px #fff, 0 0 20px rgba(255,255,255,0.5)";
+                p.style.left = (r.left + Math.random() * r.width) + "px";
+                p.style.top = (r.top + r.height * Math.random()) + "px";
+                document.body.appendChild(p);
+                var dx = (Math.random() - 0.5) * 60;
+                var dy = -(80 + Math.random() * 140);
+                var dur = 2200 + Math.random() * 1800;
+                try {
+                  var anim = p.animate([
+                    { transform: "translate(-50%,-50%) scale(1)", opacity: 0 },
+                    { transform: "translate(-50%,-50%) scale(1)", opacity: 0.9, offset: 0.2 },
+                    { transform: "translate(calc(-50% + " + dx.toFixed(0) + "px), calc(-50% + " + dy.toFixed(0) + "px)) scale(0.1)", opacity: 0 }
+                  ], { duration: dur, easing: "ease-out" });
+                  anim.onfinish = function () { p.remove(); };
+                } catch (err) { setTimeout(function () { p.remove(); }, dur + 50); }
+              })();
+            }
+          } catch (err) {}
+        }
+        function sqStartAmbient() { sqStopAmbient(); sqAmbientId = setInterval(sqAmbientTick, 350); }
+        function sqStopAmbient() { if (sqAmbientId) { clearInterval(sqAmbientId); sqAmbientId = null; } }
         function sqHide() {
+          sqStopAmbient();
           if (sqTickId) { clearInterval(sqTickId); sqTickId = null; }
           sqOverlay.classList.remove("show");
           sqOverlay.setAttribute("aria-hidden", "true");
@@ -6031,8 +6073,10 @@
         function sqShow() {
           var q = SECRET_POOL[SECRET.active.idx];
           sqTask.textContent = q.text;
-          sqExp.textContent = "+" + q.exp + " EXP";
+          if (q.exp > 0) { sqExp.textContent = "+" + q.exp + " EXP"; sqExp.classList.remove("is-hidden"); }
+          else { sqExp.classList.add("is-hidden"); }
           sqCard.classList.toggle("white", !!q.white);
+          if (q.white) sqStartAmbient(); else sqStopAmbient();
           var vEl = document.getElementById("sqVerse");
           if (q.white && vEl) {
             var v = SECRET_VERSES[SECRET.active.verse || 0];
@@ -6065,7 +6109,7 @@
           var color = q.white ? "#ffffff" : "#ff2d55";
           sqHide();
           sqParticles(color, true);
-          try { gainExp(q.exp); } catch (e) {}
+          if (q.exp > 0) { try { gainExp(q.exp); } catch (e) {} }
           sqClearAfter(q.type);
         }
         function sqDefy(penalize) {
