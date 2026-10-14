@@ -11,19 +11,60 @@
   function rnd(a, b) { return a + Math.random() * (b - a); }
   function el(tag, cls, html) { var e = document.createElement(tag); if (cls) e.className = cls; if (html != null) e.innerHTML = html; return e; }
 
-  /* ================= HIDDEN QUEST: break / restore the seal ================= */
+  /* ================= HIDDEN QUEST: hold to break the seal ================= */
   var hq = $(".q-group.q-hidden");
-  if (hq) {
+  var veil = $("#hiddenVeil");
+  if (hq && veil) {
+    window.__mxHqHold = true;
+    var cta = $(".mx-hq-cta", veil);
+    if (cta) cta.textContent = "Hold to break the seal";
+    var sigBox = $(".mx-hq-sigil", veil);
+    var ringSvg = el("div", "mx-hq-charge", '<svg viewBox="0 0 100 100" aria-hidden="true"><circle cx="50" cy="50" r="47"/></svg>');
+    veil.appendChild(ringSvg);
+    var HOLD = 650, t0 = 0, raf = 0, holding = false;
+    function center() {
+      var b = (sigBox || veil).getBoundingClientRect();
+      return { x: b.left + b.width / 2, y: b.top + b.height / 2, w: hq.getBoundingClientRect().width };
+    }
+    function stop() {
+      holding = false; cancelAnimationFrame(raf);
+      hq.classList.remove("mx-hq-charging"); hq.style.removeProperty("--hc");
+    }
+    function tick() {
+      if (!holding) return;
+      var k = Math.min(1, (performance.now() - t0) / HOLD);
+      hq.style.setProperty("--hc", k.toFixed(3));
+      if (k >= 1) {
+        var c = center();
+        stop();
+        breakSeal(c);
+        setTimeout(function () { if (window.__mxHqReveal) window.__mxHqReveal(); }, 330);
+        return;
+      }
+      raf = requestAnimationFrame(tick);
+    }
+    veil.addEventListener("pointerdown", function (e) {
+      if (!hq.classList.contains("sealed")) return;
+      holding = true; t0 = performance.now();
+      try { veil.setPointerCapture(e.pointerId); } catch (err) {}
+      hq.classList.add("mx-hq-charging");
+      if (window.__mx) window.__mx.buzz(8);
+      raf = requestAnimationFrame(tick);
+    });
+    veil.addEventListener("pointerup", stop);
+    veil.addEventListener("pointercancel", stop);
+    veil.addEventListener("contextmenu", function (e) { e.preventDefault(); });
     new MutationObserver(function (list) {
       list.forEach(function (m) {
         var wasSealed = /\bsealed\b/.test(m.oldValue || ""), sealed = hq.classList.contains("sealed");
-        if (wasSealed && !sealed) breakSeal();
+        if (wasSealed && !sealed) { hq.classList.remove("mx-hq-opening"); void hq.offsetWidth; hq.classList.add("mx-hq-opening"); setTimeout(function () { hq.classList.remove("mx-hq-opening"); }, 1400); }
         else if (!wasSealed && sealed) slamSeal();
       });
     }).observe(hq, { attributes: true, attributeFilter: ["class"], attributeOldValue: true });
   }
-  function hqCenter() { var r = hq.getBoundingClientRect(); return { x: r.left + r.width / 2, y: r.top + Math.min(r.height / 2, 120), w: r.width }; }
-  function breakSeal() {
+  /* the break plays in a fixed layer centred exactly on the seal, so it
+     stays put while the box resizes underneath it */
+  function breakSeal(c) {
     var cracks = "";
     for (var i = 0; i < 9; i++) {
       var a = i / 9 * Math.PI * 2 + rnd(-0.2, 0.2), x = 50, y = 50, d = "M50 50";
@@ -31,26 +72,28 @@
       cracks += '<path d="' + d + '"/>';
     }
     var ov = el("div", "mx-hq-break", '<div class="sig">' + (window.__mxSigil ? window.__mxSigil("mx-sigil") : "") + '</div>' +
-      '<svg class="cr" viewBox="0 0 100 100" preserveAspectRatio="xMidYMid meet" aria-hidden="true">' + cracks + '</svg><div class="flare"></div>');
-    hq.appendChild(ov);
-    hq.classList.remove("mx-hq-opening"); void hq.offsetWidth; hq.classList.add("mx-hq-opening");
-    setTimeout(function () { ov.remove(); hq.classList.remove("mx-hq-opening"); }, 1500);
+      '<svg class="cr" viewBox="0 0 100 100" aria-hidden="true">' + cracks + '</svg><div class="flare"></div>');
+    ov.style.left = c.x + "px"; ov.style.top = c.y + "px";
+    document.body.appendChild(ov);
+    setTimeout(function () { ov.remove(); }, 1400);
     var FX = window.__mx;
     if (FX) {
+      FX.buzz([20, 30, 50]);
       setTimeout(function () {
-        var c = hqCenter();
         FX.ring(c.x, c.y, { r1: c.w * 0.9, life: 650, width: 3, color: "#ff2d55" });
         FX.spark(c.x, c.y, { n: 34, min: 2, max: 9, life: 800, gravity: 0.12, color: "#ff3b5c" });
         FX.spark(c.x, c.y, { n: 12, min: 1, max: 4, life: 900, gravity: -0.04, color: "#ffd0d8" });
-        FX.buzz([20, 30, 50]);
-      }, 380);
+      }, 300);
     }
   }
   function slamSeal() {
     hq.classList.remove("mx-hq-sealing"); void hq.offsetWidth; hq.classList.add("mx-hq-sealing");
     setTimeout(function () { hq.classList.remove("mx-hq-sealing"); }, 900);
     var FX = window.__mx;
-    if (FX) setTimeout(function () { var c = hqCenter(); FX.ring(c.x, c.y, { r0: c.w * 0.5, r1: 20, life: 380, width: 2, color: "#ff2d55" }); FX.buzz(30); }, 260);
+    if (FX) setTimeout(function () {
+      var b = (sigBox || veil).getBoundingClientRect();
+      FX.ring(b.left + b.width / 2, b.top + b.height / 2, { r0: 110, r1: 20, life: 380, width: 2, color: "#ff2d55" }); FX.buzz(30);
+    }, 260);
   }
 
   /* ================= WEATHER: a living sky ================= */
@@ -58,13 +101,15 @@
   if (!wx) return;
   var cv = el("canvas", "mx-wx-sky");
   cv.setAttribute("aria-hidden", "true");
-  wx.appendChild(cv);
+  /* the sky fills the whole screen behind the panel while Weather is open */
+  var mainEl = document.getElementById("main");
+  (mainEl || document.body).appendChild(cv);
+  cv.style.display = "none";
   var ctx = cv.getContext("2d"), W = 0, H = 0, parts = [], kind = "", flashA = 0, running = false, last = 0;
   function sky() { var h = $("#wxHeroIcon"); return h ? h.getAttribute("data-icon") || "sun" : "sun"; }
   function size() {
-    var r = wx.getBoundingClientRect();
     var dpr = Math.min(2, window.devicePixelRatio || 1);
-    W = r.width; H = r.height;
+    W = window.innerWidth; H = window.innerHeight;
     cv.width = Math.round(W * dpr); cv.height = Math.round(H * dpr);
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
   }
@@ -82,15 +127,16 @@
     return { t: "mote", x: rnd(0, W), y: any ? rnd(0, H) : H + 5, v: rnd(0.15, 0.45), r: rnd(1, 2.4), ph: rnd(0, 6) };
   }
   function frame(ts) {
-    if (wx.classList.contains("is-hidden") || document.hidden) { running = false; return; }
+    if (wx.classList.contains("is-hidden") || document.hidden) { running = false; cv.style.display = "none"; return; }
     var dt = Math.min(50, ts - last) / 16.67; last = ts;
-    if (Math.abs(wx.getBoundingClientRect().height - H) > 4) size();
+    if (window.innerWidth !== W || window.innerHeight !== H) size();
     if (sky() !== kind) seed();
     ctx.clearRect(0, 0, W, H);
     var tsec = ts / 1000;
     /* sun: slow god-rays from the hero */
     if (kind === "sun" || kind === "partlyDay") {
-      var hx = W / 2, hy = 70;
+      var hr = $("#wxHeroIcon") ? $("#wxHeroIcon").getBoundingClientRect() : null;
+      var hx = hr && hr.width ? hr.left + hr.width / 2 : W / 2, hy = hr && hr.width ? hr.top + hr.height / 2 : 110;
       ctx.save(); ctx.globalCompositeOperation = "lighter";
       for (var r = 0; r < 12; r++) {
         var a = tsec * 0.12 + r / 12 * Math.PI * 2;
@@ -159,6 +205,7 @@
         wx.classList.remove("mx-wx-open"); void wx.offsetWidth; wx.classList.add("mx-wx-open");
         setTimeout(function () { wx.classList.remove("mx-wx-open"); }, 2200);
         setTimeout(countUp, 250);
+        cv.style.display = "block";
         requestAnimationFrame(function () { size(); seed(); if (!running) { running = true; last = performance.now(); requestAnimationFrame(frame); } });
       }
     });
@@ -203,4 +250,20 @@
   }
   bar.addEventListener("pointerup", end);
   bar.addEventListener("pointercancel", end);
+})();
+
+/* Inside a module the bottom REBOOT becomes a back bar (same as the
+   handle up top); REBOOT stays on the module screen. */
+(function () {
+  "use strict";
+  var ctr = document.querySelector(".main-controls");
+  var handle = document.getElementById("tabsHandle");
+  if (!ctr || !handle) return;
+  var b = document.createElement("button");
+  b.type = "button";
+  b.className = "top-handle mx-back-bar show";
+  b.setAttribute("aria-label", "Back to modules");
+  b.innerHTML = '<span class="th-bar" aria-hidden="true"></span>';
+  b.addEventListener("click", function () { window.scrollTo(0, 0); handle.click(); });
+  ctr.appendChild(b);
 })();

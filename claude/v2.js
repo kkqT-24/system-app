@@ -99,27 +99,71 @@
     return { id: Date.now().toString(36) + Math.random().toString(36).slice(2, 6), name: name, cls: cls, tier: ti,
       power: Math.round(T.base * rnd(0.85, 1.25)), day: (st() || {}).day || "", t: Date.now(), streak: streak, preview: !!preview };
   }
-  var EMBLEMS = {
-    Knight: '<path d="M12 3v13M8 7h8M10 16h4l-2 5z"/>',
-    Archer: '<path d="M6 4c8 2 8 14 0 16M6 4v16M6 12h13M16 9l3 3-3 3"/>',
-    Mage: '<path d="M12 3l2.5 5 5.5.8-4 3.9.9 5.5L12 15.6 7.1 18.2 8 12.7 4 8.8 9.5 8z"/>',
-    Assassin: '<path d="M5 19L17 7M14 4l6 6M9 15l-2 2M15 5l4 4"/>',
-    Lancer: '<path d="M4 20L18 6M14 4h6v6M7 17l-2-2"/>',
-    Bulwark: '<path d="M12 3l7 3v6c0 4.5-3 7.5-7 9-4-1.5-7-4.5-7-9V6z"/>',
-    Healer: '<path d="M12 5v14M5 12h14"/><circle cx="12" cy="12" r="8"/>',
-    Berserker: '<path d="M5 5l14 14M19 5L5 19M3 9l6-6M15 21l6-6"/>'
+  /* Shadow soldiers: pitch-black armoured silhouettes with a cold rim
+     light, burning eyes and a black-violet aura licking up off them.
+     Each class has its own body and weapon. */
+  var BODIES = {
+    Knight:
+      '<path d="M53 15c9-9 26-8 36 6-9-4-19-2-26 4z"/>' +
+      '<path d="M41 22q9-12 18 0l1 14q-10 7-20 0z"/>' +
+      '<path d="M26 47q7-11 18-5l-2 11-18 3zM74 47q-7-11-18-5l2 11 18 3zM28 44l-6-11 10 8zM72 44l6-11-10 8z"/>' +
+      '<path d="M22 108l7-50q21-10 42 0l7 50q-28-6-56 0z"/>' +
+      '<path d="M38 42h24l4 38-8 20H42l-8-20z"/>' +
+      '<path d="M48.5 57h3v47l-1.5 5-1.5-5zM41 56h18v3H41zM49 45h2v11h-2z"/><circle cx="50" cy="43.5" r="2"/>',
+    Archer:
+      '<path d="M50 13q15 4 12 25l-6 6H44l-6-6q-3-21 12-25z"/>' +
+      '<path d="M29 106l7-56q14-9 28 0l10 56q-12-7-24-2-12-5-21 2z"/>' +
+      '<path d="M73 24q22 36 0 74" fill="none" stroke-width="3.2" class="wpn"/><path d="M73 24v74" fill="none" stroke-width="0.6" class="str"/>' +
+      '<path d="M36 52l-12 10 3 3 13-8z"/>',
+    Mage:
+      '<path d="M50 2l11 28q2 10-5 14H44q-7-4-5-14z"/>' +
+      '<path d="M30 108l9-62h22l9 62q-20-8-40 0z"/><path d="M36 60q14 8 28 0l2 8q-16 8-32 0z"/>' +
+      '<path d="M75 22h2.6v86H75z"/><circle class="orb" cx="76.3" cy="17" r="5.5"/>',
+    Assassin:
+      '<path d="M50 16q13 4 10 20l-6 6h-8l-6-6q-3-16 10-20z"/>' +
+      '<path d="M56 40c14 2 26-4 36-10-8 10-20 16-34 16zM55 44c10 6 18 6 26 4-8 6-18 6-27 2z"/>' +
+      '<path d="M42 42h16l4 28 4 38H56l-6-28-6 28H34l4-38z"/>' +
+      '<path d="M31 63l-9 17 2 1 10-16zM69 63l9 17-2 1-10-16z"/>',
+    Lancer:
+      '<path d="M43 22c-7-8-9-14-5-20 2 8 6 12 9 16zM57 22c7-8 9-14 5-20-2 8-6 12-9 16z"/>' +
+      '<path d="M42 24q8-10 16 0v12q-8 5-16 0z"/>' +
+      '<path d="M27 48q7-10 17-5l-2 10-17 3zM73 48q-7-10-17-5l2 10 17 3z"/>' +
+      '<path d="M36 42h28l4 38-6 28H38l-6-28z"/>' +
+      '<path d="M17 106l64-90 2 1.4-64 90z"/><path d="M80 14l8-12-1 14z"/>',
+    Bulwark:
+      '<path d="M44 26q6-8 12 0v10H44z"/>' +
+      '<path d="M12 108l3-50q4-20 23-24h24q19 4 23 24l3 50z"/>' +
+      '<path class="wpn" d="M28 54h44v32q-22 22-44 0z" stroke-width="1.6"/><path d="M50 58v30M34 70h32" fill="none" class="str" stroke-width="0.8"/>',
+    Healer:
+      '<path d="M50 14q14 4 12 22l-6 7H44l-6-7q-2-18 12-22z"/>' +
+      '<path d="M26 108l12-62q12-6 24 0l12 62q-24-8-48 0z"/><path d="M38 64q12 6 24 0" fill="none" class="str" stroke-width="0.8"/>' +
+      '<path d="M24 26h2.4v82H24z"/><path class="orb" d="M25 12a7 7 0 1 0 0.1 0zM25 15a4 4 0 1 1-0.1 0z" fill-rule="evenodd"/>',
+    Berserker:
+      '<path d="M40 24c-9-2-14 2-16-6 6 2 10 0 16 2zM60 24c9-2 14 2 16-6-6 2-10 0-16 2z"/>' +
+      '<path d="M41 24q9-10 18 0v13q-9 6-18 0z"/>' +
+      '<path d="M18 62q4-24 24-24h16q20 0 24 24l-6 4-4-12 2 54H26l2-54-4 12z"/>' +
+      '<path d="M76 28l-10 80 2.6.4 10-80z"/><path class="wpn" d="M72 18q24 2 22 26-10-8-22-6z"/>'
   };
+  var figN = 0;
   function shadowFigure(sh) {
-    var c = TIERS[sh.tier].color;
-    return '<svg class="mx-sh-fig" viewBox="0 0 100 110" aria-hidden="true">' +
-      '<defs><radialGradient id="g' + sh.id + '" cx="50%" cy="55%" r="55%"><stop offset="0" stop-color="' + c + '" stop-opacity="0.45"/><stop offset="1" stop-color="' + c + '" stop-opacity="0"/></radialGradient></defs>' +
-      '<ellipse cx="50" cy="62" rx="46" ry="46" fill="url(#g' + sh.id + ')"/>' +
-      /* a hooded / helmed shadow: crest, head, pauldrons, cloak */
-      '<path fill="#05030c" stroke="' + c + '" stroke-opacity="0.55" stroke-width="0.8" d="M50 14c-3 5-9 7-12 14-2 5-1 11 1 15-8 3-17 8-21 15-4 8-5 22-6 38h76c-1-16-2-30-6-38-4-7-13-12-21-15 2-4 3-10 1-15-3-7-9-9-12-14z"/>' +
-      '<path fill="none" stroke="' + c + '" stroke-opacity="0.35" stroke-width="0.8" d="M30 66c6 6 14 9 20 9s14-3 20-9M50 75v28"/>' +
-      '<g class="eyes"><ellipse cx="44" cy="33" rx="3.2" ry="1.4" fill="' + c + '"/><ellipse cx="56" cy="33" rx="3.2" ry="1.4" fill="' + c + '"/></g>' +
-      '<g transform="translate(38 80) scale(1)" fill="none" stroke="' + c + '" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" opacity="0.9">' + (EMBLEMS[sh.cls] || "") + '</g>' +
-      '</svg>';
+    var T = TIERS[sh.tier] || TIERS[0], c = T.color, id = "f" + (++figN);
+    var body = BODIES[sh.cls] || BODIES.Knight;
+    var flames = "";
+    for (var i = 0; i < 7; i++) {
+      var x = 22 + i * 9.3, h = 34 + (i % 3) * 12 + (i === 3 ? 18 : 0);
+      flames += '<path class="fl" style="animation-delay:-' + (i * 0.37).toFixed(2) + 's;transform-origin:' + x + 'px 108px" d="M' + (x - 9) + ' 108 Q' + (x - 6) + ' ' + (108 - h * 0.6) + ' ' + x + ' ' + (108 - h) + ' Q' + (x + 6) + ' ' + (108 - h * 0.6) + ' ' + (x + 9) + ' 108Z" fill="url(#' + id + 'f)"/>';
+    }
+    var motes = "";
+    for (var m = 0; m < 5; m++) motes += '<circle class="mt" cx="' + (28 + m * 11) + '" cy="100" r="' + (0.9 + (m % 2) * 0.6) + '" fill="' + c + '" style="animation-delay:-' + (m * 0.9).toFixed(1) + 's"/>';
+    return '<svg class="mx-sh-fig" viewBox="0 0 100 112" aria-hidden="true" style="--tc:' + c + '">' +
+      '<defs><linearGradient id="' + id + 'f" x1="0" y1="1" x2="0" y2="0"><stop offset="0" stop-color="' + c + '" stop-opacity="0.75"/><stop offset="0.45" stop-color="#2a0a52" stop-opacity="0.55"/><stop offset="1" stop-color="#05010d" stop-opacity="0"/></linearGradient>' +
+      '<radialGradient id="' + id + 'g" cx="50%" cy="62%" r="50%"><stop offset="0" stop-color="' + c + '" stop-opacity="0.35"/><stop offset="1" stop-color="' + c + '" stop-opacity="0"/></radialGradient></defs>' +
+      '<ellipse cx="50" cy="66" rx="48" ry="44" fill="url(#' + id + 'g)"/>' +
+      '<g class="aura">' + flames + '</g>' +
+      '<g class="body" fill="#020007" stroke="' + c + '" stroke-opacity="0.75" stroke-width="0.7" stroke-linejoin="round">' + body + '</g>' +
+      '<g class="eyes" fill="#e8f4ff"><ellipse cx="45.5" cy="29.5" rx="2.6" ry="0.9"/><ellipse cx="54.5" cy="29.5" rx="2.6" ry="0.9"/></g>' +
+      '<ellipse cx="50" cy="109" rx="30" ry="3" fill="#000" opacity="0.8"/>' +
+      motes + '</svg>';
   }
   function extract(preview) {
     var s = st() || { streak: 0, day: "" };

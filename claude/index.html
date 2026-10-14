@@ -5056,7 +5056,10 @@
             if (form) form.classList.add("is-hidden");
             if (addBtn) addBtn.classList.remove("is-hidden");
           }
-          veil.addEventListener("click", function (e) { e.stopPropagation(); revealHidden(); });
+          /* v2: breaking the seal takes a short hold (polish.js drives it and
+             calls __mxHqReveal); plain taps on a sealed box do nothing */
+          window.__mxHqReveal = revealHidden;
+          veil.addEventListener("click", function (e) { e.stopPropagation(); if (!window.__mxHqHold) revealHidden(); });
           var head = hiddenGroup.querySelector(".q-head");
           if (head) head.addEventListener("click", function (e) {
             e.stopPropagation();
@@ -5066,7 +5069,7 @@
             /* while reordering, a tap on the header leaves
                reorder mode instead of sealing the box */
             if (hiddenGroup.classList.contains("rearranging")) { exitRearrangeMode(hiddenGroup); return; }
-            if (hiddenGroup.classList.contains("sealed")) revealHidden(); else hideHidden();
+            if (hiddenGroup.classList.contains("sealed")) { if (!window.__mxHqHold) revealHidden(); } else hideHidden();
           });
           hiddenGroup.addEventListener("click", function (e) {
             /* the box itself is the toggle — but never steal a tap
@@ -5075,7 +5078,7 @@
             if (e.target.closest(".q-swipe, .q-add-btn, .q-form, .q-earned")) return;
             /* never seal the box out from under a reorder in progress */
             if (hiddenGroup.classList.contains("rearranging")) return;
-            if (hiddenGroup.classList.contains("sealed")) revealHidden(); else hideHidden();
+            if (hiddenGroup.classList.contains("sealed")) { if (!window.__mxHqHold) revealHidden(); } else hideHidden();
           });
         })();
         /* add: each group's dashed button opens its inline form; submit
