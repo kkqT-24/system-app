@@ -2097,10 +2097,25 @@
         box-shadow: 0 0 32px rgba(255, 255, 255, 0.4), inset 0 0 24px rgba(255, 255, 255, 0.1);
       }
       .sq-head {
-        font-size: 11px; letter-spacing: 0.4em; text-indent: 0.4em;
-        color: var(--red); margin-bottom: 16px;
+        font-family: "Orbitron", sans-serif;
+        font-size: 21px; font-weight: 900; letter-spacing: 0.18em; text-indent: 0.18em;
+        color: var(--red); margin-bottom: 6px;
+        text-shadow: 0 0 18px rgba(255, 45, 85, 0.8), 0 0 42px rgba(255, 45, 85, 0.4);
+        animation: sqHeadPulse 1.8s ease-in-out infinite;
       }
-      .sq-card.white .sq-head { color: #fff; }
+      .sq-card.white .sq-head {
+        color: #fff;
+        text-shadow: 0 0 18px rgba(255,255,255,0.85), 0 0 42px rgba(255,255,255,0.4);
+      }
+      @keyframes sqHeadPulse {
+        0%, 100% { opacity: 1; }
+        50% { opacity: 0.82; }
+      }
+      .sq-sub {
+        font-size: 10px; letter-spacing: 0.34em; text-indent: 0.34em;
+        color: var(--red-soft); margin-bottom: 18px; opacity: 0.85;
+      }
+      .sq-card.white .sq-sub { color: #bbb; }
       .sq-task {
         font-size: 17px; letter-spacing: 0.08em; line-height: 1.5;
         color: var(--ink); margin-bottom: 12px;
@@ -2163,6 +2178,14 @@
         transition: opacity 0.2s;
       }
       .sq-card.cracking .sq-cracks { opacity: 1; }
+      .sq-card.shake { animation: sqShake 0.12s linear infinite; }
+      @keyframes sqShake {
+        0% { transform: translate(0, 0); }
+        25% { transform: translate(-2px, 1px); }
+        50% { transform: translate(2px, -1px); }
+        75% { transform: translate(-1px, -2px); }
+        100% { transform: translate(1px, 2px); }
+      }
       .sq-particle {
         position: fixed; z-index: 95; pointer-events: none; border-radius: 50%;
       }
@@ -2592,7 +2615,8 @@
     <div class="sq-overlay" id="sqOverlay" aria-hidden="true" role="dialog" aria-label="Secret Quest">
       <div class="sq-card" id="sqCard">
         <div class="sq-cracks" aria-hidden="true"></div>
-        <div class="sq-head">Secret Quest</div>
+        <div class="sq-head">&#9888; Secret Quest &#9888;</div>
+        <div class="sq-sub">Urgent directive from the System</div>
         <div class="sq-task" id="sqTask">—</div>
         <div class="sq-exp" id="sqExp">—</div>
         <div class="sq-timer" id="sqTimer">15:00</div>
@@ -5969,6 +5993,7 @@
           sqOverlay.classList.remove("show");
           sqOverlay.setAttribute("aria-hidden", "true");
           sqCard.classList.remove("cracking");
+          sqCard.classList.remove("shake");
           sqCard.classList.remove("fulfilling");
           sqCard.style.opacity = "";
           sqCard.style.filter = "";
@@ -6054,6 +6079,10 @@
               sqCard.style.filter = "brightness(" + (1 + p * 0.9).toFixed(2) + ") saturate(" + (1 + p * 0.4).toFixed(2) + ")";
               sqCard.style.opacity = (1 - p * 0.45).toFixed(2);
             }
+            if (btn === sqDefyBtn) {
+              var cracks = sqCard.querySelector(".sq-cracks");
+              if (cracks) cracks.style.opacity = p.toFixed(2);
+            }
             if (p >= 1) { cancel(); fn(); return; }
             raf = requestAnimationFrame(progress);
           }
@@ -6064,7 +6093,12 @@
             if (timer) { clearTimeout(timer); timer = null; }
             if (raf) { cancelAnimationFrame(raf); raf = null; }
             if (fillEl) fillEl.style.width = "0%";
-            if (btn === sqDefyBtn) sqCard.classList.remove("cracking");
+            if (btn === sqDefyBtn) {
+              sqCard.classList.remove("cracking");
+              sqCard.classList.remove("shake");
+              var cr = sqCard.querySelector(".sq-cracks");
+              if (cr) cr.style.opacity = "";
+            }
             if (btn === sqFulfillBtn) { sqCard.classList.remove("fulfilling"); sqCard.style.opacity = ""; sqCard.style.filter = ""; }
             pid = null;
           }
@@ -6073,7 +6107,7 @@
             pid = e.pointerId;
             try { btn.setPointerCapture(pid); } catch (err) {}
             startT = Date.now();
-            if (btn === sqDefyBtn) sqCard.classList.add("cracking");
+            if (btn === sqDefyBtn) { sqCard.classList.add("cracking"); sqCard.classList.add("shake"); }
             raf = requestAnimationFrame(progress);
           });
           btn.addEventListener("pointerup", cancel);
