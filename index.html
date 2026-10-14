@@ -608,6 +608,8 @@
       }
       .main-top .online { color: var(--lav); }
       .main-center { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 34px 0; }
+      .main-rings { display: block; width: 118px; opacity: 0.9; animation: ringBreathe 8s ease-in-out infinite; }
+      @keyframes ringBreathe { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.045); } }
       /* the wrap is exactly the rings' box (the 20px gap to the title
          lives on the wrap, not the rings) */
       .main-rings-wrap { position: relative; margin-bottom: 20px; }
@@ -618,22 +620,33 @@
          (a universal link — it lands in the Muse app when installed).
          Pressing and holding winds the spin up in stages, mirroring
          the boot core's hold-to-spin; releasing fires the tap. */
-      /* X button (replaces the Noctis rings): circular X logo that
-         glitches periodically like the boot static */
-      .x-btn {
+
+      .rings-btn {
         appearance: none; background: none; border: none; padding: 0; display: block;
-        width: 118px; height: 118px; border-radius: 50%; cursor: pointer; position: relative;
-        -webkit-touch-callout: none; user-select: none; -webkit-user-select: none;
+        border-radius: 50%; cursor: pointer; position: relative;
+        -webkit-touch-callout: none; user-select: none; -webkit-user-select: none; touch-action: none;
         transition: transform 0.22s ease;
       }
-      .x-btn:hover { transform: scale(1.06); }
-      .x-btn:active { transform: scale(1.12); }
-      .x-btn:focus-visible { outline: 2px solid var(--lav); outline-offset: 4px; }
-      .x-btn .x-logo {
-        display: block; width: 100%; height: 100%; border-radius: 50%;
+      /* the circle swells a touch under the pointer, and a little
+         more while it is pressed */
+      .rings-btn:hover { transform: scale(1.06); }
+      .rings-btn:active { transform: scale(1.12); }
+      .rings-btn:focus-visible { outline: 2px solid var(--lav); outline-offset: 4px; }
+      .rings-btn:hover .main-rings { filter: drop-shadow(0 0 10px rgba(143, 94, 248, 0.45)); }
+      /* hovering the circle also winds the spin up — about double the
+         resting pace (the hold-to-spin stages below still win while
+         pressed: they come later at equal specificity) */
+      .rings-btn:hover .main-rings .spin-slow { animation-duration: 12s; }
+      .rings-btn:hover .main-rings .spin-rev { animation-duration: 8s; }
+      .rings-btn:hover .main-rings .spin-fast { animation-duration: 3.2s; }
+      /* the X logo sits centered in the rings, where "Noctis" was */
+      .rings-x {
+        position: absolute; inset: 0; margin: auto;
+        width: 54px; height: 54px; border-radius: 50%;
         pointer-events: none;
       }
-      .x-btn.glitching .x-logo {
+      /* the X glitches like the boot static: RGB-split + jitter + slices */
+      .rings-btn.glitching .rings-x {
         animation: xJitter 0.14s steps(2) both;
         filter: drop-shadow(-3px 0 0 rgba(255, 0, 128, 0.85)) drop-shadow(3px 0 0 rgba(0, 220, 255, 0.85));
       }
@@ -644,6 +657,18 @@
         75% { transform: translate(-2px, -1px); clip-path: inset(28% 0 32% 0); }
         100% { transform: translate(0, 0); clip-path: inset(0 0 0 0); }
       }
+      /* hold-to-spin stages: each stage shortens every ring's period;
+         the wrap class also deepens the glow while the press lasts */
+      .main-rings-wrap.holding .rings-btn { filter: drop-shadow(0 0 16px rgba(143, 94, 248, 0.65)); }
+      .main-rings-wrap.spinup1 .main-rings .spin-slow { animation-duration: 9s; }
+      .main-rings-wrap.spinup1 .main-rings .spin-rev { animation-duration: 6s; }
+      .main-rings-wrap.spinup1 .main-rings .spin-fast { animation-duration: 2.4s; }
+      .main-rings-wrap.spinup2 .main-rings .spin-slow { animation-duration: 4.5s; }
+      .main-rings-wrap.spinup2 .main-rings .spin-rev { animation-duration: 3s; }
+      .main-rings-wrap.spinup2 .main-rings .spin-fast { animation-duration: 1.2s; }
+      .main-rings-wrap.spinup3 .main-rings .spin-slow { animation-duration: 2s; }
+      .main-rings-wrap.spinup3 .main-rings .spin-rev { animation-duration: 1.3s; }
+      .main-rings-wrap.spinup3 .main-rings .spin-fast { animation-duration: 0.5s; }
       /* weather panel hero: the same condition glyph, large */
       #sec-weather { padding-top: 18px; }
       .wx-hero { display: flex; justify-content: center; }
@@ -2007,7 +2032,7 @@
         .hud.idle { transform: scale(0.72); }
       }
       @media (prefers-reduced-motion: reduce) {
-        .spin-slow, .spin-rev, .spin-fast, .sweep, .core-pulse, .enter-btn, .hud.armed .core-btn, .hud-halo, .orbit, .core-ripple, .hud.armed, .hud-breathe, .bg-glow, .greet-title, .weather-card, .weather-icon, .sun-rays path, .wx-moon-body, .wx-star, .wx-cloud, .wx-partly-sun, .wx-drop, .wx-flake, .wx-bolt, .wx-fog, .section, .section.assembling > *, .showcase.enter > *, .showcase.enter .tab-tile, .top-handle.show .th-bar { animation: none !important; }
+        .spin-slow, .spin-rev, .spin-fast, .sweep, .core-pulse, .enter-btn, .hud.armed .core-btn, .hud-halo, .orbit, .core-ripple, .hud.armed, .hud-breathe, .main-rings, .bg-glow, .greet-title, .weather-card, .weather-icon, .sun-rays path, .wx-moon-body, .wx-star, .wx-cloud, .wx-partly-sun, .wx-drop, .wx-flake, .wx-bolt, .wx-fog, .section, .section.assembling > *, .showcase.enter > *, .showcase.enter .tab-tile, .top-handle.show .th-bar { animation: none !important; }
         .showcase, .top-handle { transition: none !important; }
         .section.assembling::before, .section.assembling::after { display: none; }
         .q-row.holding::after, .q-row.bursting, .q-rank-aura i, .q-rank-aura .halo, .q-rank-aura .smoke, .q-rank-aura .ember, .q-rank-wrap.rank-burst .q-rank-aura, .q-rank.rank-arrive, .q-rank-burn-clone.burning, .q-rank-burn-front, .q-level.level-glow::after, .q-group.q-hidden, .q-hidden-qmarks, .q-gain { animation: none !important; }
@@ -2037,8 +2062,19 @@
 
         <div class="main-center">
           <div class="main-rings-wrap">
-            <button type="button" class="x-btn" id="xBtn" aria-label="Open X">
-              <img class="x-logo" src="x-logo.png" alt="X" draggable="false" />
+            <button type="button" class="rings-btn" id="ringsBtn" aria-label="Open X">
+            <svg class="main-rings" viewBox="0 0 200 200" fill="none" aria-hidden="true">
+              <g class="spin-slow">
+                <circle cx="100" cy="100" r="92" stroke="var(--line-soft)" stroke-width="1.5" stroke-dasharray="4 10" />
+              </g>
+              <g class="spin-rev">
+                <circle cx="100" cy="100" r="74" stroke="var(--line)" stroke-width="2" stroke-dasharray="70 40 18 40" stroke-linecap="round" />
+              </g>
+              <g class="spin-fast">
+                <circle cx="100" cy="100" r="56" stroke="var(--purple)" stroke-width="1.5" stroke-dasharray="26 90" stroke-linecap="round" opacity="0.8" />
+              </g>
+            </svg>
+            <img class="rings-x" id="ringsX" src="x-logo.png" alt="X" draggable="false" />
             </button>
           </div>
 
@@ -2528,6 +2564,8 @@
         } catch (e) {}
         function todayKey() {
           var d = new Date();
+          /* the app day rolls over at 7am, not midnight */
+          if (d.getHours() < 7) d.setDate(d.getDate() - 1);
           return d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, "0") + "-" + String(d.getDate()).padStart(2, "0");
         }
 
@@ -5198,29 +5236,48 @@
            rings' spin up in stages while the press lasts, mirroring the
            boot core's hold-to-spin; letting go fires the tap. A plain
            tap is just a very short hold, so it leaves the same way. */
-        /* X button: opens the X app (falls back to x.com), logo
-           glitches periodically like the boot static */
-        var xBtn = document.getElementById("xBtn");
-        xBtn.addEventListener("contextmenu", function (e) { e.preventDefault(); });
-        xBtn.addEventListener("click", function () {
+        /* rings button: press-and-hold winds the spin up; tap opens
+           the X app (falls back to x.com). The X logo in the center
+           glitches periodically like the boot static. */
+        var ringsBtn = document.getElementById("ringsBtn");
+        var ringsWrap = ringsBtn.parentElement;
+        var ringsHolding = false;
+        var ringsTimers = [];
+        function clearRingsSpin() {
+          ringsHolding = false;
+          for (var ri = 0; ri < ringsTimers.length; ri++) clearTimeout(ringsTimers[ri]);
+          ringsTimers = [];
+          ringsWrap.classList.remove("holding", "spinup1", "spinup2", "spinup3");
+        }
+        ringsBtn.addEventListener("pointerdown", function (e) {
+          ringsHolding = true;
+          try { ringsBtn.setPointerCapture(e.pointerId); } catch (err) {}
+          ringsWrap.classList.add("holding", "spinup1");
+          ringsTimers.push(setTimeout(function () { if (ringsHolding) ringsWrap.classList.add("spinup2"); }, 320));
+          ringsTimers.push(setTimeout(function () { if (ringsHolding) ringsWrap.classList.add("spinup3"); }, 800));
+        });
+        ringsBtn.addEventListener("pointerup", clearRingsSpin);
+        ringsBtn.addEventListener("pointercancel", clearRingsSpin);
+        ringsBtn.addEventListener("contextmenu", function (e) { e.preventDefault(); });
+        ringsBtn.addEventListener("click", function () {
           var t = Date.now();
           window.location.href = "twitter://timeline";
           setTimeout(function () {
             if (Date.now() - t < 1500) window.location.href = "https://x.com";
           }, 900);
         });
-        function xGlitchTick() {
+        function ringsGlitchTick() {
           if (main.classList.contains("is-hidden")) {
-            setTimeout(xGlitchTick, 1200);
+            setTimeout(ringsGlitchTick, 1200);
             return;
           }
-          xBtn.classList.add("glitching");
+          ringsBtn.classList.add("glitching");
           setTimeout(function () {
-            xBtn.classList.remove("glitching");
-            setTimeout(xGlitchTick, 1400 + Math.random() * 2200);
+            ringsBtn.classList.remove("glitching");
+            setTimeout(ringsGlitchTick, 1400 + Math.random() * 2200);
           }, 120 + Math.random() * 120);
         }
-        if (!RM) setTimeout(xGlitchTick, 900 + Math.random() * 900);
+        if (!RM) setTimeout(ringsGlitchTick, 900 + Math.random() * 900);
         /* Escape also returns from an open section to the showcase */
         document.addEventListener("keydown", function (e) {
           if (e.key === "Escape" && !main.classList.contains("is-hidden") && showcase.classList.contains("is-hidden")) {
