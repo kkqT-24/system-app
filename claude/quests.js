@@ -124,6 +124,8 @@
         for (var i = 0; i < ids.length; i++) ids[i].removeAttribute("id");
         c.classList.remove("fulfilling", "shake", "cracking", "mx-arrive");
         c.classList.add("mx-sq-ghost");
+        var heavy = c.querySelectorAll(".sq-cracks, .mx-sq-sigil, .mx-sq-rays, .mx-sq-scan, .mx-sq-rise, .mx-sq-halo");
+        for (var hv = 0; hv < heavy.length; hv++) heavy[hv].remove();
         c.style.cssText = "position:fixed;margin:0;left:" + r.left + "px;top:" + r.top + "px;width:" + r.width + "px;height:" + r.height + "px;animation:none;opacity:1;filter:none;z-index:93;pointer-events:none;";
         return c;
       }
@@ -168,7 +170,7 @@
         return true;
       }
       /* DEFY / EXPIRE: the card shatters into falling shards */
-      var cols = 3, rows = 4, pts = [];
+      var cols = 2, rows = 3, pts = [];
       for (var y = 0; y <= rows; y++) {
         pts.push([]);
         for (var x = 0; x <= cols; x++) {
@@ -192,14 +194,14 @@
         var dx = (mx - 50) * rnd(2.5, 5), dy = (my - 50) * rnd(1.5, 3) + rnd(160, 420);
         var rot = rnd(-140, 140);
         s.animate([
-          { transform: "none", filter: "brightness(1.6)", opacity: 1 },
+          { transform: "none", opacity: 1 },
           { transform: "translate(" + (dx * 0.15).toFixed(0) + "px," + (-rnd(10, 40)).toFixed(0) + "px) rotate(" + (rot * 0.2).toFixed(0) + "deg)", opacity: 1, offset: 0.18 },
-          { transform: "translate(" + dx.toFixed(0) + "px," + dy.toFixed(0) + "px) rotate(" + rot.toFixed(0) + "deg) scale(0.7)", filter: "brightness(0.6)", opacity: 0 }
+          { transform: "translate(" + dx.toFixed(0) + "px," + dy.toFixed(0) + "px) rotate(" + rot.toFixed(0) + "deg) scale(0.7)", opacity: 0 }
         ], { duration: rnd(900, 1300), delay: i * 6, easing: "cubic-bezier(0.3,0.1,0.6,1)", fill: "backwards" }).onfinish = function () { s.remove(); };
       });
       FX.flash("rgba(255,30,60,0.9)", 0.55, 650);
       FX.ring(cx, cy, { r1: Math.max(innerWidth, innerHeight) * 0.8, life: 700, width: 4, color: "#ff2d55" });
-      FX.spark(cx, cy, { n: 60, min: 3, max: 12, gravity: 0.25, life: 1100, color: "#ff2d55", jx: r.width / 3, jy: r.height / 3 });
+      FX.spark(cx, cy, { n: 30, min: 3, max: 12, gravity: 0.25, life: 1000, color: "#ff2d55", jx: r.width / 3, jy: r.height / 3 });
       FX.shake(); FX.buzz([60, 40, 90]);
       FX.banner(type === "expire" ? "Time limit exceeded" : "You have refused the System", type === "expire" ? "Quest Failed" : "Quest Defied",
         testing ? "Test run · no EXP change" : "Penalty · −10 EXP", "#ff2d55", 1700);
@@ -232,10 +234,10 @@
   /* ================= SYSTEM CONSOLE ================= */
   var lvBox = document.querySelector("#sec-quests .q-level");
   if (lvBox && window.__mxHunter) {
-    var btn = el("button", "mx-console-btn mono", "Console");
+    var btn = el("button", "mx-console-btn", '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg>');
     btn.type = "button";
     btn.setAttribute("aria-label", "Open System Console");
-    lvBox.appendChild(btn);
+    (document.getElementById("sec-quests") || lvBox).appendChild(btn);
     var sheet = el("div", "mx-console", '' +
       '<div class="mx-c-card" role="dialog" aria-label="System Console">' +
       '<div class="mx-c-head"><span>System Console</span><button type="button" class="mx-c-x" aria-label="Close">&times;</button></div>' +

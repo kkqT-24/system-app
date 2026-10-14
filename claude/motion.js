@@ -11,7 +11,7 @@
   if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
 
   var PAL = ["#8f5ef8", "#c3b8fe", "#da78f5", "#6f63f6", "#f2ecff", "#7dd7ff"];
-  var RANK_COLORS = { e: "#b2b6d0", d: "#46dc78", c: "#50aaff", b: "#ffbe32", a: "#ff7a26", s: "#a855f7" };
+  var RANK_COLORS = { e: "#b2b6d0", d: "#46dc78", c: "#50aaff", b: "#ffbe32", a: "#ff2d2d", s: "#a855f7" };
   function rnd(a, b) { return a + Math.random() * (b - a); }
   function pick(a) { return a[(Math.random() * a.length) | 0]; }
   function center(el) {

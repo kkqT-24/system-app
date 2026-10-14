@@ -7,21 +7,26 @@
 .tab-tile .t-letter .mx-aura-cv { z-index: -1; }
 /* the emitted aura replaces the old static wisps; the soft halo stays as a base glow */
 .q-rank-wrap.mx-aura .q-rank-aura i { display: none; }
-/* rank A: the EXP bar burns */
+/* rank A: the EXP bar burns — crimson fire */
 .q-bar-shell.mx-fire {
-  border-color: rgba(255, 140, 50, 0.85);
-  box-shadow: 0 0 10px rgba(255, 110, 30, 0.6), 0 -8px 22px rgba(255, 90, 20, 0.35), inset 0 0 8px rgba(255, 120, 40, 0.35);
+  border-color: rgba(255, 60, 60, 0.85);
+  box-shadow: 0 0 10px rgba(255, 30, 30, 0.6), 0 -8px 22px rgba(220, 20, 20, 0.35), inset 0 0 8px rgba(255, 50, 50, 0.35);
   animation: mxHeat 1.6s ease-in-out infinite;
 }
 @keyframes mxHeat {
-  0%, 100% { box-shadow: 0 0 10px rgba(255, 110, 30, 0.55), 0 -8px 22px rgba(255, 90, 20, 0.3), inset 0 0 8px rgba(255, 120, 40, 0.3); }
-  50% { box-shadow: 0 0 16px rgba(255, 140, 40, 0.75), 0 -12px 30px rgba(255, 100, 20, 0.45), inset 0 0 10px rgba(255, 160, 60, 0.45); }
+  0%, 100% { box-shadow: 0 0 10px rgba(255, 30, 30, 0.55), 0 -8px 22px rgba(220, 20, 20, 0.3), inset 0 0 8px rgba(255, 50, 50, 0.3); }
+  50% { box-shadow: 0 0 16px rgba(255, 50, 40, 0.75), 0 -12px 30px rgba(230, 20, 20, 0.45), inset 0 0 10px rgba(255, 80, 70, 0.45); }
 }
 .q-bar-shell.mx-fire .q-bar-fill {
-  background: linear-gradient(90deg, #7a1405, #e2400f 35%, #ff8a1e 60%, #ffd36a 80%, #ff8a1e) !important;
+  background: linear-gradient(90deg, #4a0207, #b50d14 35%, #ff2a2a 60%, #ff8a7a 80%, #ff2a2a) !important;
   background-size: 200% 100% !important;
-  box-shadow: 0 0 10px rgba(255, 110, 30, 0.8) !important;
+  box-shadow: 0 0 10px rgba(255, 30, 30, 0.8) !important;
 }
+/* rank A badge + tile letter: crimson instead of orange */
+.q-rank-wrap[data-rank="a"] { --flame-core: #ffe1e1; --flame-mid: #ff3030; --flame-glow: rgba(255, 30, 30, 0.82); --smk-lo: rgba(200, 20, 25, 0.96); --smk-mid: rgba(255, 60, 60, 0.78); --smk-hi: rgba(255, 220, 220, 0.5); }
+.q-rank[data-rank="a"]::before { background: linear-gradient(135deg, #ff5a4a, #e3141b 55%, #8e0710) !important; }
+.q-rank[data-rank="a"] .q-rank-letter { color: #ffeaea !important; text-shadow: 0 0 10px rgba(255, 90, 90, 1), 0 0 24px rgba(255, 30, 30, 0.85), 0 0 38px rgba(255, 30, 30, 0.5), 0 2px 2px rgba(60, 0, 0, 0.5) !important; }
+.tab-tile .t-letter[data-rank="a"] { --ta-c1: rgba(255, 50, 50, 0.85) !important; --ta-c2: rgba(230, 20, 20, 0.45) !important; color: #ffeaea !important; text-shadow: 0 0 8px rgba(255, 90, 90, 1), 0 0 20px rgba(255, 30, 30, 0.85), 0 0 36px rgba(255, 30, 30, 0.5) !important; }
 
 /* ---------- shared rune sigil ---------- */
 .mx-sigil { width: 100%; height: 100%; overflow: visible; }
@@ -96,7 +101,7 @@
 .sq-cracks { background: none !important; }
 .sq-cracks svg { width: 100%; height: 100%; display: block; }
 .sq-cracks path { fill: none; vector-effect: non-scaling-stroke; stroke-linejoin: round; stroke-linecap: round; }
-.sq-cracks .glow path { stroke: rgba(255, 45, 85, 0.75); stroke-width: 3.5; filter: blur(1.5px); }
+.sq-cracks .glow path { stroke: rgba(255, 45, 85, 0.45); stroke-width: 4; }
 .sq-cracks .core path { stroke: #ffe3e8; stroke-width: 1; }
 .sq-card.cracking { box-shadow: 0 0 60px rgba(255, 30, 60, 0.6), inset 0 0 50px rgba(255, 30, 60, 0.25) !important; }
 /* fulfill hold: light rises up the card from the bottom */
@@ -200,12 +205,12 @@
 
 /* ---------- SYSTEM CONSOLE ---------- */
 .mx-console-btn {
-  position: absolute; right: 10px; bottom: -26px; z-index: 3;
-  appearance: none; background: rgba(9, 7, 36, 0.7); border: 1px solid var(--line-soft); color: var(--ink-faint);
-  font-size: 9px; letter-spacing: 0.24em; text-transform: uppercase; padding: 4px 8px;
+  position: absolute; right: 14px; top: 16px; z-index: 5; width: 30px; height: 30px; padding: 0;
+  appearance: none; background: none; border: none; color: var(--ink-faint); opacity: 0.55;
+  display: grid; place-items: center; transition: opacity 0.2s ease, color 0.2s ease, transform 0.4s ease;
 }
-.mx-console-btn:hover { color: var(--lav); border-color: var(--line); }
-.q-level { margin-bottom: 30px !important; }
+.mx-console-btn svg { width: 17px; height: 17px; }
+.mx-console-btn:hover, .mx-console-btn:active { opacity: 1; color: var(--lav); transform: rotate(60deg); }
 .mx-console {
   position: fixed; inset: 0; z-index: 99; display: flex; align-items: flex-end; justify-content: center;
   background: rgba(2, 1, 10, 0.6); opacity: 0; pointer-events: none; transition: opacity 0.25s ease;
@@ -244,3 +249,9 @@
 @media (prefers-reduced-motion: reduce) {
   .mx-sigil .r1, .mx-sigil .r2, .mx-sigil .r3, .mx-hq-fog i, .mx-sq-hazard, .mx-sq-scan, .sq-card.white .mx-sq-rays, .mx-hq-sigil, .q-bar-shell.mx-fire { animation: none !important; }
 }
+
+/* shatter shards: plain, unanimated copies (keeps phones from choking) */
+.mx-sq-ghost, .mx-sq-ghost * { animation: none !important; transition: none !important; }
+.mx-sq-ghost { box-shadow: none !important; will-change: transform, opacity; }
+.sq-card.cracking { box-shadow: 0 0 34px rgba(255, 30, 60, 0.55), inset 0 0 30px rgba(255, 30, 60, 0.2) !important; }
+.sq-card.cracking .mx-sigil g, .sq-card.cracking .mx-sq-scan { animation-play-state: paused; }
