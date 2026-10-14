@@ -2122,9 +2122,30 @@
         border: 1px solid; background: none; position: relative; overflow: hidden;
         touch-action: none; user-select: none; -webkit-user-select: none;
       }
-      .sq-fulfill { border-color: var(--red); color: var(--red); }
-      .sq-card.white .sq-fulfill { border-color: #fff; color: #fff; }
-      .sq-defy { border-color: #5a1622; color: #8a2438; }
+      .sq-fulfill {
+        border-color: var(--red); background: var(--red); color: #0a0a0f;
+        animation: sqFulfillPulse 1.6s ease-in-out infinite;
+      }
+      .sq-card.white .sq-fulfill {
+        border-color: #fff; background: #fff; color: #0a0a0f;
+        animation-name: sqFulfillPulseW;
+      }
+      .sq-defy {
+        border-color: var(--red); background: #0a0a0f; color: var(--red);
+        animation: sqDefyPulse 1.6s ease-in-out infinite;
+      }
+      @keyframes sqDefyPulse {
+        0%, 100% { box-shadow: 0 0 8px rgba(255,45,85,0.25); }
+        50% { box-shadow: 0 0 22px rgba(255,45,85,0.6); }
+      }
+      @keyframes sqFulfillPulse {
+        0%, 100% { box-shadow: 0 0 8px rgba(255,45,85,0.3); filter: brightness(1); }
+        50% { box-shadow: 0 0 24px rgba(255,45,85,0.65); filter: brightness(1.25); }
+      }
+      @keyframes sqFulfillPulseW {
+        0%, 100% { box-shadow: 0 0 8px rgba(255,255,255,0.3); filter: brightness(1); }
+        50% { box-shadow: 0 0 24px rgba(255,255,255,0.65); filter: brightness(1.2); }
+      }
       .sq-btn .sq-fill {
         position: absolute; inset: 0; width: 0%;
         background: rgba(255, 45, 85, 0.25); pointer-events: none;
@@ -5915,8 +5936,7 @@
           try {
             if (window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
             var r = sqCard.getBoundingClientRect();
-            var cx = r.left + r.width / 2, cy = r.top + r.height / 2;
-            for (var i = 0; i < 70; i++) {
+            for (var i = 0; i < 80; i++) {
               (function () {
                 var p = document.createElement("div");
                 p.className = "sq-particle";
@@ -5924,13 +5944,14 @@
                 p.style.width = sz + "px"; p.style.height = sz + "px";
                 p.style.background = color;
                 p.style.boxShadow = "0 0 8px " + color;
-                p.style.left = cx + "px"; p.style.top = cy + "px";
+                /* spawn along the top edge, drift up off the screen */
+                var sx = r.left + Math.random() * r.width;
+                var sy = r.top + Math.random() * 8;
+                p.style.left = sx + "px"; p.style.top = sy + "px";
                 document.body.appendChild(p);
-                var ang = Math.random() * Math.PI * 2;
-                var dist = 90 + Math.random() * 220;
-                var dx = Math.cos(ang) * dist;
-                var dy = up ? -(40 + Math.random() * 160) : Math.sin(ang) * dist;
-                var dur = 1600 + Math.random() * 1200;
+                var dx = (Math.random() - 0.5) * 120;
+                var dy = up ? -(220 + Math.random() * 320) : (Math.random() - 0.5) * 200;
+                var dur = 2600 + Math.random() * 1400;
                 try {
                   var anim = p.animate([
                     { transform: "translate(-50%,-50%) scale(1)", opacity: 1 },
