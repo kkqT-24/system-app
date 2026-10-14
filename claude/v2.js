@@ -144,6 +144,17 @@
       '<path d="M18 62q4-24 24-24h16q20 0 24 24l-6 4-4-12 2 54H26l2-54-4 12z"/>' +
       '<g class="axe"><path d="M76 28l-10 80 2.6.4 10-80z"/><path class="wpn" d="M72 18q24 2 22 26-10-8-22-6z"/></g>'
   };
+  /* engraved detail drawn over each body: armour seams, folds, trims */
+  var DETAILS = {
+    Knight: "M50 12v11M43 31h14M28 46q6-6 14-4M72 46q-6-6-14-4M40 50h20M42 57h16M44 64h12M36 80h28M30 80l-4 26M70 80l4 26M36 92l-2 14M64 92l2 14M50 60v42",
+    Archer: "M40 38q10 6 20 0M40 62l-6 42M60 62l6 42M50 64v40M58 46l9-13M61 47l9-13M66 31l2-4M69 33l3-3",
+    Mage: "M41 34h18M34 92q16 6 32 0M46 72a4 4 0 1 0 8 0a4 4 0 1 0-8 0M50 66v-3M50 78v3M75 40h3M75 46h3M75 52h3",
+    Assassin: "M44 34h12M42 62h16M37 50l-4 10M63 50l4 10M50 80v26M46 44l4 6 4-6",
+    Lancer: "M50 18v8M44 30h12M40 54h20M41 62h18M42 70h16M38 80l-2 14M50 80v16M62 80l2 14",
+    Bulwark: "M18 60q8-14 22-18M82 60q-8-14-22-18M44 64l12 12M56 64l-12 12M50 64a6 6 0 1 0 0.1 0M24 96h52M30 102h40",
+    Healer: "M40 38q10 6 20 0M44 46l12 30M30 96q20 8 40 0M38 70q12 6 24 0",
+    Berserker: "M42 50l8 10M58 48l-6 12M30 84h40M30 44l4-4 4 4 4-4 4 4 4-4 4 4 4-4 4 4 4-4 4 4M44 30h12"
+  };
   var figN = 0;
   function shadowFigure(sh, still) {
     var T = TIERS[sh.tier] || TIERS[0], c = T.color, id = "f" + (++figN);
@@ -161,6 +172,9 @@
       '<ellipse cx="50" cy="66" rx="48" ry="44" fill="url(#' + id + 'g)"/>' +
       '<g class="aura">' + flames + '</g>' +
       '<g class="body" fill="#020007" stroke="' + c + '" stroke-opacity="0.75" stroke-width="0.7" stroke-linejoin="round">' + body + '</g>' +
+      '<path class="det" d="' + (DETAILS[sh.cls] || DETAILS.Knight) + '" fill="none" stroke="' + c + '" stroke-width="0.55" stroke-linecap="round" stroke-linejoin="round"/>' +
+      '<circle class="core" cx="50" cy="' + (sh.cls === "Bulwark" ? 70 : 56) + '" r="1.7" fill="' + c + '"/>' +
+      '<g class="wisps" fill="none" stroke="' + c + '" stroke-width="0.8" stroke-linecap="round"><path d="M30 52C25 42 34 34 27 22"/><path d="M70 52C75 42 66 34 73 22"/><path d="M50 18C46 10 54 6 50 -4"/></g>' +
       '<g class="eyes" fill="#e8f4ff"><ellipse cx="45.5" cy="29.5" rx="2.6" ry="0.9"/><ellipse cx="54.5" cy="29.5" rx="2.6" ry="0.9"/></g>' +
       '<ellipse cx="50" cy="109" rx="30" ry="3" fill="#000" opacity="0.8"/>' +
       motes + '</svg>';

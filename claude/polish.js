@@ -281,7 +281,43 @@
   ring.innerHTML = '<svg viewBox="0 0 64 64"><defs><linearGradient id="mxPullG" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#8f5ef8"/><stop offset="1" stop-color="#7dd3fc"/></linearGradient></defs>' +
     '<circle class="tr" cx="32" cy="32" r="29"/><circle class="pr" cx="32" cy="32" r="29"/><circle class="sp" cx="32" cy="3" r="2.2"/><circle class="sp" cx="32" cy="61" r="1.6"/></svg>';
   h.appendChild(ring);
-  var last = 0, ready = false, wasOpen = false;
+  var last = 0, ready = false, wasOpen = false, lastDisperse = 0;
+  /* leaving a module: the back bar gently comes apart into motes that
+     drift up and fade, instead of just switching off */
+  var bar = h.querySelector(".th-bar");
+  function disperse() {
+    if (!bar || Date.now() - lastDisperse < 700) return;
+    lastDisperse = Date.now();
+    var r = bar.getBoundingClientRect();
+    if (!r.width) r = h.getBoundingClientRect();
+    var round = /50%/.test(bar.style.borderRadius || "");
+    var cols = ["#8f5ef8", "#a78bfa", "#c3b8fe", "#6f63f6", "#e9e3ff"];
+    for (var i = 0; i < 28; i++) {
+      var x, y;
+      if (round) { var a = i / 28 * Math.PI * 2; x = r.left + r.width / 2 + Math.cos(a) * r.width / 2; y = r.top + r.height / 2 + Math.sin(a) * r.height / 2; }
+      else { x = r.left + (i + 0.5) / 28 * r.width; y = r.top + Math.random() * r.height; }
+      var p = document.createElement("span");
+      var sz = 1.6 + Math.random() * 2.4, c = cols[(Math.random() * cols.length) | 0];
+      p.style.cssText = "position:fixed;z-index:97;pointer-events:none;border-radius:50%;left:" + x + "px;top:" + y + "px;width:" + sz + "px;height:" + sz + "px;background:" + c + ";box-shadow:0 0 6px " + c + ";";
+      document.body.appendChild(p);
+      var dx = (Math.random() - 0.5) * 40, dy = -(24 + Math.random() * 60), d = 900 + Math.random() * 700;
+      try {
+        p.animate([
+          { transform: "translate(-50%,-50%) scale(1)", opacity: 1 },
+          { transform: "translate(calc(-50% + " + (dx * 0.4).toFixed(1) + "px), calc(-50% + " + (dy * 0.35).toFixed(1) + "px)) scale(1)", opacity: 0.9, offset: 0.3 },
+          { transform: "translate(calc(-50% + " + dx.toFixed(1) + "px), calc(-50% + " + dy.toFixed(1) + "px)) scale(0.3)", opacity: 0 }
+        ], { duration: d, delay: Math.abs(i - 14) * 12, easing: "cubic-bezier(0.25, 0.6, 0.35, 1)", fill: "backwards" }).onfinish = (function (el) { return function () { el.remove(); }; })(p);
+      } catch (e) { setTimeout(function (el) { el.remove(); }, d + 400, p); }
+    }
+    bar.style.transition = "opacity 0.35s ease"; bar.style.opacity = "0";
+    setTimeout(function () { bar.style.opacity = ""; bar.style.transition = ""; }, 900);
+  }
+  /* tapping the bar (or the bottom back bar) also disperses it */
+  new MutationObserver(function (l) {
+    l.forEach(function (m) {
+      if (/\bshow\b/.test(m.oldValue || "") && !h.classList.contains("show")) disperse();
+    });
+  }).observe(h, { attributes: true, attributeFilter: ["class"], attributeOldValue: true });
   function openSec() {
     var ss = document.querySelectorAll(".section");
     for (var i = 0; i < ss.length; i++) if (!ss[i].classList.contains("is-hidden")) return ss[i];
@@ -301,10 +337,7 @@
     }
     /* released while ready and the panel is leaving: fire a pulse */
     if (wasOpen && sec && /110vh/.test(sec.style.transform || "")) {
-      var b = h.getBoundingClientRect(), fx = document.createElement("div");
-      fx.className = "mx-pull-burst"; fx.innerHTML = "<i></i><i></i>";
-      fx.style.left = (b.left + b.width / 2) + "px"; fx.style.top = (b.top + b.height / 2) + "px";
-      document.body.appendChild(fx); setTimeout(function () { fx.remove(); }, 700);
+      disperse();
       h.style.setProperty("--pp", "0"); last = 0; ready = false; h.classList.remove("mx-ready");
       wasOpen = false;
     } else wasOpen = !!sec && !/110vh/.test(sec.style.transform || "");

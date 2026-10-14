@@ -294,3 +294,14 @@ body.tab-open .main-controls .replay-btn { display: none !important; }
   animation: mxPullBurst 0.55s cubic-bezier(0.2, 0.8, 0.3, 1) forwards; }
 .mx-pull-burst i + i { animation-delay: 0.08s; border-color: #7dd3fc; }
 @keyframes mxPullBurst { from { transform: scale(0.6); opacity: 1; } to { transform: scale(4); opacity: 0; } }
+
+/* ---------- soldier detail: engraved seams, shadow core, rising wisps ---------- */
+.mx-sh-fig .det { opacity: 0.5; filter: drop-shadow(0 0 1.5px var(--tc)); }
+.mx-sh-fig .core { filter: drop-shadow(0 0 2px #fff) drop-shadow(0 0 5px var(--tc)); animation: mxCore 2.4s ease-in-out infinite; }
+@keyframes mxCore { 50% { opacity: 0.35; transform: scale(0.8); } }
+.mx-sh-fig .core { transform-box: fill-box; transform-origin: center; }
+.mx-sh-fig .wisps path { stroke-dasharray: 10 40; stroke-dashoffset: 50; opacity: 0.7; animation: mxWisp 2.8s linear infinite; filter: drop-shadow(0 0 2px var(--tc)); }
+.mx-sh-fig .wisps path:nth-child(2) { animation-delay: -0.9s; }
+.mx-sh-fig .wisps path:nth-child(3) { animation-delay: -1.8s; animation-duration: 3.4s; }
+@keyframes mxWisp { 0% { stroke-dashoffset: 50; opacity: 0; } 20% { opacity: 0.75; } 100% { stroke-dashoffset: 0; opacity: 0; } }
+.mx-sh-fig.still .wisps { display: none; }
