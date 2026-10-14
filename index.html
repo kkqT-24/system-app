@@ -2068,16 +2068,17 @@
       }
       .sq-card.white::after {
         background:
-          linear-gradient(#fff, #fff) left top / 18px 2px,
-          linear-gradient(#fff, #fff) left top / 2px 18px,
-          linear-gradient(#fff, #fff) right top / 18px 2px,
-          linear-gradient(#fff, #fff) right top / 2px 18px,
-          linear-gradient(#fff, #fff) left bottom / 18px 2px,
-          linear-gradient(#fff, #fff) left bottom / 2px 18px,
-          linear-gradient(#fff, #fff) right bottom / 18px 2px,
-          linear-gradient(#fff, #fff) right bottom / 2px 18px;
+          linear-gradient(#ffd700, #ffd700) left top / 18px 2px,
+          linear-gradient(#ffd700, #ffd700) left top / 2px 18px,
+          linear-gradient(#ffd700, #ffd700) right top / 18px 2px,
+          linear-gradient(#ffd700, #ffd700) right top / 2px 18px,
+          linear-gradient(#ffd700, #ffd700) left bottom / 18px 2px,
+          linear-gradient(#ffd700, #ffd700) left bottom / 2px 18px,
+          linear-gradient(#ffd700, #ffd700) right bottom / 18px 2px,
+          linear-gradient(#ffd700, #ffd700) right bottom / 2px 18px;
         background-repeat: no-repeat;
       }
+      .sq-card.white::before { border-color: rgba(255, 215, 0, 0.35); }
       @keyframes sqPulse {
         0%, 100% { box-shadow: 0 0 28px rgba(255, 45, 85, 0.3), inset 0 0 24px rgba(255, 45, 85, 0.07); }
         50% { box-shadow: 0 0 44px rgba(255, 45, 85, 0.45), inset 0 0 32px rgba(255, 45, 85, 0.12); }
@@ -2112,8 +2113,8 @@
         animation: sqHeadPulse 1.8s ease-in-out infinite;
       }
       .sq-card.white .sq-head {
-        color: #fff;
-        text-shadow: 0 0 18px rgba(255,255,255,0.85), 0 0 42px rgba(255,255,255,0.4);
+        color: #ffd700;
+        text-shadow: 0 0 18px rgba(255,215,0,0.8), 0 0 42px rgba(255,215,0,0.35);
       }
       @keyframes sqHeadPulse {
         0%, 100% { opacity: 1; }
@@ -2123,7 +2124,7 @@
         font-size: 10px; letter-spacing: 0.34em; text-indent: 0.34em;
         color: var(--red-soft); margin-bottom: 18px; opacity: 0.85;
       }
-      .sq-card.white .sq-sub { color: #bbb; }
+      .sq-card.white .sq-sub { color: #d4af37; }
       .sq-task {
         font-size: 17px; letter-spacing: 0.08em; line-height: 1.5;
         color: var(--ink); margin-bottom: 12px;
@@ -6029,8 +6030,9 @@
                 p.className = "sq-particle";
                 var sz = 2 + Math.random() * 4;
                 p.style.width = sz + "px"; p.style.height = sz + "px";
-                p.style.background = "#fff";
-                p.style.boxShadow = "0 0 10px #fff, 0 0 20px rgba(255,255,255,0.5)";
+                var gold = Math.random() < 0.35;
+                p.style.background = gold ? "#ffd700" : "#fff";
+                p.style.boxShadow = gold ? "0 0 10px #ffd700, 0 0 20px rgba(255,215,0,0.5)" : "0 0 10px #fff, 0 0 20px rgba(255,255,255,0.5)";
                 p.style.left = (r.left + Math.random() * r.width) + "px";
                 p.style.top = (r.top + r.height * Math.random()) + "px";
                 document.body.appendChild(p);
@@ -6106,7 +6108,7 @@
         function sqFulfill() {
           if (!SECRET.active) return;
           var q = SECRET_POOL[SECRET.active.idx];
-          var color = q.white ? "#ffffff" : "#ff2d55";
+          var color = q.white ? "#ffe9a3" : "#ff2d55";
           sqHide();
           sqParticles(color, true);
           if (q.exp > 0) { try { gainExp(q.exp); } catch (e) {} }
