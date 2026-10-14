@@ -5084,6 +5084,36 @@
             }
           }
         }, { passive: true });
+        function burstRingUp() {
+          if (!thBar) return;
+          var r = thBar.getBoundingClientRect();
+          var cx = r.left + r.width / 2, cy = r.top + r.height / 2;
+          var colors = ["#8f5ef8", "#c3b8fe", "#da78f5", "#6f63f6", "#f2ecff"];
+          for (var bi = 0; bi < 22; bi++) {
+            var p = document.createElement("span");
+            p.className = "w-particle";
+            var ang = Math.random() * Math.PI * 2, rad = 6 + Math.random() * 8;
+            p.style.left = (cx + Math.cos(ang) * rad) + "px";
+            p.style.top = (cy + Math.sin(ang) * rad) + "px";
+            var c = colors[(Math.random() * colors.length) | 0];
+            p.style.background = c;
+            p.style.boxShadow = "0 0 8px " + c;
+            document.body.appendChild(p);
+            var upX = Math.random() * 170 - 85;
+            var upY = -(220 + Math.random() * 420);
+            var dur = 750 + Math.random() * 400, delay = bi * 12;
+            try {
+              var anim = p.animate([
+                { transform: "translate(0,0) scale(1)", opacity: 1 },
+                { transform: "translate(" + (upX * 0.5).toFixed(1) + "px," + (upY * 0.35).toFixed(1) + "px) scale(1.15)", opacity: 1, offset: 0.35 },
+                { transform: "translate(" + upX.toFixed(1) + "px," + upY.toFixed(1) + "px) scale(0.3)", opacity: 0 }
+              ], { duration: dur, delay: delay, easing: "cubic-bezier(0.2, 0.7, 0.3, 1)", fill: "forwards" });
+              (function (el, an) { an.onfinish = function () { el.remove(); }; })(p, anim);
+            } catch (err) {
+              (function (el, dd) { setTimeout(function () { el.remove(); }, dd); })(p, dur + delay + 100);
+            }
+          }
+        }
         function endDrag(e) {
           if (!dragSec) return;
           var sec = dragSec;
@@ -5091,6 +5121,12 @@
           var dx = Math.abs(e.changedTouches[0].clientX - dragStartX);
           dragSec = null;
           if (dy >= 160 && dy > dx) {
+            burstRingUp();
+            if (thBar) {
+              thBar.style.transition = "opacity 0.16s ease-out, transform 0.16s ease-out";
+              thBar.style.opacity = "0";
+              thBar.style.transform = "scale(1.6)";
+            }
             sec.style.transition = "transform 0.28s ease-in";
             sec.style.transform = "translateY(110vh)";
             setTimeout(function () {
@@ -5101,6 +5137,7 @@
                 thBar.style.width = ""; thBar.style.height = "";
                 thBar.style.background = ""; thBar.style.border = "";
                 thBar.style.borderRadius = ""; thBar.style.boxShadow = "";
+                thBar.style.opacity = ""; thBar.style.transform = "";
               }
               sec.classList.add("is-hidden");
               document.body.classList.remove("tab-open");
