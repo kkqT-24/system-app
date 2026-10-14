@@ -60,6 +60,8 @@
     return '<svg viewBox="0 0 100 140" preserveAspectRatio="none" aria-hidden="true"><g class="glow"><path d="' + d + '"/>' + ring + '</g><g class="core"><path d="' + d + '"/>' + ring + '</g></svg>';
   }
 
+  window.__mxSigil = sigilSVG;
+
   /* ================= SECRET / PRAYER QUEST CARD ================= */
   var card = document.getElementById("sqCard");
   var overlay = document.getElementById("sqOverlay");

@@ -1,0 +1,15 @@
+{
+  "name": "System v2",
+  "short_name": "System",
+  "description": "Kent's quest system — quests, workouts, status, shadows.",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#040410",
+  "theme_color": "#040410",
+  "icons": [
+    { "src": "../icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "../apple-touch-icon.png", "sizes": "180x180", "type": "image/png" }
+  ]
+}

@@ -6,7 +6,7 @@
 <link rel="apple-touch-icon" href="../apple-touch-icon.png">
 <link rel="icon" type="image/png" href="../icon-512.png">
     <meta name="color-scheme" content="dark" />
-    <title>Boot Page</title>
+    <title>System v2</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
@@ -2298,6 +2298,13 @@
     </style>
       <link rel="stylesheet" href="motion.css" />
     <link rel="stylesheet" href="quests.css" />
+    <link rel="stylesheet" href="v2.css" />
+    <link rel="manifest" href="manifest.webmanifest" />
+    <meta name="theme-color" content="#040410" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="apple-mobile-web-app-title" content="System" />
   </head>
   <body>
     <!-- ================= MAIN (step 2: shell + section navigation) ================= -->
@@ -2340,6 +2347,8 @@
             <div class="showcase-grid" role="group" aria-label="All tabs">
               <button type="button" class="tab-tile" data-section="quests"><span class="t-name">Quests</span><span class="t-state"><span class="t-lv">Level 1 · Rank</span> <span class="t-letter" data-rank="e"><span class="t-glyph">E</span></span></span></button>
               <button type="button" class="tab-tile" data-section="workouts"><span class="t-name">Workouts</span><span class="t-bar-shell" aria-hidden="true"><span class="t-bar-track"><span class="t-bar-fill" id="wtBarFill"></span></span></span></button>
+              <button type="button" class="tab-tile" data-section="status"><span class="t-name">Status</span><span class="t-state" id="mxStatusTile">Stats · Log</span></button>
+              <button type="button" class="tab-tile" data-section="shadows"><span class="t-name">Shadows</span><span class="t-state" id="mxShadowTile">Army · 0</span></button>
               <button type="button" class="tab-tile" data-section="weather"><span class="t-name">Weather</span><span class="t-state wx-tile-state"><span class="weather-icon wx-tile-icon" id="wxTileIcon" data-icon="sun" aria-hidden="true"></span><span id="wxTileState">80° · Sunny</span></span></button>
               <button type="button" class="tab-tile" data-section="vehicle"><span class="t-name">Vehicle</span><span class="t-state">Mercedes AMG GT S</span></button>
               <button type="button" class="tab-tile" data-external="https://claude.ai/artifact/X2M1Z3DAPcH5gBRC8dX4hM"><span class="t-name">Trading Desk</span><span class="t-state">External &#8599;</span></button>
@@ -2594,6 +2603,17 @@
                 <div id="maintLog"></div>
               </div>
             </section>
+            <!-- v2: Status window (stats + history log) and the Shadow army -->
+            <section class="section is-hidden" id="sec-status" aria-label="Status">
+              <div class="s-name">Status</div>
+              <div class="s-state">Hunter status window</div>
+              <div class="mx-st-root" id="mxStatus"></div>
+            </section>
+            <section class="section is-hidden" id="sec-shadows" aria-label="Shadows">
+              <div class="s-name">Shadows</div>
+              <div class="s-state" id="mxShState">Shadow army</div>
+              <div class="mx-sh-root" id="mxShadows"></div>
+            </section>
             <!-- Claude build: Sports Desk opens inside the app -->
             <section class="section is-hidden mx-embed" id="sec-sports" aria-label="Sports Desk">
               <div class="mx-embed-bar"><span class="s-name">Sports Desk</span><a class="mx-embed-out mono" href="https://kkqt-24.github.io/sports-desk/#desk" target="_blank" rel="noopener">Open &#8599;</a></div>
@@ -2631,7 +2651,7 @@
         </div>
 
         <div class="main-top">
-          <span>Core v1.1</span>
+          <span>Core v2</span>
           <span>Louisville, KY</span>
         </div>
       </div>
@@ -2752,7 +2772,7 @@
       </div>
 
       <div class="boot-bottom">
-        <span>Build 1.1 — Boot Sequence</span>
+        <span>Build 2.0 — Boot Sequence</span>
         <span class="bb-right">First boot of the day</span>
       </div>
     </section>
@@ -2988,7 +3008,7 @@
           { at: 48, name: "INVENTORY SYNC",    st: "OK" },
           { at: 62, name: "VEHICLE TELEMETRY", st: "OK" },
           { at: 76, name: "ASSET LEDGER",      st: "OK" },
-          { at: 90, name: "ATMOSPHERIC FEED",  st: "SUNNY · 80°F" }
+          { at: 90, name: "ATMOSPHERIC FEED",  st: (function () { try { var w = JSON.parse(localStorage.getItem("systemApp.v2.wx") || "null"); if (w && w.cond) return (w.cond + " · " + Math.round(w.temp) + "°F").toUpperCase(); } catch (e) {} return "SUNNY · 80°F"; })() }
         ];
         var ARC_C = 879.6;
         var bootTimer = null;
@@ -3499,6 +3519,7 @@
            panel on the main screen. Re-checked every 20 seconds so the
            sun hands over to the moon at sunset on its own. ---------- */
         var WX_CONDITION = "Sunny";
+        var WX_TEMP = 80;
         var WX_SUNSET_MIN = 19 * 60 + 7;    /* 7:07 PM, from the snapshot */
         var WX_SUNRISE_MIN = 7 * 60 + 47;   /* Louisville, mid-October */
         var WX_OPEN = '<svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">';
@@ -3552,12 +3573,23 @@
           /* the Weather tile carries the same snapshot at a glance,
              glyph included — the same glyph the panel hero shows */
           var wxTile = document.getElementById("wxTileState");
-          if (wxTile) wxTile.textContent = "80° · " + label;
+          if (wxTile) wxTile.textContent = WX_TEMP + "° · " + label;
           var wxTileIcon = document.getElementById("wxTileIcon");
           if (wxTileIcon) { wxTileIcon.innerHTML = GLYPHS[key]; wxTileIcon.setAttribute("data-icon", key); }
         }
         refreshWeather();
         setInterval(refreshWeather, 20000);
+        /* v2: live weather — v2.js fetches the forecast and hands it here */
+        window.__mxGlyph = function (k) { return GLYPHS[k] || ""; };
+        window.__mxWeatherApply = function (w) {
+          if (!w) return;
+          if (w.cond) WX_CONDITION = w.cond;
+          if (isFinite(w.temp)) WX_TEMP = Math.round(w.temp);
+          if (isFinite(w.sunsetMin)) WX_SUNSET_MIN = w.sunsetMin;
+          if (isFinite(w.sunriseMin)) WX_SUNRISE_MIN = w.sunriseMin;
+          wxKeyNow = null;
+          refreshWeather();
+        };
 
         /* glyph reference at the bottom of the Weather panel: every
            condition glyph, rendered from the same GLYPHS map with its
@@ -3874,6 +3906,7 @@
               var lost = Math.max(0, beforeV - hunterTotalValue());
               LAST_PENALTY = lost;
               if (lost > 0) TOTAL_PENALTY += lost;
+              try { if (window.__mxEvt) window.__mxEvt("penalty", { lost: lost, day: WORKOUT.day }); } catch (e) {}
               updateHunterTexts();
               if (!main.classList.contains("is-hidden")) showMissPopup(lost, minY, TOTAL_PENALTY);
               else pendingMiss = { lost: lost, min: minY, total: TOTAL_PENALTY };
@@ -3999,6 +4032,7 @@
           var r = box.getBoundingClientRect();
           if (!r.width) return;
           wFullCelebrated = true;
+          try { if (window.__mxEvt) window.__mxEvt("workout", { total: workoutTotal() }); } catch (e) {}
           if (!RM) {
             box.classList.remove("celebrate");
             void box.offsetWidth;
@@ -4548,6 +4582,7 @@
           if (!item || item.done) return;
           if (isWorkoutQuest(key, item)) return; /* the Workouts tab owns this one */
           item.done = true;
+          try { if (window.__mxEvt) window.__mxEvt("quest", { key: key, name: item.name, exp: item.exp || 0 }); } catch (e) {}
           row.classList.add("done", "bursting");
           setTimeout(function () { row.classList.remove("bursting"); }, 500);
           var gain = item.exp || 0;
@@ -4754,6 +4789,7 @@
           lvl.classList.remove("level-glow");
           void lvl.offsetWidth;
           lvl.classList.add("level-glow");
+          try { if (window.__mxEvt) window.__mxEvt("levelup", { level: HUNTER.level }); } catch (e) {}
           setTimeout(function () { lvl.classList.remove("level-glow"); }, 1450);
         }
         /* rank-up burn-in: SLOWER (1.75s) and LEFT → RIGHT. A clone of
@@ -4773,6 +4809,7 @@
           rankEl.classList.remove("rank-arrive");
           void rankEl.offsetWidth;
           rankEl.classList.add("rank-arrive");
+          try { if (window.__mxEvt) window.__mxEvt("rankup", { rank: newRank, from: prevRank }); } catch (e) {}
           setTimeout(function () { rankEl.classList.remove("rank-arrive"); }, 1850);
           var wrapEl = sec.querySelector(".q-rank-wrap");
           if (wrapEl) {
@@ -4934,6 +4971,7 @@
           var entry = UNDO_STACK.pop();
           if (!entry) { refreshUndo(); return; }
           if (entry.type === "complete") {
+            try { if (window.__mxEvt) window.__mxEvt("undo", { key: entry.key, name: entry.item && entry.item.name }); } catch (e) {}
             entry.cancelled = true;
             entry.item.done = false;
             /* undoing a secret completion un-earns its reward:
@@ -6133,6 +6171,7 @@
           sqHide();
           if (!fxDone) sqParticles(color, true);
           if (isTest) { SECRET.active = null; secretSave(); return; }
+          try { if (window.__mxEvt) window.__mxEvt("secret", { result: "fulfilled", name: q.text, exp: q.exp || 0, white: !!q.white }); } catch (e) {}
           if (q.exp > 0) { try { gainExp(q.exp); } catch (e) {} }
           sqClearAfter(q.type);
         }
@@ -6146,6 +6185,7 @@
           /* shatter: red burst outward */
           if (!fxDone) sqParticles("#ff2d55", false);
           if (isTest) { SECRET.active = null; secretSave(); return; }
+          try { if (window.__mxEvt) window.__mxEvt("secret", { result: penalize ? "defied" : "expired", name: q.text, exp: penalize ? -10 : 0, white: !!q.white }); } catch (e) {}
           if (penalize) { try { subtractExp(10); } catch (e) {} }
           sqClearAfter(q.type);
         }
@@ -6186,6 +6226,14 @@
             try { renderWorkouts(); } catch (e) {}
             if (window.__ksSaveState) window.__ksSaveState();
           }
+        };
+        window.__mxState = function () {
+          return {
+            day: todayKey(), daily: QUESTS.daily.map(function (q) { return { name: q.name, done: !!q.done }; }),
+            weekly: QUESTS.weekly.map(function (q) { return { name: q.name, done: !!q.done }; }),
+            streak: STREAK.count || 0, reps: workoutTotal(), repsMin: workoutRepsForRank(currentRankLetter()),
+            level: HUNTER.level, rank: rankFor(HUNTER.level), secretActive: !!(SECRET.active && !SECRET.active.test)
+          };
         };
         window.__mxSqTest = function (white) {
           if (SECRET.active && !SECRET.active.test) return false;
@@ -6277,25 +6325,6 @@
         } catch (e) {}
         /* count this launch (deferred a beat so boot doesn't fight the popup) */
         setTimeout(sqCountOpen, 1200);
-        /* hidden test hook: triple-tap the version label to force a quest */
-        (function () {
-          try {
-            var taps = 0, lastTap = 0;
-            document.addEventListener("click", function (e) {
-              var t = e.target;
-              if (t && t.textContent && /Core v1\.1/.test(t.textContent)) {
-                var now = Date.now();
-                taps = (now - lastTap < 800) ? taps + 1 : 1;
-                lastTap = now;
-                if (taps >= 3) {
-                  taps = 0;
-                  if (!SECRET.active) sqTrigger();
-                  else sqShow();
-                }
-              } else { taps = 0; }
-            });
-          } catch (e) {}
-        })();
       })();
     </script>
     <!-- Three.js (classic builds) for the Vehicle tab's 3D viewer -->
@@ -7068,5 +7097,6 @@
     <script src="bolts.js"></script>
     <script src="aura.js"></script>
     <script src="quests.js"></script>
+    <script src="v2.js"></script>
   </body>
 </html>
