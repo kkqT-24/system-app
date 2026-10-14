@@ -5043,6 +5043,7 @@
            follows the finger down; release past the threshold and it slides
            off, otherwise it springs back. */
         var dragSec = null, dragStartY = 0, dragStartX = 0;
+        var thBar = tabsHandle.querySelector(".th-bar");
         document.addEventListener("touchstart", function (e) {
           dragSec = null;
           if (!document.body.classList.contains("tab-open") || e.touches.length !== 1 || navBusy) return;
@@ -5054,7 +5055,7 @@
             dragStartX = e.touches[0].clientX;
             dragSec.classList.remove("assembling");
             dragSec.style.transition = "none";
-            tabsHandle.style.transition = "none";
+            if (thBar) thBar.style.transition = "none";
           } else {
             dragSec = null;
           }
@@ -5064,10 +5065,14 @@
           var mdy = e.touches[0].clientY - dragStartY;
           if (mdy > 0) {
             dragSec.style.transform = "translateY(" + Math.round(mdy * 0.85) + "px)";
-            tabsHandle.style.transform = "rotate(" + Math.round(mdy * 1.8) + "deg)";
+            if (thBar) {
+              var mp = Math.min(mdy / 200, 1);
+              thBar.style.width = Math.round(46 - 26 * mp) + "px";
+              thBar.style.height = Math.round(5 + 15 * mp) + "px";
+            }
           } else {
             dragSec.style.transform = "";
-            tabsHandle.style.transform = "";
+            if (thBar) { thBar.style.width = ""; thBar.style.height = ""; }
           }
         }, { passive: true });
         document.addEventListener("touchend", function (e) {
@@ -5082,8 +5087,7 @@
             setTimeout(function () {
               sec.style.transition = "";
               sec.style.transform = "";
-              tabsHandle.style.transition = "";
-              tabsHandle.style.transform = "";
+              if (thBar) { thBar.style.transition = ""; thBar.style.width = ""; thBar.style.height = ""; }
               sec.classList.add("is-hidden");
               document.body.classList.remove("tab-open");
               tabsHandle.classList.remove("show");
@@ -5093,13 +5097,15 @@
           } else {
             sec.style.transition = "transform 0.32s cubic-bezier(0.22, 1, 0.36, 1)";
             sec.style.transform = "translateY(0px)";
-            tabsHandle.style.transition = "transform 0.32s cubic-bezier(0.22, 1, 0.36, 1)";
-            tabsHandle.style.transform = "rotate(0deg)";
+            if (thBar) {
+              thBar.style.transition = "width 0.32s cubic-bezier(0.22, 1, 0.36, 1), height 0.32s cubic-bezier(0.22, 1, 0.36, 1)";
+              thBar.style.width = "";
+              thBar.style.height = "";
+            }
             setTimeout(function () {
               sec.style.transition = "";
               sec.style.transform = "";
-              tabsHandle.style.transition = "";
-              tabsHandle.style.transform = "";
+              if (thBar) thBar.style.transition = "";
             }, 340);
           }
         }, { passive: true });
