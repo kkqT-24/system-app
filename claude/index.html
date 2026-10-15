@@ -2836,7 +2836,10 @@
           if (localStorage.getItem(RESET_MARK) !== "2026-10-15") {
             var _old = null;
             try { _old = JSON.parse(localStorage.getItem(PERSIST_KEY) || "null"); } catch (e) {}
-            if (_old && typeof _old === "object") {
+            /* only saves from before the fresh start get wiped — a save
+               imported later (into a newly added home-screen app) is kept */
+            var _stale = !_old || !(+_old.savedAt >= Date.parse("2026-10-15T13:05:00Z"));
+            if (_old && typeof _old === "object" && _stale) {
               var _keep = { v: 1, savedAt: Date.now() };
               if (_old.quests && typeof _old.quests === "object") {
                 _keep.quests = {};
@@ -2848,11 +2851,13 @@
               if (_old.maintEntries) _keep.maintEntries = _old.maintEntries;
               localStorage.setItem(PERSIST_KEY, JSON.stringify(_keep));
             }
-            var _v2 = null;
-            try { _v2 = JSON.parse(localStorage.getItem("systemApp.v2") || "null"); } catch (e) {}
-            if (_v2 && _v2.settings) localStorage.setItem("systemApp.v2", JSON.stringify({ v: 2, settings: _v2.settings }));
-            else localStorage.removeItem("systemApp.v2");
-            localStorage.removeItem("ksystem.lastBootDay");
+            if (_stale) {
+              var _v2 = null;
+              try { _v2 = JSON.parse(localStorage.getItem("systemApp.v2") || "null"); } catch (e) {}
+              if (_v2 && _v2.settings) localStorage.setItem("systemApp.v2", JSON.stringify({ v: 2, settings: _v2.settings }));
+              else localStorage.removeItem("systemApp.v2");
+              localStorage.removeItem("ksystem.lastBootDay");
+            }
             localStorage.setItem(RESET_MARK, "2026-10-15");
           }
         } catch (e) {}
