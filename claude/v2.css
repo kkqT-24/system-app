@@ -171,3 +171,21 @@
 @media (prefers-reduced-motion: reduce) {
   .mx-ar-smoke i, .mx-sh-fig .eyes, .mx-st-row .plus, .mx-chips .chip .fl, .mx-brief { animation: none !important; }
 }
+
+/* ---------- weekly backup reminder ---------- */
+.mx-backup {
+  position: fixed; left: 50%; bottom: calc(18px + env(safe-area-inset-bottom)); z-index: 9000; width: min(380px, calc(100vw - 32px));
+  transform: translate(-50%, 24px); opacity: 0; transition: transform 0.35s cubic-bezier(0.2, 0.9, 0.2, 1), opacity 0.35s;
+  background: var(--panel-solid); border: 1px solid var(--line); box-shadow: 0 0 24px var(--glow), 0 12px 30px var(--shadow); padding: 14px 16px;
+  clip-path: polygon(10px 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%, 0 10px);
+}
+.mx-backup.show { transform: translate(-50%, 0); opacity: 1; }
+.mx-bk-k { font-family: "Share Tech Mono", monospace; font-size: 9px; letter-spacing: 0.24em; color: var(--lav); text-transform: uppercase; }
+.mx-bk-t { font-family: "Orbitron", sans-serif; font-weight: 700; font-size: 15px; letter-spacing: 0.06em; color: var(--ink); margin-top: 4px; }
+.mx-bk-d { font-family: "Rajdhani", sans-serif; font-size: 14px; color: var(--ink-dim); margin-top: 6px; line-height: 1.35; }
+.mx-bk-b { display: flex; gap: 8px; margin-top: 12px; }
+.mx-bk-b button {
+  flex: 1; appearance: none; border: 1px solid var(--line-soft); background: rgba(111, 99, 246, 0.08); color: var(--ink-dim);
+  font-family: "Share Tech Mono", monospace; font-size: 11px; letter-spacing: 0.2em; text-transform: uppercase; padding: 10px 6px;
+}
+.mx-bk-b button.go { background: linear-gradient(90deg, var(--violet), var(--purple)); color: #fff; border-color: var(--lav); }

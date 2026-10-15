@@ -38,10 +38,14 @@
       });
       if (raw.extracted && typeof raw.extracted === "object") D.extracted = raw.extracted;
       if (raw.workoutDays && typeof raw.workoutDays === "object") D.workoutDays = raw.workoutDays;
+      if (isFinite(+raw.lastBackup)) D.lastBackup = +raw.lastBackup;
+      if (isFinite(+raw.firstOpen)) D.firstOpen = +raw.firstOpen;
+      if (isFinite(+raw.backupSnooze)) D.backupSnooze = +raw.backupSnooze;
       if (raw.settings && typeof raw.settings === "object") { D.settings.sound = !!raw.settings.sound; if (raw.settings.view3d === false) D.settings.view3d = false; }
     }
   } catch (e) {}
   function save() { try { localStorage.setItem(KEY, JSON.stringify(D)); } catch (e) {} }
+  if (!D.firstOpen) { D.firstOpen = Date.now(); save(); }
 
   /* ---------------- history ---------------- */
   function log(type, text, extra) {
@@ -775,10 +779,7 @@
     sb.addEventListener("click", function (e) { e.stopPropagation(); D.settings.sound = !D.settings.sound; save(); paint(); if (D.settings.sound) snd("quest"); });
     $(".mx-c-exp-save", row2).addEventListener("click", function (e) {
       e.stopPropagation();
-      var blob = "SYSTEM-SAVE:" + btoa(unescape(encodeURIComponent(JSON.stringify({ v1: localStorage.getItem("systemApp.v1"), v2: localStorage.getItem(KEY) }))));
-      var done = function () { alert("Save copied. Open the other copy of the app → Console → Paste save."); };
-      if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(blob).then(done, function () { prompt("Copy this save code:", blob); });
-      else prompt("Copy this save code:", blob);
+      copySave("Save copied. Paste it into Notes as a backup, or into the other copy of the app → Console → Paste save.");
     });
     $(".mx-c-imp-save", row2).addEventListener("click", function (e) {
       e.stopPropagation();
@@ -795,6 +796,39 @@
     return true;
   }
   if (!addConsoleRows()) { var tries = 0, iv = setInterval(function () { if (addConsoleRows() || ++tries > 20) clearInterval(iv); }, 250); }
+
+
+  /* ---------------- weekly backup reminder ----------------
+     Deleting the home-screen app deletes its save, so once a week the
+     System asks for a backup: one tap copies the save code to paste
+     into Notes. "Later" snoozes it a day. */
+  var WEEK = 7 * 864e5;
+  function saveCode() {
+    return "SYSTEM-SAVE:" + btoa(unescape(encodeURIComponent(JSON.stringify({ v1: localStorage.getItem("systemApp.v1"), v2: localStorage.getItem(KEY) }))));
+  }
+  function copySave(msg) {
+    D.lastBackup = Date.now(); save();
+    var blob = saveCode();
+    var done = function () { alert(msg); };
+    if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(blob).then(done, function () { prompt("Copy this save code:", blob); });
+    else prompt("Copy this save code:", blob);
+  }
+  function checkBackup() {
+    var now = Date.now(), mainEl = document.getElementById("main");
+    if (!mainEl || mainEl.classList.contains("is-hidden") || document.hidden || $(".mx-backup") || document.querySelector(".mx-arise")) return;
+    if ((D.backupSnooze || 0) > now) return;
+    if (now - (D.lastBackup || D.firstOpen || now) < WEEK) return;
+    var b = el("div", "mx-backup", '<div class="mx-bk-k">System notice</div><div class="mx-bk-t">Back up your progress</div>' +
+      '<div class="mx-bk-d">Copy your save code and paste it into Notes. If the app is ever deleted, Paste save brings everything back.</div>' +
+      '<div class="mx-bk-b"><button type="button" class="later">Later</button><button type="button" class="go">Copy save</button></div>');
+    document.body.appendChild(b);
+    requestAnimationFrame(function () { b.classList.add("show"); });
+    function close() { b.classList.remove("show"); setTimeout(function () { if (b.parentNode) b.parentNode.removeChild(b); }, 400); }
+    $(".go", b).addEventListener("click", function (e) { e.stopPropagation(); close(); copySave("Save copied — paste it into Notes. Next reminder in a week."); });
+    $(".later", b).addEventListener("click", function (e) { e.stopPropagation(); D.backupSnooze = Date.now() + 864e5; save(); close(); });
+  }
+  setTimeout(checkBackup, 6000);
+  setInterval(checkBackup, 60000);
 
   /* ---------------- install (service worker) ---------------- */
   if ("serviceWorker" in navigator && location.protocol === "https:") {
