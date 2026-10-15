@@ -65,3 +65,26 @@ distinct evolved looks, cool effects and skins. No 3D needed for the game.
    The Hunter's stats come from the real Status screen (VIT → gate HP, STR → damage, INT → mana,
    AGI → rerolls, PER → crit/extraction). The Hunter has its own die and the mana ultimate.
 8. Key fusion: 3 of a rank → 1 of the next.
+
+## Decisions — round 3
+- **Each die is a shadow** in your 5-slot squad (+ the Hunter's own die). Dice roll numbers for
+  Dicero combos; the class decides the attack pattern. No pure blocking — every class deals damage.
+- **Class attack patterns (3-lane board):**
+  Knight — heavy single hit on the front enemy in its lane + knockback (push back a step) ·
+  Archer — pierce: hits every enemy in its lane ·
+  Mage — splash: target + neighbours in adjacent lanes ·
+  Lancer — sweep: hits the front enemy in all 3 lanes ·
+  Assassin — execute: hits the lowest-HP enemy anywhere, x2 under 50% HP ·
+  Berserker — damage grows every turn it's rolled in a run (ramps) ·
+  Bulwark — shockwave: small damage to its lane + stun 1 turn ·
+  Healer — heals the gate and adds +1 to every other die this turn (combo enabler).
+- **Special dice / faces (upgrade path):** Wild (counts as any number), Twin (duplicate numbers →
+  easier pairs), Weighted (high faces), Crit ★ (triggers class special), Elemental (burn / frost /
+  shadow status), Monarch dice (wild + legendary special). Upgrading/evolving = adding or
+  replacing faces.
+- **Lanes:** 3 lanes. Each shadow is posted to a lane before the run; after locking a roll you can
+  tap a die to move it to another lane before it fires. Flank/boss mechanics later.
+- **The Hunter evolves with real rank** (E rags → D leathers → C plate → B shadow cloak →
+  A crimson knight → S Monarch form); each rank unlocks a Hunter skill. **Gear slots:** weapon,
+  armor, accessory — loot with rarity (common → legendary), changes the Hunter's die faces and
+  passives, visible on the sprite.
