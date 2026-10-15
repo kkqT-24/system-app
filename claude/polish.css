@@ -519,3 +519,6 @@ body:not(.tab-open) .main-center { padding-bottom: 8px; }
    content (and the version row under it) slid off the bottom. Now the
    version row follows REBOOT directly. */
 body:not(.tab-open) .main-center { flex: 0 0 auto; justify-content: flex-start; }
+
+/* boot screen: everything sits a hair higher */
+#boot { padding-top: max(6px, calc(env(safe-area-inset-top) - 8px)) !important; }

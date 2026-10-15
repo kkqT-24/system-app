@@ -396,3 +396,12 @@
     setTimeout(function () { ov.remove(); }, openT + 1000);
   };
 })();
+
+/* boot screen build label always matches the footer version (Core vX.Y) */
+(function () {
+  try {
+    var v = document.getElementById("appVersion"), b = document.getElementById("bootBuild");
+    var m = v && v.textContent.match(/v?(\d+(?:\.\d+)*)/);
+    if (b && m) b.textContent = "Build " + m[1] + " — Boot Sequence";
+  } catch (e) {}
+})();
