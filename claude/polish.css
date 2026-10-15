@@ -508,3 +508,8 @@ body.tab-open .main-controls .replay-btn { display: none !important; }
    until a module is open */
 html:has(body:not(.tab-open)), body:not(.tab-open) { overflow: hidden; height: 100%; }
 body:not(.tab-open) #main { height: 100vh; height: 100lvh; min-height: 100vh; min-height: 100lvh; }
+
+/* hub on a phone: status row a hair lower (clear of the top fade) and the
+   version row tucked right under REBOOT so it stays on screen */
+body:not(.tab-open) #main { padding-top: calc(max(14px, env(safe-area-inset-top)) + 8px); }
+body:not(.tab-open) .main-center { padding-bottom: 8px; }
