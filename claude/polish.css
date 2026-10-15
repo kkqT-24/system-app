@@ -522,3 +522,8 @@ body:not(.tab-open) .main-center { flex: 0 0 auto; justify-content: flex-start; 
 
 /* boot screen: everything sits a hair higher */
 #boot { padding-top: max(6px, calc(env(safe-area-inset-top) - 8px)) !important; }
+
+/* hub fine-tune (measured from the phone): version row nearer the bottom
+   edge, REBOOT centred in the gap between the verse and the version row */
+body:not(.tab-open) .main-inner > .main-top:last-child { position: relative; top: 20px; }
+body:not(.tab-open) .main-controls { position: relative; top: -14px; }
