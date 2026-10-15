@@ -503,3 +503,8 @@ body.tab-open .main-controls .replay-btn { display: none !important; }
 .mx-sh-fig.mon-regent .body { filter: drop-shadow(0 0 1.5px #ffc94d) drop-shadow(0 0 6px rgba(255, 42, 61, 0.6)) drop-shadow(0 0 14px rgba(255, 201, 77, 0.7)) !important; }
 .mx-sh-fig.mon-archon .bolts path { stroke: #e0f2ff; } .mx-sh-fig.mon-fenris .bolts path { stroke: #a7f3d0; } .mx-sh-fig.mon-wyrm .bolts path { stroke: #ffd2a8; }
 .mx-stage { height: 280px !important; }
+
+/* the hub fits the screen exactly — no page scroll (and no scroll bar)
+   until a module is open */
+html:has(body:not(.tab-open)), body:not(.tab-open) { overflow: hidden; height: 100%; }
+body:not(.tab-open) #main { height: 100dvh; min-height: 100dvh; }
