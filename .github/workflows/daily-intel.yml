@@ -1,0 +1,38 @@
+# Market data for the Daily Intel module (claude/data/market.json).
+# Runs before the open and every 30 minutes through the US session on
+# weekdays; commits only when the numbers changed. Run it by hand from
+# the Actions tab ("Run workflow"). Optional: add a free Finnhub API key
+# as the repo secret FINNHUB_KEY to get upcoming earnings dates.
+name: Daily Intel market data
+on:
+  schedule:
+    - cron: "15 11 * * 1-5"
+    - cron: "5,35 13-21 * * 1-5"
+  workflow_dispatch:
+permissions:
+  contents: write
+concurrency:
+  group: daily-intel
+  cancel-in-progress: false
+jobs:
+  market:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Fetch quotes
+        env:
+          FINNHUB_KEY: ${{ secrets.FINNHUB_KEY }}
+        run: python .github/scripts/market.py
+      - name: Commit if changed
+        run: |
+          if git diff --quiet -- claude/data/market.json; then echo "no change"; exit 0; fi
+          git config user.name "daily-intel-bot"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add claude/data/market.json
+          git commit -m "Daily Intel: market data $(date -u +%H:%MZ)"
+          for i in 1 2 3; do git pull --rebase -q && git push -q && exit 0; sleep 5; done
+          exit 1

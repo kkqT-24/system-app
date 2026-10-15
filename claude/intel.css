@@ -1,0 +1,94 @@
+/* ==========================================================
+   DAILY INTEL styles (Claude build)
+   ========================================================== */
+.tab-tile[data-section="intel"] { --acc: #cbd5e1; }
+#sec-intel { --acc: #cbd5e1; }
+/* phone: the 9th tile would sit alone, so Intel spans the top row */
+@media (max-width: 560px) {
+  .tab-tile[data-section="intel"] { grid-column: 1 / -1; }
+}
+.showcase.enter .tab-tile:nth-child(9) { animation-delay: 0.53s; }
+.tab-tile[data-section="intel"] .t-state { font-family: "Share Tech Mono", monospace; }
+
+#intelBody { max-width: 420px; margin: 0 auto; text-align: left; }
+#intelBody .s-name, #intelBody .s-state { text-align: center; }
+#sec-intel.assembling #intelBody:not(.in-quiet) > .in-block { animation: throughScreen 0.45s cubic-bezier(0.22, 1, 0.36, 1) both; }
+#sec-intel.assembling #intelBody:not(.in-quiet) > .in-block:nth-of-type(1) { animation-delay: 0.30s; }
+#sec-intel.assembling #intelBody:not(.in-quiet) > .in-block:nth-of-type(2) { animation-delay: 0.38s; }
+#sec-intel.assembling #intelBody:not(.in-quiet) > .in-block:nth-of-type(3) { animation-delay: 0.46s; }
+#sec-intel.assembling #intelBody:not(.in-quiet) > .in-block:nth-of-type(4) { animation-delay: 0.54s; }
+#sec-intel.assembling #intelBody:not(.in-quiet) > .in-block:nth-of-type(5) { animation-delay: 0.62s; }
+#sec-intel.assembling #intelBody:not(.in-quiet) > .in-block:nth-of-type(6) { animation-delay: 0.70s; }
+#sec-intel.assembling #intelBody:not(.in-quiet) > .in-block:nth-of-type(n+7) { animation-delay: 0.78s; }
+
+.in-block {
+  margin-top: 16px; padding: 13px 14px 12px;
+  background: var(--field); border: 1px solid var(--line-soft);
+  clip-path: polygon(10px 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%, 0 10px);
+}
+.in-h {
+  font-family: "Orbitron", sans-serif; font-weight: 700; font-size: 11px; letter-spacing: 0.18em;
+  text-transform: uppercase; color: var(--acc); margin-bottom: 9px;
+}
+.in-meta, .in-empty, .in-foot {
+  font-family: "Share Tech Mono", monospace; font-size: 10px; letter-spacing: 0.12em;
+  text-transform: uppercase; color: var(--ink-faint); margin-top: 8px;
+}
+.in-empty { margin-top: 0; }
+.in-foot { text-align: center; margin: 16px 0 4px; line-height: 1.6; }
+.in-txt, .in-note, .in-big, .in-ex { margin: 0; color: var(--ink-dim); font-size: 13.5px; line-height: 1.5; }
+.in-note { margin-top: 10px; padding-top: 9px; border-top: 1px solid var(--line-soft); color: var(--ink); }
+.in-big { color: var(--ink); font-size: 15px; line-height: 1.5; }
+.in-ex { margin-top: 7px; font-size: 12.5px; color: var(--ink-faint); }
+
+/* markets */
+.in-mstat { font-family: "Share Tech Mono", monospace; font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--ink-dim); }
+.in-mstat::before { content: ""; display: inline-block; width: 7px; height: 7px; border-radius: 50%; margin-right: 7px; background: var(--ink-faint); vertical-align: 1px; }
+.in-mstat.open::before { background: #34d399; box-shadow: 0 0 8px #34d399; }
+.in-mstat.pre::before, .in-mstat.after::before { background: #fbbf24; }
+.in-quotes { display: grid; grid-template-columns: repeat(auto-fill, minmax(92px, 1fr)); gap: 7px; margin-top: 10px; }
+.in-q {
+  display: flex; flex-direction: column; gap: 1px; padding: 7px 8px;
+  border: 1px solid var(--line-soft); background: rgba(111, 99, 246, 0.06);
+  font-family: "Share Tech Mono", monospace;
+}
+.in-q .s { font-size: 10.5px; letter-spacing: 0.14em; color: var(--ink-faint); }
+.in-q .p { font-size: 14px; color: var(--ink); }
+.in-q .c { font-size: 12px; }
+.in-q.up .c { color: #34d399; } .in-q.up { border-left: 2px solid rgba(52, 211, 153, 0.7); }
+.in-q.dn .c { color: #ff5a6e; } .in-q.dn { border-left: 2px solid rgba(255, 90, 110, 0.7); }
+.in-q.flat .c { color: var(--ink-faint); }
+
+/* calendar */
+.in-cal { display: flex; gap: 10px; padding: 6px 0; border-top: 1px solid var(--line-soft); font-size: 13px; }
+.in-h + .in-cal { border-top: none; padding-top: 0; }
+.in-cal .d { flex: none; width: 88px; font-family: "Share Tech Mono", monospace; font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--ink-faint); padding-top: 1px; }
+.in-cal .t { color: var(--ink-dim); }
+.in-cal.today .d { color: #fbbf24; }
+.in-cal.today .t { color: var(--ink); }
+
+/* headlines, pulse, on this day */
+.in-hl { display: flex; flex-direction: column; gap: 2px; padding: 7px 0; border-top: 1px solid var(--line-soft); }
+.in-h + .in-hl { border-top: none; padding-top: 0; }
+.in-hl .t, .in-otd .t { color: var(--ink); font-size: 13.5px; line-height: 1.4; text-decoration: none; }
+a.t { color: var(--ink); text-decoration: underline; text-decoration-color: var(--line); text-underline-offset: 3px; }
+.in-hl .w { color: var(--ink-faint); font-size: 12.5px; line-height: 1.4; }
+.in-pulse { position: relative; padding: 5px 0 5px 14px; color: var(--ink-dim); font-size: 13px; line-height: 1.45; }
+.in-pulse::before { content: ""; position: absolute; left: 2px; top: 12px; width: 5px; height: 5px; background: var(--acc); transform: rotate(45deg); }
+.in-otd { display: flex; gap: 10px; padding: 6px 0; border-top: 1px solid var(--line-soft); }
+.in-h + .in-otd { border-top: none; padding-top: 0; }
+.in-otd .y { flex: none; width: 44px; font-family: "Share Tech Mono", monospace; font-size: 12px; color: var(--acc); padding-top: 1px; }
+.in-tname { font-family: "Orbitron", sans-serif; font-weight: 700; font-size: 15px; letter-spacing: 0.06em; color: var(--ink); margin-bottom: 6px; }
+
+/* sky */
+.in-skyrow { display: flex; align-items: center; gap: 14px; }
+.in-sun { flex: 1; display: grid; grid-template-columns: auto 1fr; gap: 4px 12px; align-items: baseline; }
+.in-sun .k, .in-moonbox .k, .in-year .k { font-family: "Share Tech Mono", monospace; font-size: 10.5px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--ink-faint); }
+.in-sun b { font-family: "Share Tech Mono", monospace; font-weight: 400; font-size: 13px; color: var(--ink); }
+.in-moonbox { flex: none; display: flex; flex-direction: column; align-items: center; gap: 3px; width: 104px; text-align: center; }
+.in-moon { width: 44px; height: 44px; filter: drop-shadow(0 0 8px rgba(226, 232, 240, 0.35)); }
+.in-moon .dark { fill: rgba(30, 28, 60, 0.9); stroke: rgba(203, 213, 225, 0.25); stroke-width: 1; }
+.in-moon .lit { fill: #e8ecf5; }
+.in-moonbox .n { font-size: 12px; color: var(--ink); }
+.in-year { margin-top: 12px; padding-top: 10px; border-top: 1px solid var(--line-soft); }
+.in-year .w-bar-shell { margin-top: 7px; }
