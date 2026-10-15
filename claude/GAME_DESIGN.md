@@ -47,3 +47,21 @@ distinct evolved looks, cool effects and skins. No 3D needed for the game.
 1. Playable Training Grounds gate: dice, lanes, a few cards, one boss.
 2. Key economy + keyed gates + extraction.
 3. Rewards layer (evolutions, relics, skins, codex, titles).
+
+## Decisions (Oct 14, 2026 — round 2)
+1. **Turn-based**, Dicero-style: monsters advance one step per finished roll.
+2. **Dice ↔ shadows — still open.** Leading option: each die *is* one shadow in your squad
+   (bring 5 = 5 dice). Dice roll numbers for Dicero poker combos (pair, straight, 5-of-a-kind
+   multipliers); each die's class decides what its number does (Knight blocks, Archer hits the
+   lane, Mage splashes) and a special face triggers that shadow's ability. Upgrades/evolutions
+   improve faces. Alternative: class-icon faces.
+3. **Lanes — still open.** Leading option: one Dicero-style lane with 3 positions (front / mid /
+   back) for placement; higher gate ranks add a flank lane.
+4. Run length: E 5 waves+boss (~5 min), C 7 (~8), A 10 (~12), Red 12 + tougher boss (~15).
+5. Losing a keyed run: lose the key, keep half the loot. Red Gate: lose everything.
+6. Extraction: 3 ARISE rolls vs a target total (harder for stronger bosses); **your rank adds a
+   bonus**, cards/relics can too.
+7. **Clean reset at launch.** You start with **yourself (the Hunter)** plus one starter shadow.
+   The Hunter's stats come from the real Status screen (VIT → gate HP, STR → damage, INT → mana,
+   AGI → rerolls, PER → crit/extraction). The Hunter has its own die and the mana ultimate.
+8. Key fusion: 3 of a rank → 1 of the next.
