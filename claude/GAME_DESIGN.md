@@ -148,6 +148,14 @@ for portraits/forms; replace everything with licensed art if it's ever released.
 - Each shadow has a small attack; **higher rarity/rank adds a little AoE or a special buff**
   (e.g. aura that slows, small heal, crit buff). Rank aura grows Soldier → Marshal.
 - Bring a squad of permanent shadows into each run; they follow and auto-fight.
+- **Churn:** low ranks have low HP and die fast; you keep ARISE-ing fallen enemies as you fight
+  to replace them. The army is always moving, never a wall you watch. Capped by shadow slots
+  (grow with real level) so the screen stays readable. A permanent shadow that falls mid-run is
+  back for the next run — no permadeath.
+- **Squad synergies:** class combos unlock bonuses (e.g. 3 Knights → shield aura,
+  Archer + Mage → burning arrows). Gives collecting a purpose without shadows carrying the run.
+- **Strong top end:** **Marshals** — big AoE on a long cooldown. **Monarchs** — a unique special
+  each (their signature move).
 
 ### Luck (replaces the dice)
 Extraction rolls (rank + PER improve odds) · chest roulette · gear rarity rolls · crits ·
@@ -162,6 +170,8 @@ the scouting card ("Elites ×2, better loot").
 
 ### Between runs
 - Gear: weapon (sets the basic attack), armor, accessory — rarity tiers.
+- **Skill unlocks (rare loot):** new attacks found in keyed gates are added to the level-up pool,
+  so they can be drawn in future runs. The pool grows with your real-life effort.
 - Permanent army: level, rank up, evolve duplicates into named elites.
 - Hunter rank forms E → S (Monarch). Cosmetics, codex, titles as in round 5.
 
