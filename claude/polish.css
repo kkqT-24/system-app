@@ -6,8 +6,8 @@
 .tab-tile[data-section="quests"] { --acc: #a78bfa; }
 .tab-tile[data-section="workouts"] { --acc: #ff8a4c; }
 .tab-tile[data-section="status"] { --acc: #22d3ee; }
-.tab-tile[data-section="shadows"] { --acc: #d07cff; }
-.tab-tile[data-section="weather"] { --acc: #fbbf24; }
+.tab-tile[data-section="shadows"] { --acc: #fbbf24; }
+.tab-tile[data-section="weather"] { --acc: #d07cff; }
 .tab-tile[data-section="vehicle"] { --acc: #ff4d6d; }
 .tab-tile[data-section="sports"] { --acc: #38bdf8; }
 .tab-tile[data-external] { --acc: #34d399; }
@@ -25,8 +25,8 @@
     linear-gradient(115deg, transparent 30%, rgba(125, 215, 255, 0.10) 45%, rgba(218, 120, 245, 0.14) 55%, transparent 70%) !important;
   background-size: 100% 100%, 260% 100% !important; }
 /* each open module carries its accent along its top edge and title */
-#sec-quests { --acc: #a78bfa; } #sec-workouts { --acc: #ff8a4c; } #sec-status { --acc: #22d3ee; } #sec-shadows { --acc: #d07cff; }
-#sec-weather { --acc: #fbbf24; } #sec-vehicle { --acc: #ff4d6d; } #sec-sports { --acc: #38bdf8; } #sec-todo { --acc: #34d399; }
+#sec-quests { --acc: #a78bfa; } #sec-workouts { --acc: #ff8a4c; } #sec-status { --acc: #22d3ee; } #sec-shadows { --acc: #fbbf24; }
+#sec-weather { --acc: #d07cff; } #sec-vehicle { --acc: #ff4d6d; } #sec-sports { --acc: #38bdf8; } #sec-todo { --acc: #34d399; }
 .section { border-top-color: color-mix(in srgb, var(--acc, #8f5ef8) 60%, transparent) !important; }
 .section > .s-name {
   background: linear-gradient(90deg, #ffffff 0%, color-mix(in srgb, var(--acc, #c3b8fe) 75%, #ffffff) 50%, #ffffff 100%);
@@ -121,8 +121,8 @@
 @keyframes mxWxRow { from { opacity: 0; transform: translateX(30px); } to { opacity: 1; transform: none; } }
 #sec-weather.mx-wx-open .wx-day .weather-icon { animation: mxWxPop 0.5s cubic-bezier(0.2, 1.6, 0.4, 1) both; animation-delay: inherit; }
 @keyframes mxWxPop { from { transform: scale(0); } to { transform: none; } }
-#sec-weather .wx-temp { text-shadow: 0 0 18px rgba(251, 191, 36, 0.45); }
-#sec-weather .wx-day .t { color: #fde68a; }
+#sec-weather .wx-temp { text-shadow: 0 0 18px rgba(208, 124, 255, 0.45); }
+#sec-weather .wx-day .t { color: #ecd2ff; }
 
 /* ---------- Sports Desk: nearly full width ---------- */
 .section.mx-embed { margin-left: -12px !important; margin-right: -12px !important; padding: 8px 4px 6px !important; }
