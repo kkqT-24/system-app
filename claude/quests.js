@@ -263,10 +263,56 @@
       var rb = sheet.querySelectorAll(".mx-c-ranks button");
       for (var i = 0; i < rb.length; i++) rb[i].classList.toggle("on", rb[i].textContent === h.rank);
     }
-    function open() { refresh(); sheet.classList.add("show"); }
-    function close() { sheet.classList.remove("show"); }
+    var card = sheet.querySelector(".mx-c-card");
+    function open() { refresh(); card.style.transition = ""; card.style.transform = ""; sheet.style.opacity = ""; sheet.classList.add("show"); }
+    function close() { sheet.classList.remove("show"); card.style.transform = ""; sheet.style.opacity = ""; }
+    /* pull down to close, like the module panels: the card follows
+       the finger, release past the threshold (or a quick flick) and
+       it drops away, otherwise it springs back. The touch is kept
+       from the page underneath so the quest panel doesn't drag too.
+       The EXP slider keeps its own sideways drag. */
+    var sy = null, sx = 0, st = 0, dragging = false, dy = 0;
+    sheet.addEventListener("touchstart", function (e) {
+      e.stopPropagation();
+      sy = null; dragging = false; dy = 0;
+      if (e.touches.length !== 1 || e.target.closest("input")) return;
+      sy = e.touches[0].clientY; sx = e.touches[0].clientX; st = Date.now();
+    }, { passive: true });
+    sheet.addEventListener("touchmove", function (e) {
+      e.stopPropagation();
+      if (sy == null) return;
+      var my = e.touches[0].clientY - sy, mx = e.touches[0].clientX - sx;
+      if (!dragging) {
+        if (Math.abs(my) < 8 && Math.abs(mx) < 8) return;
+        if (my <= 0 || Math.abs(mx) > Math.abs(my)) { sy = null; return; }
+        dragging = true; card.style.transition = "none";
+      }
+      dy = Math.max(0, my);
+      card.style.transform = "translateY(" + Math.round(dy) + "px)";
+      sheet.style.opacity = String(Math.max(0.35, 1 - dy / 400));
+      if (e.cancelable) e.preventDefault();
+    }, { passive: false });
+    function endDrag() {
+      if (!dragging) { sy = null; return; }
+      dragging = false; sy = null;
+      var fast = dy > 40 && (Date.now() - st) < 220;
+      card.style.transition = "";
+      if (dy > 90 || fast) {
+        card.style.transform = "translateY(110%)";
+        sheet.classList.remove("show"); sheet.style.opacity = "";
+        setTimeout(function () { if (!sheet.classList.contains("show")) card.style.transform = ""; }, 380);
+      } else {
+        card.style.transform = ""; sheet.style.opacity = "";
+      }
+      /* a drag is not a tap: swallow the click a release can fire */
+      sheet.setAttribute("data-dragged", "1");
+      setTimeout(function () { sheet.removeAttribute("data-dragged"); }, 350);
+    }
+    sheet.addEventListener("touchend", endDrag);
+    sheet.addEventListener("touchcancel", endDrag);
     btn.addEventListener("click", function (e) { e.stopPropagation(); open(); });
     sheet.addEventListener("click", function (e) {
+      if (sheet.hasAttribute("data-dragged")) return;
       if (e.target === sheet || e.target.closest(".mx-c-x")) { close(); return; }
       var b = e.target.closest("button");
       if (!b) return;
