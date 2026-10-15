@@ -508,3 +508,13 @@ body.tab-open .main-controls .replay-btn { display: none !important; }
    until a module is open */
 html:has(body:not(.tab-open)), body:not(.tab-open) { overflow: hidden; height: 100%; }
 body:not(.tab-open) #main { height: 100vh; height: 100lvh; min-height: 100vh; min-height: 100lvh; }
+
+/* hub fits a phone screen top to bottom: status row sits a little lower
+   (clear of the edge fade), spacing tightens so the footer row shows */
+body:not(.tab-open) #main { padding-top: calc(max(14px, env(safe-area-inset-top)) + 10px); padding-bottom: max(12px, calc(env(safe-area-inset-bottom) - 12px)); }
+body:not(.tab-open) .main-inner { padding-bottom: 0; min-height: 0; }
+body:not(.tab-open) .main-center { padding: 0; justify-content: space-evenly; min-height: 0; }
+body:not(.tab-open) .main-rings-wrap { margin-bottom: 10px; }
+body:not(.tab-open) .main-greet { margin-bottom: 10px; }
+body:not(.tab-open) .showcase { margin-top: 10px; }
+body:not(.tab-open) .handle-row { margin-top: 8px; }
