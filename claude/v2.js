@@ -188,11 +188,11 @@
   }
   /* ---------------- THE HUNTER (placeholder) ----------------
      Kent's own figure, drawn in the same line style as the shadows: middle-part
-     flowing hair, long coat, twin daggers in a reverse grip. Stand-in until the game
+     wolf-cut hair, long coat, twin daggers in a reverse grip. Stand-in until the game
      art is settled (the pixel shadow knight is archived in game/shadow-knight/). */
   var HUNTER_C = "#9ad0ff";
-  var HUNTER_BODY = "<path d=\"M34 42Q50 35 66 42L78 108H59L55.5 78H44.5L41 108H22Z\"/><path d=\"M37 41L43 34H57L63 41L50 48Z\"/><path d=\"M34 44L25 71L30 73L39 48ZM66 44L75 71L70 73L61 48Z\"/><path class=\"wpn\" d=\"M26 71L11 91L14 93.4L30 73.4ZM74 71L89 91L86 93.4L70 73.4Z\"/><path d=\"M23 69.5l9 4.5-1.4 2.4-9-4.5zM77 69.5l-9 4.5 1.4 2.4 9-4.5z\"/><path d=\"M42 19Q50 14 58 19L57.5 30L50 36L42.5 30Z\"/><path d=\"M50 11.5Q41 10 38.5 17Q36.5 26 38.5 36L41.5 31L42.5 22.5Q46 17.5 50 14.5Q54 17.5 57.5 22.5L58.5 31L61.5 36Q63.5 26 61.5 17Q59 10 50 11.5Z\"/>";
-  var HUNTER_DET = "M50 48v28M43 58h14M42 64h16M38 74l-5 30M62 74l5 30M40 50q-2 8 1 14M60 50q2 8-1 14M44 34l6 6 6-6M15 89l12-15M85 89l-12-15M46 32l4 2 4-2M50 12v3M40.5 19q-1.5 7 0 14M59.5 19q1.5 7 0 14";
+  var HUNTER_BODY = "<path d=\"M34 42Q50 35 66 42L78 108H59L55.5 78H44.5L41 108H22Z\"/><path d=\"M37 41L43 34H57L63 41L50 48Z\"/><path d=\"M34 44L25 71L30 73L39 48ZM66 44L75 71L70 73L61 48Z\"/><path class=\"wpn\" d=\"M26 71L11 91L14 93.4L30 73.4ZM74 71L89 91L86 93.4L70 73.4Z\"/><path d=\"M23 69.5l9 4.5-1.4 2.4-9-4.5zM77 69.5l-9 4.5 1.4 2.4 9-4.5z\"/><path d=\"M41.5 25L34.5 33L38 32.5L35.5 39L40.5 34.5L42.5 30ZM58.5 25L65.5 33L62 32.5L64.5 39L59.5 34.5L57.5 30Z\"/><path d=\"M42 19Q50 14 58 19L57.5 30L50 36L42.5 30Z\"/><path d=\"M50 11.5Q41 10 39 17Q38 22 39.5 27.5L41 25.5L41.8 28.5L42.5 23Q46 17.5 50 14.5Q54 17.5 57.5 23L58.2 28.5L59 25.5L60.5 27.5Q62 22 61 17Q59 10 50 11.5Z\"/>";
+  var HUNTER_DET = "M50 48v28M43 58h14M42 64h16M38 74l-5 30M62 74l5 30M40 50q-2 8 1 14M60 50q2 8-1 14M44 34l6 6 6-6M15 89l12-15M85 89l-12-15M46 32l4 2 4-2M50 12v3M41 18.5q-1 4 0 7M59 18.5q1 4 0 7M37.5 34l3-4M62.5 34l-3-4";
   function hunterFigure(still) {
     var c = HUNTER_C, id = "h" + (++figN), flames = "";
     for (var i = 0; i < 7; i++) {
