@@ -2826,6 +2826,36 @@
            in-flight state), and the boot day-flag keeps its own key. */
         var PERSIST_KEY = "systemApp.v1";
         window.__ksPersisted = null;
+        /* One-time fresh start (Oct 15, 2026): wipes progress — level,
+           EXP, streak, penalties, workout totals, hidden-quest rewards,
+           and the whole v2 save (shadows, stats, history) — but keeps
+           the quest lists (unchecked), to-dos and vehicle log. Runs once
+           per device; the marker key stops it from ever running again. */
+        try {
+          var RESET_MARK = "systemApp.freshStart";
+          if (localStorage.getItem(RESET_MARK) !== "2026-10-15") {
+            var _old = null;
+            try { _old = JSON.parse(localStorage.getItem(PERSIST_KEY) || "null"); } catch (e) {}
+            if (_old && typeof _old === "object") {
+              var _keep = { v: 1, savedAt: Date.now() };
+              if (_old.quests && typeof _old.quests === "object") {
+                _keep.quests = {};
+                ["daily", "weekly", "hidden"].forEach(function (k) {
+                  if (Array.isArray(_old.quests[k])) _keep.quests[k] = _old.quests[k].map(function (q) { var c = {}; for (var f in q) c[f] = q[f]; c.done = false; return c; });
+                });
+              }
+              if (_old.todo) _keep.todo = _old.todo;
+              if (_old.maintEntries) _keep.maintEntries = _old.maintEntries;
+              localStorage.setItem(PERSIST_KEY, JSON.stringify(_keep));
+            }
+            var _v2 = null;
+            try { _v2 = JSON.parse(localStorage.getItem("systemApp.v2") || "null"); } catch (e) {}
+            if (_v2 && _v2.settings) localStorage.setItem("systemApp.v2", JSON.stringify({ v: 2, settings: _v2.settings }));
+            else localStorage.removeItem("systemApp.v2");
+            localStorage.removeItem("ksystem.lastBootDay");
+            localStorage.setItem(RESET_MARK, "2026-10-15");
+          }
+        } catch (e) {}
         try {
           var _raw = store.get(PERSIST_KEY);
           if (_raw) {
