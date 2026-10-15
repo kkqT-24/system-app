@@ -102,3 +102,12 @@ distinct evolved looks, cool effects and skins. No 3D needed for the game.
   line, lands on the gate — Archer/Lancer), Lane-jumper (switches lanes), Shaman (heals others
   from the back — Archer pierce/Assassin). Waves surge unevenly so you redistribute dice.
 - Combo multiplier is global (applies to every die that turn).
+
+## Round 5
+- **Gate scouting:** before entering, a gate card shows its rank, lanes, wave count, every monster
+  type inside (with role icons), the boss and its extraction difficulty, and possible drops. You
+  build your squad from that screen.
+- **Cosmetic gear:** separate cosmetic slots (outfit, weapon skin, aura, dice skin, gate theme)
+  layered over real gear stats — wear the look you want with the stats you need.
+- **Art first:** settle the visual style on a style board (same Knight in a few pixel styles),
+  then a design sheet (Hunter by rank, the 8 classes, monsters, dice, UI) before building.
