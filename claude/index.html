@@ -6268,6 +6268,29 @@
             if (window.__ksSaveState) window.__ksSaveState();
           }
         };
+        /* complete a daily/weekly quest by name from outside the list
+           (location check-ins) — same EXP, history and undo as a hold */
+        window.__mxCompleteQuest = function (name) {
+          var n = String(name || "").trim().toLowerCase();
+          var keys = ["daily", "weekly"];
+          for (var k = 0; k < keys.length; k++) {
+            var key = keys[k], list = QUESTS[key];
+            for (var i = 0; i < list.length; i++) {
+              var item = list[i];
+              if (item.name.trim().toLowerCase() !== n) continue;
+              if (item.done || isWorkoutQuest(key, item)) return false;
+              item.done = true;
+              try { if (window.__mxEvt) window.__mxEvt("quest", { key: key, name: item.name, exp: item.exp || 0 }); } catch (e) {}
+              var entry = { type: "complete", key: key, item: item, exp: item.exp || 0, prevLevel: HUNTER.level, prevExp: HUNTER.exp, prevBank: HUNTER.bank, applied: true, cancelled: false, earnedRef: null };
+              UNDO_STACK.push(entry); refreshUndo();
+              gainExp(item.exp || 0);
+              renderQuestGroup(key);
+              if (window.__ksSaveState) window.__ksSaveState();
+              return true;
+            }
+          }
+          return null; /* no quest by that name */
+        };
         window.__mxState = function () {
           return {
             day: todayKey(), daily: QUESTS.daily.map(function (q) { return { name: q.name, done: !!q.done }; }),

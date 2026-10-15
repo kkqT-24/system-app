@@ -189,3 +189,10 @@
   font-family: "Share Tech Mono", monospace; font-size: 11px; letter-spacing: 0.2em; text-transform: uppercase; padding: 10px 6px;
 }
 .mx-bk-b button.go { background: linear-gradient(90deg, var(--violet), var(--purple)); color: #fff; border-color: var(--lav); }
+
+/* ---------- location quests (console) ---------- */
+.mx-c-places { display: flex; flex-direction: column; gap: 6px; margin: 6px 0; width: 100%; }
+.mx-c-pl { display: flex; justify-content: space-between; align-items: center; gap: 8px; font-family: "Share Tech Mono", monospace; font-size: 11px; letter-spacing: 0.06em; color: var(--ink-dim); }
+.mx-c-pl b { color: var(--ink); font-weight: 400; }
+.mx-c-pl button { appearance: none; background: transparent; border: 1px solid var(--line-soft); color: var(--red-soft); font-family: inherit; font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase; padding: 5px 8px; }
+.mx-c-pl-empty { font-family: "Share Tech Mono", monospace; font-size: 10px; letter-spacing: 0.12em; color: var(--ink-faint); text-transform: uppercase; }

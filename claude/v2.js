@@ -26,7 +26,7 @@
   var STATS = ["STR", "AGI", "VIT", "INT", "PER"];
   var STAT_NAMES = { STR: "Strength", AGI: "Agility", VIT: "Vitality", INT: "Intelligence", PER: "Perception" };
   var STAT_COLORS = { STR: "#ff5a6e", AGI: "#3ee6a0", VIT: "#ffa24c", INT: "#5aa8ff", PER: "#c77dff" };
-  var D = { v: 2, history: [], shadows: [], earned: { STR: 0, AGI: 0, VIT: 0, INT: 0, PER: 0 }, alloc: { STR: 0, AGI: 0, VIT: 0, INT: 0, PER: 0 }, extracted: {}, workoutDays: {}, settings: { sound: false, view3d: true } };
+  var D = { v: 2, history: [], shadows: [], earned: { STR: 0, AGI: 0, VIT: 0, INT: 0, PER: 0 }, alloc: { STR: 0, AGI: 0, VIT: 0, INT: 0, PER: 0 }, extracted: {}, workoutDays: {}, places: [], settings: { sound: false, view3d: true } };
   try {
     var raw = JSON.parse(localStorage.getItem(KEY) || "null");
     if (raw && typeof raw === "object") {
@@ -38,6 +38,7 @@
       });
       if (raw.extracted && typeof raw.extracted === "object") D.extracted = raw.extracted;
       if (raw.workoutDays && typeof raw.workoutDays === "object") D.workoutDays = raw.workoutDays;
+      if (Array.isArray(raw.places)) D.places = raw.places.filter(function (x) { return x && isFinite(+x.lat) && isFinite(+x.lon) && typeof x.quest === "string"; });
       if (isFinite(+raw.lastBackup)) D.lastBackup = +raw.lastBackup;
       if (isFinite(+raw.firstOpen)) D.firstOpen = +raw.firstOpen;
       if (isFinite(+raw.backupSnooze)) D.backupSnooze = +raw.backupSnooze;
@@ -307,7 +308,7 @@
     if (!s || !s.daily || !s.daily.length) return;
     var mainEl = document.getElementById("main");
     if (!mainEl || mainEl.classList.contains("is-hidden") || document.hidden) return; /* wait until you're in the app */
-    var all = s.daily.every(function (q) { return q.done; });
+    var all = s.daily.filter(function (q) { return !offToday(q.name); }).every(function (q) { return q.done; });
     if (all && !D.extracted[s.day]) {
       D.extracted[s.day] = "pending"; save();
       setTimeout(function () { extract(false); }, 2400);
@@ -453,7 +454,7 @@
       }).join("") + '</div>';
       var items = D.history.slice().reverse().filter(function (h) {
         if (logFilter === "all") return true;
-        if (logFilter === "quest") return h.type === "quest" || h.type === "workout" || h.type === "secret" || h.type === "undo";
+        if (logFilter === "quest") return h.type === "quest" || h.type === "workout" || h.type === "secret" || h.type === "undo" || h.type === "place";
         if (logFilter === "exp") return h.type === "level" || h.type === "rank";
         return h.type === logFilter;
       });
@@ -772,7 +773,10 @@
     }
     var row = el("div", "mx-c-row", '<span class="mx-c-k">Sound</span><button type="button" class="mx-c-sound"></button>');
     var row2 = el("div", "mx-c-row col", '<span class="mx-c-k">Save transfer <em>(Safari ↔ home-screen app)</em></span><div class="mx-c-tests"><button type="button" class="mx-c-exp-save">Copy save</button><button type="button" class="mx-c-imp-save">Paste save</button></div>');
-    card.insertBefore(row, note); card.insertBefore(row2, note);
+    var row3 = el("div", "mx-c-row col", '<span class="mx-c-k">Location quests <em>(auto-complete when you open the app there)</em></span><div class="mx-c-places"></div><div class="mx-c-tests"><button type="button" class="mx-c-place-add">Link this spot</button></div>');
+    card.insertBefore(row, note); card.insertBefore(row2, note); card.insertBefore(row3, note);
+    paintPlaces(row3);
+    $(".mx-c-place-add", row3).addEventListener("click", function (e) { e.stopPropagation(); linkPlace(row3); });
     var sb = $(".mx-c-sound", row);
     function paint() { sb.textContent = D.settings.sound ? "On" : "Off"; sb.classList.toggle("on", D.settings.sound); }
     paint();
@@ -797,6 +801,111 @@
   }
   if (!addConsoleRows()) { var tries = 0, iv = setInterval(function () { if (addConsoleRows() || ++tries > 20) clearInterval(iv); }, 250); }
 
+
+
+  /* ---------------- location quests ----------------
+     A spot saved in Console is linked to a quest by name. Whenever the
+     app is opened (or brought back) within ~150 m of that spot, on one
+     of its days, the quest completes itself — full EXP, logged as a
+     check-in. On its off days the quest doesn't block ARISE. iOS only
+     allows location while the app is open, so nothing runs in the
+     background. */
+  var DAYS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+  function parseDays(t) {
+    t = String(t || "").toLowerCase();
+    if (!t.trim() || /every|daily|all/.test(t)) return [0, 1, 2, 3, 4, 5, 6];
+    var out = [];
+    var rng = t.match(/(sun|mon|tue|wed|thu|fri|sat)\w*\s*[-–]\s*(sun|mon|tue|wed|thu|fri|sat)/);
+    if (rng) {
+      var a = DAYS.map(function (d) { return d.toLowerCase(); }).indexOf(rng[1]), b = DAYS.map(function (d) { return d.toLowerCase(); }).indexOf(rng[2]);
+      for (var i = a; ; i = (i + 1) % 7) { out.push(i); if (i === b) break; }
+      return out;
+    }
+    DAYS.forEach(function (d, i) { if (t.indexOf(d.toLowerCase()) >= 0) out.push(i); });
+    return out.length ? out : [0, 1, 2, 3, 4, 5, 6];
+  }
+  function daysLabel(ds) {
+    if (!ds || ds.length === 7) return "every day";
+    return ds.map(function (i) { return DAYS[i]; }).join(" ");
+  }
+  function offToday(questName) {
+    var n = String(questName || "").trim().toLowerCase(), today = new Date().getDay();
+    var linked = (D.places || []).filter(function (p) { return p.quest.trim().toLowerCase() === n; });
+    if (!linked.length) return false;
+    return !linked.some(function (p) { return !p.days || p.days.indexOf(today) >= 0; });
+  }
+  function distM(a, b, c, d) {
+    var R = 6371000, toR = Math.PI / 180, dLa = (c - a) * toR, dLo = (d - b) * toR;
+    var x = Math.sin(dLa / 2) * Math.sin(dLa / 2) + Math.cos(a * toR) * Math.cos(c * toR) * Math.sin(dLo / 2) * Math.sin(dLo / 2);
+    return 2 * R * Math.asin(Math.sqrt(x));
+  }
+  function paintPlaces(row3) {
+    var box = $(".mx-c-places", row3); if (!box) return;
+    box.innerHTML = (D.places || []).length ? "" : '<div class="mx-c-pl-empty">No spots linked yet</div>';
+    (D.places || []).forEach(function (p, i) {
+      var r = el("div", "mx-c-pl", '<span><b>' + esc(p.quest) + '</b> · ' + esc(daysLabel(p.days)) + '</span><button type="button">Remove</button>');
+      $("button", r).addEventListener("click", function (e) {
+        e.stopPropagation();
+        if (!confirm('Unlink "' + p.quest + '" from this spot?')) return;
+        D.places.splice(i, 1); save(); paintPlaces(row3);
+      });
+      box.appendChild(r);
+    });
+  }
+  function linkPlace(row3) {
+    if (!navigator.geolocation) { alert("Location isn't available on this device."); return; }
+    var s = st() || { daily: [], weekly: [] };
+    var names = s.daily.concat(s.weekly || []).map(function (q) { return q.name; }).filter(function (n) { return n !== "Workout"; });
+    var quest = prompt("Which quest should complete at this spot? Type its name exactly.\n\nYour quests: " + names.join(", "), names.indexOf("Work") >= 0 ? "Work" : "");
+    if (!quest || !quest.trim()) return;
+    quest = quest.trim();
+    var match = names.filter(function (n) { return n.toLowerCase() === quest.toLowerCase(); })[0];
+    if (!match) { alert('No quest named "' + quest + '". Add it in Quests first, then link it here.'); return; }
+    var days = prompt("Which days? e.g. Wed-Sat, or Mon Wed Fri. Leave blank for every day.", "");
+    if (days === null) return;
+    navigator.geolocation.getCurrentPosition(function (pos) {
+      D.places = D.places || [];
+      D.places.push({ quest: match, lat: pos.coords.latitude, lon: pos.coords.longitude, r: 150, days: parseDays(days) });
+      save(); paintPlaces(row3);
+      alert('Linked. "' + match + '" will complete when you open the app here (' + daysLabel(parseDays(days)) + ').');
+      lastPlaceCheck = 0; checkPlaces();
+    }, function () {
+      alert("Couldn't get your location. Allow location for this app and try again.");
+    }, { enableHighAccuracy: true, timeout: 15000, maximumAge: 0 });
+  }
+  var lastPlaceCheck = 0;
+  function checkPlaces() {
+    if (!(D.places || []).length || !navigator.geolocation || !window.__mxCompleteQuest) return;
+    var now = Date.now(); if (now - lastPlaceCheck < 60000) return; lastPlaceCheck = now;
+    var s = st(); if (!s) return;
+    var today = new Date().getDay();
+    var due = D.places.filter(function (p) {
+      if (p.days && p.days.indexOf(today) < 0) return false;
+      var q = s.daily.concat(s.weekly || []).filter(function (x) { return x.name.trim().toLowerCase() === p.quest.trim().toLowerCase(); })[0];
+      return q && !q.done;
+    });
+    if (!due.length) return;
+    navigator.geolocation.getCurrentPosition(function (pos) {
+      due.forEach(function (p) {
+        var d = distM(pos.coords.latitude, pos.coords.longitude, +p.lat, +p.lon);
+        if (d <= (p.r || 150) + Math.min(pos.coords.accuracy || 0, 100)) {
+          if (window.__mxCompleteQuest(p.quest) === true) {
+            log("place", "Checked in — " + p.quest + " auto-completed");
+            if (D.settings.sound) snd("quest");
+            placeNotice(p.quest);
+          }
+        }
+      });
+    }, function () {}, { enableHighAccuracy: true, timeout: 15000, maximumAge: 120000 });
+  }
+  function placeNotice(q) {
+    var b = el("div", "mx-backup mx-place-note", '<div class="mx-bk-k">System notice</div><div class="mx-bk-t">Location confirmed</div><div class="mx-bk-d">Quest cleared: <b>' + esc(q) + '</b></div>');
+    document.body.appendChild(b);
+    requestAnimationFrame(function () { b.classList.add("show"); });
+    setTimeout(function () { b.classList.remove("show"); setTimeout(function () { if (b.parentNode) b.parentNode.removeChild(b); }, 400); }, 3200);
+  }
+  setTimeout(checkPlaces, 2500);
+  document.addEventListener("visibilitychange", function () { if (!document.hidden) { lastPlaceCheck = 0; setTimeout(checkPlaces, 800); } });
 
   /* ---------------- weekly backup reminder ----------------
      Deleting the home-screen app deletes its save, so once a week the
