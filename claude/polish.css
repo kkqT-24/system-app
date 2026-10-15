@@ -507,4 +507,4 @@ body.tab-open .main-controls .replay-btn { display: none !important; }
 /* the hub fits the screen exactly — no page scroll (and no scroll bar)
    until a module is open */
 html:has(body:not(.tab-open)), body:not(.tab-open) { overflow: hidden; height: 100%; }
-body:not(.tab-open) #main { height: 100dvh; min-height: 100dvh; }
+body:not(.tab-open) #main { height: 100vh; height: 100lvh; min-height: 100vh; min-height: 100lvh; }
