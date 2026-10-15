@@ -1,5 +1,10 @@
 # Shadow Dice Gates — design notes (agreed Oct 14, 2026)
 
+> **Round 7 (bottom of this file) replaces the gameplay.** The game is now a survivors-like
+> action roguelite (Survivor.io-style). The dice, lanes and turn-based combat in rounds 2–5 are
+> kept below as history only. Still in force: the core rule, keys, key fusion, losing a keyed run,
+> gate scouting, cosmetics, friends as bosses, and the Hunter evolving with real rank.
+
 ## Core rule
 Play is unlimited; **loot only comes from keys, and keys only come from real-life effort.**
 
@@ -118,3 +123,52 @@ distinct evolved looks, cool effects and skins. No 3D needed for the game.
   own pixel design, signature ability and special die face; beat them and ARISE them onto your team.
 - Per friend we need: name/nickname, look (hair, build, style, signature item), personality,
   the class/power that fits them, and an iconic quirk or inside joke for their ability.
+
+## Round 7 — survivors-like rethink (Oct 14, 2026)
+**Why:** the dice/lane/turn-based versions needed custom character art we can't make at the
+quality wanted. The things that matter most are **the army, the payoff and the Hunter** — combat
+is the vehicle. Survivors-likes deliver all three, are quick or long, and have the easiest art.
+
+**Platform:** phone first (portrait, one-thumb virtual joystick); PC optional (WASD).
+**Art:** top-down survivors-style sprites from a bought pack; shadows = recolored monsters
+(near-black, glowing eyes, rank aura). Just for personal use for now — AI-generated art is fine
+for portraits/forms; replace everything with licensed art if it's ever released.
+
+### The run (a gate)
+- Steer the Hunter; attacks fire automatically. Waves of monsters, elites, then a boss.
+- Kills drop XP → each level-up: pick **1 of 3** skills (Hunter skills + passives).
+  Skill + matching passive **evolves** into an ultimate (Survivor.io-style).
+- **Mid-run ARISE:** elites/mini-bosses can rise and fight with you for the rest of the run.
+- **Boss ARISE (keyed gates only):** extraction roll — success adds that shadow to the permanent army.
+- Lengths: Training Grounds ~5 min · E–C gates 8–12 min · A / Red gates 15–20 min.
+
+### Shadows (feel over power)
+- Shadows are there for the **feel** — a growing horde around you — not to carry the run.
+  The Hunter's build does the heavy lifting.
+- Each shadow has a small attack; **higher rarity/rank adds a little AoE or a special buff**
+  (e.g. aura that slows, small heal, crit buff). Rank aura grows Soldier → Marshal.
+- Bring a squad of permanent shadows into each run; they follow and auto-fight.
+
+### Luck (replaces the dice)
+Extraction rolls (rank + PER improve odds) · chest roulette · gear rarity rolls · crits ·
+random mid-run **System quests** ("kill 150 in 30s" → bonus chest) · gate modifiers shown on
+the scouting card ("Elites ×2, better loot").
+
+### Real life → game (unchanged core)
+- Keys from quests/workouts (key table above) open **Keyed Gates** — the only source of real
+  loot and permanent shadows. **Training Grounds** stay free and unlimited with small rewards.
+- Real Status sets the Hunter's base: VIT → HP · STR → damage · AGI → move speed ·
+  INT → cooldowns · PER → crit, pickup range, extraction luck. Today's workout = bonus for the day.
+
+### Between runs
+- Gear: weapon (sets the basic attack), armor, accessory — rarity tiers.
+- Permanent army: level, rank up, evolve duplicates into named elites.
+- Hunter rank forms E → S (Monarch). Cosmetics, codex, titles as in round 5.
+
+### Idle raids (lazy mode)
+Spend a key to send the army on a raid; collect when done. Same keys, **lower loot odds** than
+playing it yourself.
+
+### Open
+- Exact skill list and evolutions · monster roster by role · which sprite pack ·
+  how many shadows on screen before it gets messy · keyed-gate boss list (incl. friends).
