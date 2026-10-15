@@ -514,7 +514,8 @@ body:not(.tab-open) #main { height: 100vh; height: 100lvh; min-height: 100vh; mi
 body:not(.tab-open) #main { padding-top: calc(max(14px, env(safe-area-inset-top)) + 8px); }
 body:not(.tab-open) .main-center { padding-bottom: 8px; }
 
-/* the hub is pinned to the real screen edges. 100lvh came out taller than
-   the screen in the home-screen app, which centred everything lower and
-   pushed the version row off the bottom. */
-body:not(.tab-open) #main { position: fixed; top: 0; left: 0; right: 0; bottom: 0; height: auto; min-height: 0; }
+/* hub stacks from the top instead of centring in the screen box: on the
+   home-screen app that box runs taller than the visible screen, so centred
+   content (and the version row under it) slid off the bottom. Now the
+   version row follows REBOOT directly. */
+body:not(.tab-open) .main-center { flex: 0 0 auto; justify-content: flex-start; }
