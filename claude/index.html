@@ -1817,6 +1817,19 @@
          longer it is held (wired in script) — no scroll / select
          fighting the hold */
       .w-step[data-delta="-1"] { touch-action: none; user-select: none; -webkit-user-select: none; }
+      /* edit workouts: add / remove / reorder */
+      .w-ex-empty { max-width: 400px; margin: 17px auto 0; font-size: 10.5px; letter-spacing: 0.14em; color: var(--ink-faint); text-transform: uppercase; text-align: center; }
+      .w-ex.editing .w-ex-count { display: none; }
+      .w-ex.editing .w-bar-shell { opacity: 0.35; }
+      .w-mv { min-width: 34px; font-size: 10px; }
+      .w-mv[disabled] { opacity: 0.3; pointer-events: none; }
+      .w-rm { color: #ff7a8a; border-color: rgba(255, 90, 110, 0.35); }
+      .w-rm.armed { background: rgba(255, 70, 95, 0.18); border-color: #ff5a6e; color: #fff; font-size: 10.5px; letter-spacing: 0.08em; text-transform: uppercase; }
+      .w-edit-btn { display: block; max-width: 400px; margin: 18px auto 0; }
+      .w-edit-btn.on { border-style: solid; border-color: var(--purple); color: var(--lav); }
+      .w-add-form { display: flex; gap: 6px; max-width: 400px; margin: 16px auto 0; }
+      .w-add-form.shake { animation: wShake 0.35s ease; }
+      @keyframes wShake { 20%, 60% { transform: translateX(-5px); } 40%, 80% { transform: translateX(5px); } }
       /* cardio: not rep-counted — a done / not-done toggle worth a
          flat 40 reps toward the day's total */
       .w-cardio-btn { min-width: 72px; height: 26px; padding: 0 8px; font-size: 10.5px; text-transform: uppercase; letter-spacing: 0.1em; }
@@ -2448,46 +2461,7 @@
                 <div class="w-bar-shell"><div class="w-bar-track"><div class="w-bar-fill" id="wTotalFill"></div></div></div>
                 <div class="w-total-meta mono"><span id="wMinMeta">Minimum — 100 reps · +30 EXP</span><span id="wExpMeta">100 reps to minimum</span><span id="wFreeMeta">Free skips — 2 of 2 left this week</span><span id="wStreakMeta">Streak — 0 days</span></div>
               </div>
-              <div class="w-ex" data-ex="pushups">
-                <div class="w-ex-top">
-                  <span class="w-ex-name">Push-ups</span>
-                  <span class="w-ex-count mono"><b>0</b> reps</span>
-                  <span class="w-steppers"><button type="button" class="w-step" data-delta="-1" aria-label="Push-ups: remove one rep">&minus;</button><button type="button" class="w-step" data-delta="1" aria-label="Push-ups: add one rep">+1</button><button type="button" class="w-step" data-delta="10" aria-label="Push-ups: add ten reps">+10</button></span>
-                </div>
-                <div class="w-bar-shell"><div class="w-bar-track"><div class="w-bar-fill"></div></div></div>
-              </div>
-              <div class="w-ex" data-ex="situps">
-                <div class="w-ex-top">
-                  <span class="w-ex-name">Sit-ups</span>
-                  <span class="w-ex-count mono"><b>0</b> reps</span>
-                  <span class="w-steppers"><button type="button" class="w-step" data-delta="-1" aria-label="Sit-ups: remove one rep">&minus;</button><button type="button" class="w-step" data-delta="1" aria-label="Sit-ups: add one rep">+1</button><button type="button" class="w-step" data-delta="10" aria-label="Sit-ups: add ten reps">+10</button></span>
-                </div>
-                <div class="w-bar-shell"><div class="w-bar-track"><div class="w-bar-fill"></div></div></div>
-              </div>
-              <div class="w-ex" data-ex="curls">
-                <div class="w-ex-top">
-                  <span class="w-ex-name">Curls</span>
-                  <span class="w-ex-count mono"><b>0</b> reps</span>
-                  <span class="w-steppers"><button type="button" class="w-step" data-delta="-1" aria-label="Curls: remove one rep">&minus;</button><button type="button" class="w-step" data-delta="1" aria-label="Curls: add one rep">+1</button><button type="button" class="w-step" data-delta="10" aria-label="Curls: add ten reps">+10</button></span>
-                </div>
-                <div class="w-bar-shell"><div class="w-bar-track"><div class="w-bar-fill"></div></div></div>
-              </div>
-              <div class="w-ex" data-ex="press">
-                <div class="w-ex-top">
-                  <span class="w-ex-name">Shoulder Press</span>
-                  <span class="w-ex-count mono"><b>0</b> reps</span>
-                  <span class="w-steppers"><button type="button" class="w-step" data-delta="-1" aria-label="Shoulder press: remove one rep">&minus;</button><button type="button" class="w-step" data-delta="1" aria-label="Shoulder press: add one rep">+1</button><button type="button" class="w-step" data-delta="10" aria-label="Shoulder press: add ten reps">+10</button></span>
-                </div>
-                <div class="w-bar-shell"><div class="w-bar-track"><div class="w-bar-fill"></div></div></div>
-              </div>
-              <div class="w-ex" data-ex="dips">
-                <div class="w-ex-top">
-                  <span class="w-ex-name">Dips</span>
-                  <span class="w-ex-count mono"><b>0</b> reps</span>
-                  <span class="w-steppers"><button type="button" class="w-step" data-delta="-1" aria-label="Dips: remove one rep">&minus;</button><button type="button" class="w-step" data-delta="1" aria-label="Dips: add one rep">+1</button><button type="button" class="w-step" data-delta="10" aria-label="Dips: add ten reps">+10</button></span>
-                </div>
-                <div class="w-bar-shell"><div class="w-bar-track"><div class="w-bar-fill"></div></div></div>
-              </div>
+              <div class="w-ex-list" id="wExList"></div>
               <div class="w-ex" data-ex="cardio">
                 <div class="w-ex-top">
                   <span class="w-ex-name">Cardio</span>
@@ -2496,6 +2470,11 @@
                 </div>
                 <div class="w-bar-shell"><div class="w-bar-track"><div class="w-bar-fill" id="wCardioFill"></div></div></div>
               </div>
+              <form class="w-add-form is-hidden" id="wAddForm" autocomplete="off">
+                <input class="t-input" id="wAddIn" type="text" maxlength="24" placeholder="New workout — e.g. Squats" aria-label="New workout name" />
+                <button type="submit" class="t-confirm">Add</button>
+              </form>
+              <button type="button" class="t-add-btn w-edit-btn" id="wEditBtn" aria-pressed="false">Edit workouts</button>
               <div class="w-stats">
                 <div class="w-tabs" role="tablist" aria-label="Workout records">
                   <button type="button" class="w-tab" role="tab" data-wtab="pb" aria-selected="false">Personal Best</button>
@@ -2503,28 +2482,16 @@
                   <button type="button" class="w-tab sel" role="tab" data-wtab="life" aria-selected="true">Lifetime</button>
                 </div>
                 <div class="w-pane is-hidden" data-wpane="pb">
-                  <div class="w-life-row mono"><span>Push-ups</span><b data-pb="pushups">0</b></div>
-                  <div class="w-life-row mono"><span>Sit-ups</span><b data-pb="situps">0</b></div>
-                  <div class="w-life-row mono"><span>Curls</span><b data-pb="curls">0</b></div>
-                  <div class="w-life-row mono"><span>Shoulder Press</span><b data-pb="press">0</b></div>
-                  <div class="w-life-row mono"><span>Dips</span><b data-pb="dips">0</b></div>
+                  <div class="w-ex-rows" data-rows="pb"></div>
                   <div class="w-life-row mono"><span>Best Day Total</span><b data-pb="total">0</b></div>
                 </div>
                 <div class="w-pane is-hidden" data-wpane="week">
-                  <div class="w-life-row mono"><span>Push-ups</span><b data-week="pushups">0</b></div>
-                  <div class="w-life-row mono"><span>Sit-ups</span><b data-week="situps">0</b></div>
-                  <div class="w-life-row mono"><span>Curls</span><b data-week="curls">0</b></div>
-                  <div class="w-life-row mono"><span>Shoulder Press</span><b data-week="press">0</b></div>
-                  <div class="w-life-row mono"><span>Dips</span><b data-week="dips">0</b></div>
+                  <div class="w-ex-rows" data-rows="week"></div>
                   <div class="w-life-row mono"><span>Cardio</span><b data-week="cardio">0 days</b></div>
                   <div class="w-life-row mono"><span>Total Reps</span><b data-week="total">0</b></div>
                 </div>
                 <div class="w-pane" data-wpane="life">
-                  <div class="w-life-row mono"><span>Push-ups</span><b data-life="pushups">0</b></div>
-                  <div class="w-life-row mono"><span>Sit-ups</span><b data-life="situps">0</b></div>
-                  <div class="w-life-row mono"><span>Curls</span><b data-life="curls">0</b></div>
-                  <div class="w-life-row mono"><span>Shoulder Press</span><b data-life="press">0</b></div>
-                  <div class="w-life-row mono"><span>Dips</span><b data-life="dips">0</b></div>
+                  <div class="w-ex-rows" data-rows="life"></div>
                   <div class="w-life-row mono"><span>Cardio</span><b data-life="cardio">0 days</b></div>
                 </div>
               </div>
@@ -2652,7 +2619,7 @@
         </div>
 
         <div class="main-top">
-          <span id="appVersion">Core v2.4</span>
+          <span id="appVersion">Core v2.5</span>
           <span>Louisville, KY</span>
         </div>
       </div>
@@ -3728,7 +3695,18 @@
           x.setDate(x.getDate() - ((x.getDay() + 6) % 7));
           return x.getFullYear() + "-" + String(x.getMonth() + 1).padStart(2, "0") + "-" + String(x.getDate()).padStart(2, "0");
         }
+        /* the exercise list is editable (Edit workouts): each entry
+           is { id, name }. Records are keyed by id, and a removed
+           exercise's lifetime / best history is KEPT under its id,
+           so adding the same name back brings its records back. */
+        var DEFAULT_EXERCISES = [
+          { id: "pushups", name: "Push-ups" }, { id: "situps", name: "Sit-ups" },
+          { id: "curls", name: "Curls" }, { id: "press", name: "Shoulder Press" }, { id: "dips", name: "Dips" }
+        ];
+        var EX_ID_RE = /^[a-z0-9_]{1,32}$/;
+        function zeroReps() { var o = {}; for (var i = 0; i < WORKOUT.list.length; i++) o[WORKOUT.list[i].id] = 0; return o; }
         var WORKOUT = {
+          list: DEFAULT_EXERCISES.map(function (e) { return { id: e.id, name: e.name }; }),
           reps: { pushups: 0, situps: 0, curls: 0, press: 0, dips: 0 },
           cardio: false,
           expGranted: 0,
@@ -3739,25 +3717,57 @@
           pbTotal: 0,
           week: { key: weekKeyOf(new Date()), reps: { pushups: 0, situps: 0, curls: 0, press: 0, dips: 0 }, cardioDays: 0 }
         };
+        /* make sure every record bucket has a slot for an exercise */
+        function ensureExerciseSlots(id) {
+          if (!(id in WORKOUT.reps)) WORKOUT.reps[id] = 0;
+          if (!(id in WORKOUT.life)) WORKOUT.life[id] = 0;
+          if (!(id in WORKOUT.pb)) WORKOUT.pb[id] = 0;
+          if (!(id in WORKOUT.week.reps)) WORKOUT.week.reps[id] = 0;
+        }
+        /* every id-shaped key in a persisted bucket (so history for
+           custom and removed exercises survives a reload) */
+        function persistedKeys(src) {
+          var out = [];
+          if (src && typeof src === "object") for (var k in src) if (EX_ID_RE.test(k)) out.push(k);
+          return out;
+        }
         /* Restore persisted workout state (validated, clamped). */
         (function () {
           try {
             var p = window.__ksPersisted && window.__ksPersisted.workout;
             if (!p || typeof p !== "object") return;
-            window.__ksMergeNums(WORKOUT.reps, p.reps, ["pushups", "situps", "curls", "press", "dips"]);
+            if (Array.isArray(p.list)) {
+              var seen = {}, list = [];
+              for (var li = 0; li < p.list.length && list.length < 30; li++) {
+                var e = p.list[li];
+                if (!e || typeof e.id !== "string" || !EX_ID_RE.test(e.id) || seen[e.id]) continue;
+                var nm = typeof e.name === "string" ? e.name.trim().slice(0, 24) : "";
+                if (!nm) continue;
+                seen[e.id] = 1; list.push({ id: e.id, name: nm });
+              }
+              WORKOUT.list = list;
+            }
+            window.__ksMergeNums(WORKOUT.reps, p.reps, persistedKeys(p.reps));
             if (typeof p.cardio === "boolean") WORKOUT.cardio = p.cardio;
             if (isFinite(+p.expGranted)) WORKOUT.expGranted = Math.max(0, +p.expGranted);
             if (typeof p.day === "string" && /^\d{4}-\d{2}-\d{2}$/.test(p.day)) WORKOUT.day = p.day;
-            window.__ksMergeNums(WORKOUT.life, p.life, ["pushups", "situps", "curls", "press", "dips"]);
+            window.__ksMergeNums(WORKOUT.life, p.life, persistedKeys(p.life));
             if (isFinite(+p.lifeCardio)) WORKOUT.lifeCardio = Math.max(0, +p.lifeCardio);
-            window.__ksMergeNums(WORKOUT.pb, p.pb, ["pushups", "situps", "curls", "press", "dips"]);
+            window.__ksMergeNums(WORKOUT.pb, p.pb, persistedKeys(p.pb));
             if (isFinite(+p.pbTotal)) WORKOUT.pbTotal = Math.max(0, +p.pbTotal);
             if (p.week && typeof p.week === "object" && typeof p.week.key === "string" && /^\d{4}-\d{2}-\d{2}$/.test(p.week.key)) {
               WORKOUT.week.key = p.week.key;
-              window.__ksMergeNums(WORKOUT.week.reps, p.week.reps, ["pushups", "situps", "curls", "press", "dips"]);
+              window.__ksMergeNums(WORKOUT.week.reps, p.week.reps, persistedKeys(p.week.reps));
               if (isFinite(+p.week.cardioDays)) WORKOUT.week.cardioDays = Math.max(0, +p.week.cardioDays);
             }
           } catch (e) {}
+          for (var i = 0; i < WORKOUT.list.length; i++) ensureExerciseSlots(WORKOUT.list[i].id);
+          /* reps only count for exercises on the list */
+          for (var rk in WORKOUT.reps) {
+            var on = false;
+            for (var j = 0; j < WORKOUT.list.length; j++) if (WORKOUT.list[j].id === rk) on = true;
+            if (!on) WORKOUT.reps[rk] = 0;
+          }
         })();
         /* the last missed-day penalty actually deducted (shown on
            the level card's Penalties line), the running total of
@@ -3890,7 +3900,7 @@
           renderWorkouts();
         }
         function changeReps(id, delta) {
-          if (!(id in WORKOUT.reps)) return;
+          if (exerciseIndex(id) < 0) return;
           WORKOUT.reps[id] = Math.max(0, (WORKOUT.reps[id] || 0) + delta);
           syncWorkoutExp(true);
           renderWorkouts();
@@ -3970,7 +3980,7 @@
             if (WORKOUT.cardio) WORKOUT.week.cardioDays += 1;
           }
           if (WORKOUT.week.key !== weekKeyOf(new Date())) {
-            WORKOUT.week = { key: weekKeyOf(new Date()), reps: { pushups: 0, situps: 0, curls: 0, press: 0, dips: 0 }, cardioDays: 0 };
+            WORKOUT.week = { key: weekKeyOf(new Date()), reps: zeroReps(), cardioDays: 0 };
           }
           for (var k in WORKOUT.reps) { WORKOUT.life[k] = (WORKOUT.life[k] || 0) + (WORKOUT.reps[k] || 0); WORKOUT.reps[k] = 0; }
           if (WORKOUT.cardio) WORKOUT.lifeCardio += 1;
@@ -4100,8 +4110,80 @@
             if (workoutTotal() >= workoutRepsForRank(currentRankLetter())) celebrateWorkoutFull();
           }, delay);
         }
+        /* ---------- editable exercise list ----------
+           Rows (and their record rows) are rebuilt only when the
+           list or edit mode changes, never on a rep change, so a
+           held minus button keeps its element mid-hold. */
+        var WORKOUT_EDIT = false;
+        var workoutRowsSig = "";
+        function escHtml(t) { return String(t).replace(/[&<>"']/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]; }); }
+        function buildWorkoutRows() {
+          var sig = (WORKOUT_EDIT ? "E|" : "N|") + WORKOUT.list.map(function (e) { return e.id + ":" + e.name; }).join("|");
+          if (sig === workoutRowsSig) return;
+          workoutRowsSig = sig;
+          var box = document.getElementById("wExList");
+          if (!box) return;
+          var html = "";
+          for (var i = 0; i < WORKOUT.list.length; i++) {
+            var e = WORKOUT.list[i], nm = escHtml(e.name);
+            var ctl = WORKOUT_EDIT
+              ? '<span class="w-steppers w-edit-ctl">' +
+                  '<button type="button" class="w-step w-mv" data-mv="-1" aria-label="' + nm + ': move up"' + (i === 0 ? " disabled" : "") + '>&#9650;</button>' +
+                  '<button type="button" class="w-step w-mv" data-mv="1" aria-label="' + nm + ': move down"' + (i === WORKOUT.list.length - 1 ? " disabled" : "") + '>&#9660;</button>' +
+                  '<button type="button" class="w-step w-rm" aria-label="Remove ' + nm + '">&#10005;</button></span>'
+              : '<span class="w-steppers"><button type="button" class="w-step" data-delta="-1" aria-label="' + nm + ': remove one rep">&minus;</button><button type="button" class="w-step" data-delta="1" aria-label="' + nm + ': add one rep">+1</button><button type="button" class="w-step" data-delta="10" aria-label="' + nm + ': add ten reps">+10</button></span>';
+            html += '<div class="w-ex' + (WORKOUT_EDIT ? " editing" : "") + '" data-ex="' + e.id + '"><div class="w-ex-top"><span class="w-ex-name">' + nm + '</span>' +
+              '<span class="w-ex-count mono"><b>0</b> reps</span>' + ctl + '</div>' +
+              '<div class="w-bar-shell"><div class="w-bar-track"><div class="w-bar-fill"></div></div></div></div>';
+          }
+          if (!WORKOUT.list.length) html = '<div class="w-ex-empty mono">No workouts on the list — tap Add below</div>';
+          box.innerHTML = html;
+          var boxes = document.querySelectorAll("#sec-workouts .w-ex-rows");
+          for (var b = 0; b < boxes.length; b++) {
+            var kind = boxes[b].getAttribute("data-rows"), rh = "";
+            for (var j = 0; j < WORKOUT.list.length; j++)
+              rh += '<div class="w-life-row mono"><span>' + escHtml(WORKOUT.list[j].name) + '</span><b data-' + kind + '="' + WORKOUT.list[j].id + '">0</b></div>';
+            boxes[b].innerHTML = rh;
+          }
+        }
+        function exerciseIndex(id) { for (var i = 0; i < WORKOUT.list.length; i++) if (WORKOUT.list[i].id === id) return i; return -1; }
+        function slugExercise(name) { return name.toLowerCase().replace(/[^a-z0-9]+/g, "_").replace(/^_+|_+$/g, "").slice(0, 32); }
+        /* add returns "" on success, else a short reason */
+        function addExercise(name) {
+          name = String(name || "").replace(/\s+/g, " ").trim().slice(0, 24);
+          if (!name) return "Type a name";
+          for (var i = 0; i < WORKOUT.list.length; i++) if (WORKOUT.list[i].name.toLowerCase() === name.toLowerCase()) return "Already on the list";
+          if (WORKOUT.list.length >= 30) return "List is full";
+          var id = slugExercise(name);
+          if (!id || !EX_ID_RE.test(id) || exerciseIndex(id) >= 0) id = "ex_" + Date.now().toString(36);
+          /* a name matching an old removed exercise reuses its id, so its lifetime / best records come back */
+          WORKOUT.list.push({ id: id, name: name });
+          ensureExerciseSlots(id);
+          renderWorkouts();
+          return "";
+        }
+        /* removing takes today's reps for it off today's total (EXP
+           settles through the normal rep path); its lifetime and
+           best records stay stored under its id */
+        function removeExercise(id) {
+          var i = exerciseIndex(id);
+          if (i < 0) return;
+          var today = WORKOUT.reps[id] || 0;
+          if (today > 0) changeReps(id, -today);
+          WORKOUT.list.splice(i, 1);
+          WORKOUT.reps[id] = 0;
+          syncWorkoutExp(true);
+          renderWorkouts();
+        }
+        function moveExercise(id, dir) {
+          var i = exerciseIndex(id), j = i + dir;
+          if (i < 0 || j < 0 || j >= WORKOUT.list.length) return;
+          var t = WORKOUT.list[i]; WORKOUT.list[i] = WORKOUT.list[j]; WORKOUT.list[j] = t;
+          renderWorkouts();
+        }
         function renderWorkouts() {
           if (window.__ksSaveState) window.__ksSaveState();
+          buildWorkoutRows();
           var rank = currentRankLetter();
           var min = workoutRepsForRank(rank);
           var base = workoutExpForRank(rank);
@@ -5354,85 +5436,126 @@
           setInterval(todoDayCheck, 60000);
         })();
 
-        /* ---------- workouts tab: stepper wiring ---------- */
-        var stepBtns = document.querySelectorAll("#sec-workouts .w-step[data-delta]");
-        for (var si = 0; si < stepBtns.length; si++) {
-          stepBtns[si].addEventListener("click", function () {
-            if (this.getAttribute("data-holdfired") === "1") { this.removeAttribute("data-holdfired"); return; }
-            var exEl = this.closest ? this.closest(".w-ex") : null;
-            if (!exEl) return;
-            var d = parseInt(this.getAttribute("data-delta"), 10) || 0;
-            /* fullness BEFORE this click decides where add
-               particles land (changeReps runs first, below) */
-            var wasFull = workoutTotal() >= workoutRepsForRank(currentRankLetter());
-            changeReps(exEl.getAttribute("data-ex"), d);
-            /* one particle per rep, into BOTH bars on add — the
-               day's total bar AND this exercise's own bar; on
-               subtract they stream back out of BOTH bars into
-               the button. But once the total bar is already full,
-               added reps fly straight from the button up into the
-               tab button instead — the click that FILLS the bar
-               still lands in the bars (wasFull false) so the
-               sequenced celebration can follow it. */
-            var exShell = workoutExShell(exEl);
-            if (d > 0) {
-              if (wasFull) {
-                flyParticles(this, document.getElementById("tabsHandle"), d);
-              } else {
-                flyParticles(this, workoutTotalShell(), d);
-                flyParticles(this, exShell, d);
-              }
-            } else if (d < 0) {
-              flyParticles(workoutTotalShell(), this, 1);
-              flyParticles(exShell, this, 1);
+        /* ---------- workouts tab: stepper wiring ----------
+           Delegated from the section, since the exercise rows are
+           rebuilt when the list is edited. */
+        var secW = document.getElementById("sec-workouts");
+        secW.addEventListener("click", function (ev) {
+          var btn = ev.target.closest ? ev.target.closest(".w-step[data-delta]") : null;
+          if (!btn || !secW.contains(btn)) return;
+          if (btn.getAttribute("data-holdfired") === "1") { btn.removeAttribute("data-holdfired"); return; }
+          var exEl = btn.closest(".w-ex");
+          if (!exEl) return;
+          var d = parseInt(btn.getAttribute("data-delta"), 10) || 0;
+          /* fullness BEFORE this click decides where add
+             particles land (changeReps runs first, below) */
+          var wasFull = workoutTotal() >= workoutRepsForRank(currentRankLetter());
+          changeReps(exEl.getAttribute("data-ex"), d);
+          /* one particle per rep, into BOTH bars on add — the
+             day's total bar AND this exercise's own bar; on
+             subtract they stream back out of BOTH bars into the
+             button. Once the total bar is already full, added
+             reps fly straight up into the tab button instead. */
+          var exShell = workoutExShell(exEl);
+          if (d > 0) {
+            if (wasFull) {
+              flyParticles(btn, document.getElementById("tabsHandle"), d);
+            } else {
+              flyParticles(btn, workoutTotalShell(), d);
+              flyParticles(btn, exShell, d);
             }
-          });
-        }
+          } else if (d < 0) {
+            flyParticles(workoutTotalShell(), btn, 1);
+            flyParticles(exShell, btn, 1);
+          }
+        });
         /* holding the minus stepper: after a short beat the count
            ticks down on its own, each tick faster than the last,
            until release (or zero). The click that follows a hold is
            swallowed via data-holdfired so it doesn't step once more;
            the flag self-clears in case no click ever consumes it. */
-        var minusBtns = document.querySelectorAll('#sec-workouts .w-step[data-delta="-1"]');
-        for (var mi = 0; mi < minusBtns.length; mi++) {
-          (function (btn) {
-            var exEl = btn.closest ? btn.closest(".w-ex") : null;
-            var exId = exEl ? exEl.getAttribute("data-ex") : null;
-            var t1 = null, t2 = null, holding = false;
-            function stop() {
-              if (t1) { clearTimeout(t1); t1 = null; }
-              if (t2) { clearTimeout(t2); t2 = null; }
-              if (holding) {
-                holding = false;
-                btn.setAttribute("data-holdfired", "1");
-                setTimeout(function () { btn.removeAttribute("data-holdfired"); }, 400);
-              }
+        secW.addEventListener("pointerdown", function (ev) {
+          var btn = ev.target.closest ? ev.target.closest('.w-step[data-delta="-1"]') : null;
+          if (!btn || !secW.contains(btn)) return;
+          var exEl = btn.closest(".w-ex");
+          var exId = exEl ? exEl.getAttribute("data-ex") : null;
+          if (!exId) return;
+          var t1 = null, t2 = null, holding = false, delay = 120;
+          function stop() {
+            if (t1) { clearTimeout(t1); t1 = null; }
+            if (t2) { clearTimeout(t2); t2 = null; }
+            btn.removeEventListener("pointerup", stop);
+            btn.removeEventListener("pointerleave", stop);
+            btn.removeEventListener("pointercancel", stop);
+            if (holding) {
+              holding = false;
+              btn.setAttribute("data-holdfired", "1");
+              setTimeout(function () { btn.removeAttribute("data-holdfired"); }, 400);
             }
-            btn.addEventListener("pointerdown", function () {
-              if (!exId) return;
-              if (t1) { clearTimeout(t1); t1 = null; }
-              if (t2) { clearTimeout(t2); t2 = null; }
-              var delay = 120;
-              t1 = setTimeout(function () {
-                holding = true;
-                (function loop() {
-                  if ((WORKOUT.reps[exId] || 0) <= 0) { stop(); return; }
-                  changeReps(exId, -1);
-                  /* each hold tick drains a particle out of both
-                     bars — the total bar and this exercise's bar */
-                  flyParticles(workoutTotalShell(), btn, 1);
-                  flyParticles(workoutExShell(exEl), btn, 1);
-                  delay = Math.max(30, Math.round(delay * 0.8));
-                  t2 = setTimeout(loop, delay);
-                })();
-              }, 380);
-            });
-            btn.addEventListener("pointerup", stop);
-            btn.addEventListener("pointerleave", stop);
-            btn.addEventListener("pointercancel", stop);
-            btn.addEventListener("contextmenu", function (e) { e.preventDefault(); });
-          })(minusBtns[mi]);
+          }
+          btn.addEventListener("pointerup", stop);
+          btn.addEventListener("pointerleave", stop);
+          btn.addEventListener("pointercancel", stop);
+          t1 = setTimeout(function () {
+            holding = true;
+            (function loop() {
+              if ((WORKOUT.reps[exId] || 0) <= 0) { stop(); return; }
+              changeReps(exId, -1);
+              /* each hold tick drains a particle out of both
+                 bars — the total bar and this exercise's bar */
+              flyParticles(workoutTotalShell(), btn, 1);
+              flyParticles(workoutExShell(exEl), btn, 1);
+              delay = Math.max(30, Math.round(delay * 0.8));
+              t2 = setTimeout(loop, delay);
+            })();
+          }, 380);
+        });
+        secW.addEventListener("contextmenu", function (ev) {
+          if (ev.target.closest && ev.target.closest('.w-step[data-delta="-1"]')) ev.preventDefault();
+        });
+        /* ---------- edit workouts: add / remove / reorder ----------
+           Edit mode swaps each row's steppers for move up / down
+           and remove, and shows the add field. Remove asks twice:
+           the first tap arms it (showing the reps it would take
+           off today's total), the second removes. */
+        var wEditBtn = document.getElementById("wEditBtn");
+        var wAddForm = document.getElementById("wAddForm");
+        var wAddIn = document.getElementById("wAddIn");
+        function setWorkoutEdit(on) {
+          WORKOUT_EDIT = !!on;
+          wEditBtn.textContent = WORKOUT_EDIT ? "Done editing" : "Edit workouts";
+          wEditBtn.setAttribute("aria-pressed", WORKOUT_EDIT ? "true" : "false");
+          wEditBtn.classList.toggle("on", WORKOUT_EDIT);
+          wAddForm.classList.toggle("is-hidden", !WORKOUT_EDIT);
+          if (!WORKOUT_EDIT) { wAddIn.value = ""; wAddIn.placeholder = "New workout — e.g. Squats"; wAddIn.blur(); }
+          renderWorkouts();
         }
+        wEditBtn.addEventListener("click", function () { setWorkoutEdit(!WORKOUT_EDIT); });
+        wAddForm.addEventListener("submit", function (ev) {
+          ev.preventDefault();
+          var why = addExercise(wAddIn.value);
+          if (why) { wAddIn.value = ""; wAddIn.placeholder = why; wAddForm.classList.remove("shake"); void wAddForm.offsetWidth; wAddForm.classList.add("shake"); return; }
+          wAddIn.value = ""; wAddIn.placeholder = "Added — add another?";
+        });
+        secW.addEventListener("click", function (ev) {
+          var mv = ev.target.closest ? ev.target.closest(".w-mv") : null;
+          if (mv) { var exM = mv.closest(".w-ex"); if (exM) moveExercise(exM.getAttribute("data-ex"), parseInt(mv.getAttribute("data-mv"), 10)); return; }
+          var rm = ev.target.closest ? ev.target.closest(".w-rm") : null;
+          if (!rm) return;
+          var exR = rm.closest(".w-ex");
+          if (!exR) return;
+          var id = exR.getAttribute("data-ex");
+          if (!rm.classList.contains("armed")) {
+            var arms = secW.querySelectorAll(".w-rm.armed");
+            for (var ai = 0; ai < arms.length; ai++) { arms[ai].classList.remove("armed"); arms[ai].innerHTML = "&#10005;"; }
+            var today = WORKOUT.reps[id] || 0;
+            rm.classList.add("armed");
+            rm.textContent = today > 0 ? "Remove −" + today + "?" : "Remove?";
+            setTimeout(function () { if (rm.isConnected && rm.classList.contains("armed")) { rm.classList.remove("armed"); rm.innerHTML = "&#10005;"; } }, 3500);
+            return;
+          }
+          removeExercise(id);
+        });
         var cardioBtn = document.getElementById("wCardioBtn");
         if (cardioBtn) cardioBtn.addEventListener("click", function () {
           var wasDone = WORKOUT.cardio;
