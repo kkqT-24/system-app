@@ -111,3 +111,10 @@ distinct evolved looks, cool effects and skins. No 3D needed for the game.
   layered over real gear stats — wear the look you want with the stats you need.
 - **Art first:** settle the visual style on a style board (same Knight in a few pixel styles),
   then a design sheet (Hunter by rank, the 8 classes, monsters, dice, UI) before building.
+
+## Round 6 — friends as legends
+- No characters from existing anime (recognizable = theirs; generic = pointless). Instead:
+- **Friends as Named Bosses → shadows.** Each friend becomes a unique named gate boss with their
+  own pixel design, signature ability and special die face; beat them and ARISE them onto your team.
+- Per friend we need: name/nickname, look (hair, build, style, signature item), personality,
+  the class/power that fits them, and an iconic quirk or inside joke for their ability.
