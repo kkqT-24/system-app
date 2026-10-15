@@ -197,16 +197,9 @@
         '<g class="raise"><path d="M63 44l24-38 2.2 1.4-24 38z"/><path d="M60 40l10 6-1.4 2.2-10-6z"/></g>',
       det: "M50 18v12M43 25h14M40 50h20M42 58h16M44 66h12M36 80h28M20 80l-8 28M80 80l8 28M30 70l-10 38M70 70l10 38" },
     { key: "wyrm", c1: "#ff7a2e", c2: "#ff2d1a", ce: "#ffb020", name: "Vorhal, Wyrm of the Abyss", cls: "Wyrm", need: "Hold a 30-day workout streak", power: 12000,
-      eyes: [[34, 21], [41, 20]],
-      body: '<g class="wingL"><path d="M50 52C32 22 10 16 2 28c10 0 16 5 19 13C11 39 5 45 3 54c12-6 22-4 31 6z"/></g>' +
-        '<g class="wingR"><path d="M50 52C68 22 90 16 98 28c-10 0-16 5-19 13 10-2 16 4 18 13-12-6-22-4-31 6z"/></g>' +
-        '<path d="M37 60q13-10 26 0l7 30q-20 17-40 0z"/>' +
-        '<path d="M42 63C34 52 33 42 39 31L50 28C50 38 53 50 58 63Z"/>' +
-        '<path d="M43 15Q50 6 60 4Q52 9 47 17ZM47 19Q56 14 64 15Q55 18 50 22Z"/>' +
-        '<path d="M51 30Q46 35 36 33L22 31Q15 29 15 26Q16 23 21 22L31 20L38 14Q44 12 48 16Q52 22 51 30Z"/>' +
-        '<path d="M37 33L24 33Q20 34 20 36L27 37L40 35Z"/>' +
-        '<path class="tail" d="M62 94c14 6 25 1 34 10-12-1-24 5-37-3z"/>',
-      det: "M8 30l14 10M92 30l-14 10M14 46l16 8M86 46l-16 8M40 70h20M38 78h24M40 86h20M17 25l3-1M24 31l1 3M28 31l1 3M32 31l1 3M40 40l9-2M41 48l10-2M43 56l10-2M39 19l6 3" },
+      eyes: [[35, 22], [42, 21]],
+      body: '<path d="M50 52C32 22 10 16 2 28c10 0 16 5 19 13C11 39 5 45 3 54c12-6 22-4 31 6z"/><path d="M50 52C68 22 90 16 98 28c-10 0-16 5-19 13 10-2 16 4 18 13-12-6-22-4-31 6z"/><path d="M37 60q13-10 26 0l7 30q-20 17-40 0z"/><path d="M42 63L35 50L36 40L41 31L50 27L53 40L58 63Z"/><path d="M40 14L45 0L47 15ZM45 17L61 6L51 21ZM49 22L65 18L53 26Z"/><path d="M45 32L32 35L15 42L19 37L31 31Z"/><path d="M52 23L50 30L44 33L34 31L13 26L22 21L33 18L39 11L47 13Z"/><path d="M17 27L19.5 32L21.5 28ZM23.5 28.3L26 34L28 29ZM30 29.8L32 34L33.6 30.6Z" fill="#fff6f0" stroke="none"/><path d="M19.5 38.5L21 34L23.4 37.4ZM26 36.2L28 31.5L30 35Z" fill="#fff6f0" stroke="none"/><path d="M62 94c14 6 25 1 34 10-12-1-24 5-37-3z"/>',
+      det: "M8 30l14 10M92 30l-14 10M14 46l16 8M86 46l-16 8M40 70h20M38 78h24M40 86h20M15 25l3-1M31 18l13 4M40 40l10-2M40 48l11-2M42 56l11-2" },
     { key: "archon", c1: "#bfe9ff", c2: "#7dd3fc", ce: "#e0f2ff", name: "Seraphine, Archon of Night", cls: "Archon", need: "Raise 25 shadows", power: 10500,
       eyes: [[45.5, 27], [54.5, 27]],
       body: '<ellipse class="halo" cx="50" cy="9" rx="13" ry="3.4" fill="none" stroke-width="1.6"/>' +
@@ -215,13 +208,9 @@
         '<path d="M50 14q12 4 10 22l-5 6H45l-5-6q-2-18 10-22z"/><path d="M36 44h28l11 66H25z"/>',
       det: "M40 36q10 6 20 0M38 60h24M34 80q16 6 32 0M30 100q20 6 40 0M50 44v64M16 18l18 18M84 18l-18 18" },
     { key: "fenris", c1: "#34f5a0", c2: "#10b981", ce: "#6effc8", name: "Fenrath, the Black Wolf", cls: "Wolf", need: "Clear every daily quest 7 days in a row", power: 8000,
-      eyes: [[44, 46], [56, 46]],
-      body: '<path class="tail" d="M70 104c12-2 22-12 22-28-6 10-14 14-24 16z"/>' +
-        '<path d="M28 108c-3-20 0-34 10-44q12-7 24 0c10 10 13 24 10 44z"/>' +
-        '<path d="M38 64l-6 4 5 2-4 5 7-1 3 5 3-5 4 4 4-4 3 5 3-5 7 1-4-5 5-2-6-4z"/>' +
-        '<path d="M35 44L31 18L42 31Q50 28 58 31L69 18L65 44Q69 51 63 57L56 69Q50 74 44 69L37 57Q31 51 35 44Z"/>' +
-        '<path d="M47 63h6l-3 3.5z" fill="#d8ffe9" stroke="none"/>',
-      det: "M34 24l5 6M66 24l-5 6M38 41l7 3M62 41l-7 3M50 52v10M45 67q5 2 10 0M50 76v30M40 92h20M36 54l-5 2M64 54l5 2" }
+      eyes: [[44, 48], [56, 48]],
+      body: '<path d="M70 104c12-2 22-12 22-28-6 10-14 14-24 16z"/><path d="M28 108c-3-20 0-34 10-44q12-7 24 0c10 10 13 24 10 44z"/><path d="M37 64l-7 3 5 3-4 6 8-2 3 6 3-6 5 5 5-5 3 6 3-6 8 2-4-6 5-3-7-3z"/><path d="M36 42L27 12L44 30ZM64 42L73 12L56 30Z"/><path d="M36 50L24 52L35 57ZM64 50L76 52L65 57Z"/><path d="M33 44L42 31L50 34L58 31L67 44L64 56L57 62L54 73L50 76L46 73L43 62L36 56Z"/><path d="M43.5 63L50 68L56.5 63L55 71L50 74L45 71Z" fill="#000"/><path d="M44 62.5L46 71L48 64.5ZM56 62.5L54 71L52 64.5Z" fill="#fff6f0" stroke="none"/><path d="M46.5 73L47.5 69.5L49 73ZM53.5 73L52.5 69.5L51 73Z" fill="#fff6f0" stroke="none"/><path d="M46.5 57h7l-3.5 3.5z" fill="#d8ffe9" stroke="none"/>',
+      det: "M30 18l6 9M70 18l-6 9M37 42l9 5M63 42l-9 5M50 50v6M50 80v26M40 92h20" }
   ];
   function monarchFigure(m, still) {
     var id = "m" + (++figN), gold = m.c1 || "#ffd166", vio = m.c2 || "#a855f7";

@@ -196,3 +196,8 @@
 .mx-c-pl b { color: var(--ink); font-weight: 400; }
 .mx-c-pl button { appearance: none; background: transparent; border: 1px solid var(--line-soft); color: var(--red-soft); font-family: inherit; font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase; padding: 5px 8px; }
 .mx-c-pl-empty { font-family: "Share Tech Mono", monospace; font-size: 10px; letter-spacing: 0.12em; color: var(--ink-faint); text-transform: uppercase; }
+
+/* Hunter portrait (hunter.js): the shadow knight above the status window */
+.mx-hunter { display: flex; flex-direction: column; align-items: center; margin: 4px auto 6px; }
+.mx-hunter-cv { width: 100%; max-width: 300px; aspect-ratio: 300 / 250; display: block; cursor: pointer; image-rendering: pixelated; -webkit-tap-highlight-color: transparent; }
+.mx-hunter-hint { font-size: 10px; letter-spacing: 0.22em; text-transform: uppercase; opacity: 0.45; margin-top: -6px; }
