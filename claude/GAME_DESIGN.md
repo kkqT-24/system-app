@@ -182,3 +182,13 @@ playing it yourself.
 ### Open
 - Exact skill list and evolutions · monster roster by role · which sprite pack ·
   how many shadows on screen before it gets messy · keyed-gate boss list (incl. friends).
+
+## Round 8 (Oct 15, 2026): rewards rethink, Kingdom Rush-style roguelike TD
+- The survivors-like prototype wasn't polished enough to want to play. New direction, not built yet:
+  a Kingdom Rush-style roguelike tower defense (fixed roads, build spots hold shadow squads, the Hunter as the hero).
+- Posts hold a squad type, capped by how many shadows of that role you've extracted; extras are reserves that reform fallen units. Cap visible units per post.
+- Tower floors with infinite scaling; floors scale a little faster than you, so there's always a wall. Early floors simple and low reward.
+- Idle expeditions as a secondary mode: send a squad, come back to loot and an ARISE roll on the boss (random stats, chance at a stronger variant). Random stats matter in the idle mode only; one shared army across modes.
+- A few small app upgrades as real rank rises.
+- Art: Muse's pixel shadow knight is archived in `game/shadow-knight/`. For now the Hunter uses a line-art placeholder (`hunterFigure()` in v2.js, `window.MXHunterFigure`), and the existing line-art shadows stay as placeholders.
+- Asset-pack candidate for enemies and maps: Free Game Assets (CraftPix) Tower Defense bundle on itch.io.

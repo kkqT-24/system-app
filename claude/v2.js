@@ -186,6 +186,30 @@
       '<ellipse cx="50" cy="109" rx="30" ry="3" fill="#000" opacity="0.8"/>' +
       motes + '</svg>';
   }
+  /* ---------------- THE HUNTER (placeholder) ----------------
+     Kent's own figure, drawn in the same line style as the shadows: spiky
+     hair, long coat, twin daggers in a reverse grip. Stand-in until the game
+     art is settled (the pixel shadow knight is archived in game/shadow-knight/). */
+  var HUNTER_C = "#9ad0ff";
+  var HUNTER_BODY = "<path d=\"M34 42Q50 35 66 42L78 108H59L55.5 78H44.5L41 108H22Z\"/><path d=\"M37 41L43 34H57L63 41L50 48Z\"/><path d=\"M34 44L25 71L30 73L39 48ZM66 44L75 71L70 73L61 48Z\"/><path class=\"wpn\" d=\"M26 71L11 91L14 93.4L30 73.4ZM74 71L89 91L86 93.4L70 73.4Z\"/><path d=\"M23 69.5l9 4.5-1.4 2.4-9-4.5zM77 69.5l-9 4.5 1.4 2.4 9-4.5z\"/><path d=\"M42 19Q50 14 58 19L57.5 30L50 36L42.5 30Z\"/><path d=\"M40 24L34 16L41 17L38 8L46 13L50 4L53 13L61 7L59 16L66 15L60 23L58 19Q50 14 42 19Z\"/>";
+  var HUNTER_DET = "M50 48v28M43 58h14M42 64h16M38 74l-5 30M62 74l5 30M40 50q-2 8 1 14M60 50q2 8-1 14M44 34l6 6 6-6M15 89l12-15M85 89l-12-15M46 32l4 2 4-2";
+  function hunterFigure(still) {
+    var c = HUNTER_C, id = "h" + (++figN), flames = "";
+    for (var i = 0; i < 7; i++) {
+      var x = 22 + i * 9.3, hh = 34 + (i % 3) * 12 + (i === 3 ? 18 : 0);
+      flames += '<path class="fl" style="animation-delay:-' + (i * 0.37).toFixed(2) + 's;transform-origin:' + x + 'px 108px" d="M' + (x - 9) + ' 108 Q' + (x - 6) + ' ' + (108 - hh * 0.6) + ' ' + x + ' ' + (108 - hh) + ' Q' + (x + 6) + ' ' + (108 - hh * 0.6) + ' ' + (x + 9) + ' 108Z" fill="url(#' + id + 'f)"/>';
+    }
+    return '<svg class="mx-sh-fig cls-hunter' + (still ? " still" : "") + '" viewBox="0 0 100 112" aria-hidden="true" style="--tc:' + c + '">' +
+      '<defs><linearGradient id="' + id + 'f" x1="0" y1="1" x2="0" y2="0"><stop offset="0" stop-color="' + c + '" stop-opacity="0.7"/><stop offset="0.45" stop-color="#14204a" stop-opacity="0.55"/><stop offset="1" stop-color="#05010d" stop-opacity="0"/></linearGradient>' +
+      '<radialGradient id="' + id + 'g" cx="50%" cy="62%" r="50%"><stop offset="0" stop-color="' + c + '" stop-opacity="0.3"/><stop offset="1" stop-color="' + c + '" stop-opacity="0"/></radialGradient></defs>' +
+      '<ellipse cx="50" cy="66" rx="48" ry="44" fill="url(#' + id + 'g)"/>' +
+      '<g class="aura">' + flames + '</g>' +
+      '<g class="body" fill="#020007" stroke="' + c + '" stroke-opacity="0.85" stroke-width="0.7" stroke-linejoin="round">' + HUNTER_BODY + '</g>' +
+      '<path class="det" d="' + HUNTER_DET + '" fill="none" stroke="' + c + '" stroke-width="0.55" stroke-linecap="round" stroke-linejoin="round"/>' +
+      '<g class="eyes" fill="#e8f4ff"><ellipse cx="45.5" cy="25.5" rx="2.6" ry="0.9"/><ellipse cx="54.5" cy="25.5" rx="2.6" ry="0.9"/></g>' +
+      '<ellipse cx="50" cy="109" rx="30" ry="3" fill="#000" opacity="0.8"/></svg>';
+  }
+  window.MXHunterFigure = hunterFigure;
   /* ---------------- MONARCH'S GUARD: four legendary shadows ----------------
      Not rolled at random — each answers only when you earn it. */
   var MONARCHS = [
