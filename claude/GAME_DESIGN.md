@@ -88,3 +88,17 @@ distinct evolved looks, cool effects and skins. No 3D needed for the game.
   A crimson knight → S Monarch form); each rank unlocks a Hunter skill. **Gear slots:** weapon,
   armor, accessory — loot with rarity (common → legendary), changes the Hunter's die faces and
   passives, visible on the sprite.
+
+## Scaling (round 4)
+- **Squad grows with real level:** start with 3 dice (Hunter + starter Knight + 1 generic soldier
+  die); +1 shadow slot at Lv 10 / 20 / 30 → max 6 dice (Hunter + 5).
+- **Lanes grow with gate rank:** E = 1 lane (pure Dicero), D–C = 2 lanes, B and up = 3 lanes.
+- **The Hunter roams:** not tied to a lane; can target any lane each turn.
+- **Threat budget per wave** = gate-rank base + wave × growth, spent on monster types. Keyed
+  gates are fixed by rank (getting stronger *feels* stronger); Training Grounds auto-scales to
+  your squad power.
+- **Monster roles force class choices:** Shielded (front armour — needs pierce/knockback),
+  Swarm (many weak — splash/sweep), Brute (huge HP — Berserker/Assassin), Flier (skips the front
+  line, lands on the gate — Archer/Lancer), Lane-jumper (switches lanes), Shaman (heals others
+  from the back — Archer pierce/Assassin). Waves surge unevenly so you redistribute dice.
+- Combo multiplier is global (applies to every die that turn).
