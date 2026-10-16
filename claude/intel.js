@@ -321,9 +321,32 @@
     var fresh = isFresh();
     return CARDS.filter(function (c) {
       if (c === "trending") return fresh && (brief.trending.stocks.length + brief.trending.tech.length + brief.trending.world.length > 0);
+      if (c === "catalyst") return catalystCard();
       if (c === "gbot") return fresh && (brief.gbot.items.length + brief.gbot.sports.length > 0);
       return true;
     });
+  }
+  /* Catalyst only gets its own card on days it has something: a release
+     today, or Sunday's week-ahead. Otherwise the outlook and the next
+     few events fold into the Market card. */
+  function todaysReleases(today) {
+    var cat = isFresh() ? brief.catalyst : null;
+    if (cat && cat.today.length) return cat.today;
+    return econ.filter(function (e) { return e.date === today; }).map(function (e) { return { name: e.name, time: e.time, actual: "", expected: "", previous: "", read: "" }; });
+  }
+  function weekAhead(today) {
+    var cat = isFresh() ? brief.catalyst : null, horizon = addDays(today, 7), wk = [];
+    (cat ? cat.week : []).forEach(function (w) { if (w.date > today && w.date <= horizon) wk.push(w); });
+    econ.forEach(function (e) {
+      if (e.date > today && e.date <= horizon && !wk.some(function (w) { return w.date === e.date && w.name.toLowerCase().indexOf(e.name.split(" ")[0].toLowerCase()) >= 0; })) wk.push({ date: e.date, time: e.time, name: e.name, why: "" });
+    });
+    wk.sort(function (a, b) { return (a.date + (a.time || "99")).localeCompare(b.date + (b.time || "99")); });
+    return wk;
+  }
+  function catalystCard() {
+    var today = dayKey(new Date());
+    if (todaysReleases(today).length) return true;
+    return parseDay(today).getDay() === 0 && isFresh() && brief.catalyst.week.length > 0;
   }
   function nextEvent(today) {
     var list = econ.filter(function (e) { return e.date >= today; });
@@ -725,6 +748,8 @@
 
   function cardShell(kind, title, kicker) {
     var c = el("div", "ib-card k-" + kind);
+    var pos = list.indexOf(kind);
+    if (pos >= 0) kicker = kicker.replace(/^\d+/, pad(pos + 1));
     var h = el("div", "ib-ch");
     h.appendChild(el("span", "ib-kick", kicker));
     h.appendChild(el("h2", "ib-title", title));
@@ -778,12 +803,26 @@
         if (brief.market.headline) rd.appendChild(el("div", "ib-hl", brief.market.headline));
         if (brief.market.note) rd.appendChild(el("p", "ib-p", brief.market.note));
       }
+      if (list.indexOf("catalyst") < 0) {
+        var up = weekAhead(today).slice(0, 3), olk = fresh ? brief.catalyst.outlook : "";
+        if (olk || up.length) {
+          var us = sect(c, "On deck");
+          if (olk) us.appendChild(el("p", "ib-p", olk));
+          up.forEach(function (w) {
+            var r = el("div", "ib-wk");
+            r.appendChild(el("span", "d", shortDate(parseDay(w.date))));
+            var b = el("span", "b"); b.appendChild(el("span", "n", w.name + (w.time ? " · " + clock24(w.time) : ""))); if (w.why) b.appendChild(el("span", "w", w.why));
+            r.appendChild(b); us.appendChild(r);
+          });
+          if (!up.length) { var nx = nextEvent(addDays(today, 1)); if (nx) us.appendChild(el("p", "ib-p dim", "Next up: " + nx.name + ", " + shortDate(parseDay(nx.date)) + ".")); }
+        }
+      }
       c.appendChild(callPanel(now, today));
     } else if (kind === "catalyst") {
       c = cardShell("catalyst", "Catalyst", "02 · What moves it");
       var cat = fresh ? brief.catalyst : null;
       if (cat && cat.outlook) { var ol = sect(c, "Outlook"); ol.appendChild(el("p", "ib-p", cat.outlook)); }
-      var todays = cat && cat.today.length ? cat.today : econ.filter(function (e) { return e.date === today; }).map(function (e) { return { name: e.name, time: e.time, actual: "", expected: "", previous: "", read: "" }; });
+      var todays = todaysReleases(today);
       if (todays.length) {
         var ts = sect(c, "Today");
         todays.forEach(function (e) {
@@ -801,13 +840,7 @@
           ts.appendChild(r);
         });
       }
-      var horizon = addDays(today, 7), wk = [];
-      var botWeek = cat ? cat.week : [];
-      botWeek.forEach(function (w) { if (w.date > today && w.date <= horizon) wk.push(w); });
-      econ.forEach(function (e) {
-        if (e.date > today && e.date <= horizon && !wk.some(function (w) { return w.date === e.date && w.name.toLowerCase().indexOf(e.name.split(" ")[0].toLowerCase()) >= 0; })) wk.push({ date: e.date, time: e.time, name: e.name, why: "" });
-      });
-      wk.sort(function (a, b) { return (a.date + (a.time || "99")).localeCompare(b.date + (b.time || "99")); });
+      var wk = weekAhead(today);
       var ws = sect(c, "Week ahead");
       if (wk.length) wk.forEach(function (w) {
         var r = el("div", "ib-wk");
