@@ -110,6 +110,45 @@ def quote(row):
     return None
 
 
+def lev200():
+    """LEV200 v2b: QLD when QQQ closes >1% above its 200-day SMA, T-bills when
+    >1% below, otherwise hold the last state. Computed from two years of
+    QQQ daily closes. 'live' is where today stands if it closed right now."""
+    d = json.loads(get("https://query1.finance.yahoo.com/v8/finance/chart/QQQ?range=2y&interval=1d"))
+    res = d["chart"]["result"][0]
+    ts, cl = res["timestamp"], res["indicators"]["quote"][0]["close"]
+    bars = [(ny_day(ts[i]), float(cl[i])) for i in range(len(ts)) if cl[i] is not None]
+    now = datetime.now(NY)
+    today = now.strftime("%Y-%m-%d")
+    live_px = float(res["meta"]["regularMarketPrice"])
+    in_session = bars and bars[-1][0] == today and (now.hour, now.minute) < (16, 0)
+    done = bars[:-1] if in_session else bars
+    if len(done) < 260:
+        raise ValueError("not enough history")
+    state, since, flips = None, None, []
+    closes = [c for _, c in done]
+    for i in range(199, len(done)):
+        sma = sum(closes[i - 199:i + 1]) / 200
+        c = closes[i]
+        new = state
+        if c > sma * 1.01: new = "ON"
+        elif c < sma * 0.99: new = "OFF"
+        elif state is None: new = "ON" if c >= sma else "OFF"
+        if new != state:
+            if state is not None: flips.append({"date": done[i][0], "to": new})
+            state, since = new, done[i][0]
+    sma = sum(closes[-200:]) / 200
+    last_day, last = done[-1]
+    out = {"date": last_day, "state": state, "since": since, "qqq_close": round(last, 2), "sma200": round(sma, 2),
+           "pct_vs_sma": round((last / sma - 1) * 100, 2), "upper": round(sma * 1.01, 2), "lower": round(sma * 0.99, 2),
+           "flips": flips[-6:]}
+    lsma = (sum(closes[-199:]) + live_px) / 200
+    lstate = "ON" if live_px > lsma * 1.01 else "OFF" if live_px < lsma * 0.99 else state
+    out["live"] = {"price": round(live_px, 2), "sma200": round(lsma, 2), "pct_vs_sma": round((live_px / lsma - 1) * 100, 2),
+                   "state_if_closed": lstate, "in_session": bool(in_session)}
+    return out
+
+
 def earnings():
     if not FINNHUB:
         return []
@@ -139,10 +178,15 @@ def main():
         print("no quotes from any source; keeping the old file", file=sys.stderr)
         return
     ern = earnings() if FINNHUB else old.get("earnings", [])
+    try:
+        lev = lev200()
+    except Exception as e:  # noqa: BLE001 - keep the last good read
+        print("  lev200 failed: %s" % e, file=sys.stderr)
+        lev = old.get("lev200")
     data = {"version": 1, "updated": datetime.now(timezone.utc).isoformat(timespec="seconds"),
-            "quotes": quotes, "earnings": ern}
+            "quotes": quotes, "earnings": ern, "lev200": lev}
     # skip the write (and so the commit) when nothing but the timestamp moved
-    if old and old.get("quotes") == quotes and old.get("earnings") == ern:
+    if old and old.get("quotes") == quotes and old.get("earnings") == ern and old.get("lev200") == lev:
         print("unchanged")
         return
     os.makedirs(os.path.dirname(OUT), exist_ok=True)

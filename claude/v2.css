@@ -197,3 +197,5 @@
 .mx-c-pl button { appearance: none; background: transparent; border: 1px solid var(--line-soft); color: var(--red-soft); font-family: inherit; font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase; padding: 5px 8px; }
 .mx-c-pl-empty { font-family: "Share Tech Mono", monospace; font-size: 10px; letter-spacing: 0.12em; color: var(--ink-faint); text-transform: uppercase; }
 
+.mx-c-cloud-state { font-weight: 400; color: #34d399; letter-spacing: 0.12em; }
+.mx-c-cloud-state.bad { color: #fbbf24; }

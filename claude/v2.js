@@ -946,6 +946,7 @@
     var now = Date.now(), mainEl = document.getElementById("main");
     if (!mainEl || mainEl.classList.contains("is-hidden") || document.hidden || $(".mx-backup") || document.querySelector(".mx-arise")) return;
     if ((D.backupSnooze || 0) > now) return;
+    if (cloud().token && !cloud().err) return;
     if (now - (D.lastBackup || D.firstOpen || now) < WEEK) return;
     var b = el("div", "mx-backup", '<div class="mx-bk-k">System notice</div><div class="mx-bk-t">Back up your progress</div>' +
       '<div class="mx-bk-d">Copy your save code and paste it into Notes. If the app is ever deleted, Paste save brings everything back.</div>' +
@@ -956,6 +957,114 @@
     $(".go", b).addEventListener("click", function (e) { e.stopPropagation(); close(); copySave("Save copied — paste it into Notes. Next reminder in a week."); });
     $(".later", b).addEventListener("click", function (e) { e.stopPropagation(); D.backupSnooze = Date.now() + 864e5; save(); close(); });
   }
+
+  /* ---------------- cloud backup (secret GitHub gist) ----------------
+     One-time setup in Console: paste a GitHub token that only has the
+     "gist" permission. After that the whole save (quests, history,
+     shadows, briefing games) is written to a secret gist automatically
+     — whenever the app opens or closes, at most every few hours — and
+     Restore pulls it back onto any copy of the app. The token lives only
+     on this phone and is never part of the backup itself. */
+  var CLOUD_KEY = "systemApp.cloud", GIST_DESC = "System App backup (automatic)", GIST_FILE = "system-app-backup.json";
+  var CLOUD_EVERY = 3 * 3600e3;
+  function cloud() { try { return JSON.parse(localStorage.getItem(CLOUD_KEY) || "null") || {}; } catch (e) { return {}; } }
+  function setCloud(o) { try { localStorage.setItem(CLOUD_KEY, JSON.stringify(o)); } catch (e) {} }
+  function gh(method, path, token, body) {
+    return fetch("https://api.github.com" + path, {
+      method: method, headers: { "Authorization": "Bearer " + token, "Accept": "application/vnd.github+json", "X-GitHub-Api-Version": "2022-11-28", "Content-Type": "application/json" },
+      body: body ? JSON.stringify(body) : undefined, cache: "no-store"
+    }).then(function (r) { if (!r.ok) { var e = new Error("GitHub " + r.status); e.status = r.status; throw e; } return r.status === 204 ? null : r.json(); });
+  }
+  function payload() {
+    return JSON.stringify({ app: "system-app", at: new Date().toISOString(), v1: localStorage.getItem("systemApp.v1"), v2: localStorage.getItem(KEY), intel: localStorage.getItem("systemApp.intel") });
+  }
+  function findGist(token) {
+    return gh("GET", "/gists?per_page=100", token).then(function (list) {
+      var g = (list || []).filter(function (x) { return x.description === GIST_DESC && x.files && x.files[GIST_FILE]; })[0];
+      return g ? g.id : null;
+    });
+  }
+  var cloudBusy = false;
+  function cloudBackup(force) {
+    var c = cloud();
+    if (!c.token || cloudBusy) return Promise.resolve(false);
+    if (!force && c.last && Date.now() - c.last < CLOUD_EVERY) return Promise.resolve(false);
+    cloudBusy = true;
+    var body = { description: GIST_DESC, files: {} }; body.files[GIST_FILE] = { content: payload() };
+    var go = c.gist ? gh("PATCH", "/gists/" + c.gist, c.token, body) : gh("POST", "/gists", c.token, { description: GIST_DESC, public: false, files: body.files });
+    return go.then(function (g) {
+      c = cloud(); c.gist = g.id; c.last = Date.now(); c.err = ""; setCloud(c);
+      D.lastBackup = Date.now(); save();
+      cloudBusy = false; paintCloud(); return true;
+    }, function (e) {
+      cloudBusy = false;
+      c = cloud();
+      if (e.status === 404 && c.gist) { delete c.gist; setCloud(c); return cloudBackup(true); }
+      c.err = e.status === 401 ? "Token expired or revoked" : "Last try failed (" + (e.message || "offline") + ")"; setCloud(c); paintCloud(); return false;
+    });
+  }
+  function cloudRestore() {
+    var c = cloud();
+    if (!c.token) { alert("Set up cloud backup first (paste the token), then Restore."); return; }
+    (c.gist ? Promise.resolve(c.gist) : findGist(c.token)).then(function (id) {
+      if (!id) throw new Error("No backup found on this GitHub account yet.");
+      return gh("GET", "/gists/" + id, c.token).then(function (g) {
+        var f = g.files[GIST_FILE];
+        if (!f) throw new Error("Backup file missing.");
+        return (f.truncated ? fetch(f.raw_url).then(function (r) { return r.text(); }) : Promise.resolve(f.content)).then(function (txt) { return { id: id, data: JSON.parse(txt) }; });
+      });
+    }).then(function (r) {
+      var o = r.data, when = o.at ? new Date(o.at).toLocaleString() : "unknown time";
+      if (!confirm("Restore the cloud backup from " + when + "? This replaces the progress in this copy of the app.")) return;
+      if (o.v1) localStorage.setItem("systemApp.v1", o.v1);
+      if (o.v2) localStorage.setItem(KEY, o.v2);
+      if (o.intel) localStorage.setItem("systemApp.intel", o.intel);
+      var c2 = cloud(); c2.gist = r.id; c2.last = Date.now(); setCloud(c2);
+      alert("Restored. Reloading.");
+      location.reload();
+    }).catch(function (e) { alert("Restore failed: " + (e.message || e)); });
+  }
+  function cloudSetup() {
+    var t = prompt("Paste your GitHub token (classic, with only the \"gist\" box ticked). It stays on this phone.");
+    if (!t) return;
+    t = t.trim();
+    gh("GET", "/user", t).then(function () { return findGist(t); }).then(function (id) {
+      var c = cloud(); c.token = t; if (id) c.gist = id; c.err = ""; setCloud(c);
+      return cloudBackup(true);
+    }).then(function (ok) { paintCloud(); alert(ok ? "Cloud backup is on. It saves on its own from now on." : "Token saved, but the first backup didn't go through. It'll retry next time you open the app."); })
+      .catch(function (e) { alert("That token didn't work (" + (e.message || e) + "). Make sure it has the gist permission."); });
+  }
+  var cloudRow = null;
+  function ago(ms) { var m = Math.round(ms / 60000); return m < 1 ? "just now" : m < 60 ? m + "m ago" : m < 1440 ? Math.round(m / 60) + "h ago" : Math.round(m / 1440) + "d ago"; }
+  function paintCloud() {
+    if (!cloudRow) return;
+    var c = cloud(), k = $(".mx-c-cloud-state", cloudRow), a = $(".mx-c-cloud-go", cloudRow);
+    k.textContent = !c.token ? "Off" : c.err ? c.err : c.last ? "On · saved " + ago(Date.now() - c.last) : "On";
+    k.classList.toggle("bad", !!(c.token && c.err));
+    a.textContent = c.token ? "Back up now" : "Set up";
+  }
+  function addCloudRow() {
+    var card = $(".mx-console .mx-c-card");
+    if (!card) return false;
+    if (card.__cloud) return true;
+    card.__cloud = true;
+    cloudRow = el("div", "mx-c-row col", '<span class="mx-c-k">Cloud backup <em>(automatic, to a secret GitHub gist)</em> · <b class="mx-c-cloud-state"></b></span><div class="mx-c-tests"><button type="button" class="mx-c-cloud-go"></button><button type="button" class="mx-c-cloud-restore">Restore</button></div>');
+    var note = $(".mx-c-note", card);
+    card.insertBefore(cloudRow, note);
+    $(".mx-c-cloud-go", cloudRow).addEventListener("click", function (e) { e.stopPropagation(); if (cloud().token) cloudBackup(true).then(function (ok) { if (!ok) alert(cloud().err || "Backup didn't go through."); }); else cloudSetup(); });
+    $(".mx-c-cloud-restore", cloudRow).addEventListener("click", function (e) { e.stopPropagation(); cloudRestore(); });
+    paintCloud();
+    return true;
+  }
+  if (!addCloudRow()) { var ctries = 0, civ = setInterval(function () { if (addCloudRow() || ++ctries > 40) clearInterval(civ); }, 250); }
+  setTimeout(function () { cloudBackup(false); }, 8000);
+  document.addEventListener("visibilitychange", function () {
+    var c = cloud();
+    /* leaving the app: save if it's been an hour; coming back: the normal cadence */
+    if (document.hidden) { if (c.token && (!c.last || Date.now() - c.last > 3600e3)) cloudBackup(true); }
+    else { cloudBackup(false); paintCloud(); }
+  });
+
   setTimeout(checkBackup, 6000);
   setInterval(checkBackup, 60000);
 

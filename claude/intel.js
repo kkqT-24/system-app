@@ -329,7 +329,7 @@
   }
 
   /* ---------------- preview box ---------------- */
-  var CARDS = ["market", "trending", "gbot", "mind"];
+  var CARDS = ["week", "market", "trending", "gbot", "mind"];
   var GROK_URL = "https://grok.com";
   /* fresh = written within the last 14 hours (a 12 AM trending update
      still counts for the day it belongs to) */
@@ -349,6 +349,7 @@
   function activeCards() {
     var fresh = isFresh();
     return CARDS.filter(function (c) {
+      if (c === "week") return new Date().getDay() === 0;
       if (c === "trending") return fresh && (brief.trending.stocks.length + brief.trending.tech.length + brief.trending.world.length > 0);
       if (c === "gbot") return fresh && (brief.gbot.items.length + brief.gbot.sports.length > 0);
       return true;
@@ -971,10 +972,80 @@
     return s;
   }
 
+
+  /* ---------------- Sunday: Week in Review ----------------
+     Monday through today from the app's own logs (quests, EXP, workouts,
+     level/rank-ups, shadows), the briefing games, and the two systems. */
+  function weekStats(today) {
+    var t = parseDay(today), back = (t.getDay() + 6) % 7, start = dayKey(new Date(t.getFullYear(), t.getMonth(), t.getDate() - back));
+    var inWk = function (k) { return k >= start && k <= today; };
+    var v2 = {}; try { v2 = JSON.parse(localStorage.getItem("systemApp.v2") || "{}") || {}; } catch (e) {}
+    var hist = Array.isArray(v2.history) ? v2.history : [];
+    var w = { start: start, end: today, exp: 0, quests: 0, levels: 0, ranks: [], shadows: 0, workouts: 0, days: {} };
+    hist.forEach(function (h) {
+      if (!h || !h.t) return;
+      var k = dayKey(new Date(h.t)); if (!inWk(k)) return;
+      if (h.type === "quest" && !h.undone) { w.quests++; w.exp += +h.exp || 0; w.days[k] = (w.days[k] || 0) + 1; }
+      else if (h.type === "level") w.levels++;
+      else if (h.type === "rank") w.ranks.push(h.rank);
+      else if (h.type === "shadow") w.shadows++;
+    });
+    Object.keys(v2.workoutDays || {}).forEach(function (k) { if (inWk(k)) w.workouts++; });
+    var cw = 0, cl = 0; Object.keys(C.calls).forEach(function (k) { var c = C.calls[k]; if (inWk(k) && c && c.result === "win") cw++; else if (inWk(k) && c && c.result === "loss") cl++; });
+    w.calls = [cw, cl];
+    var ft = 0, fo = 0; Object.keys(C.ff).forEach(function (k) { if (inWk(k) && C.ff[k]) { ft++; if (C.ff[k].right) fo++; } });
+    w.ff = [fo, ft];
+    w.words = C.words.filter(function (x) { return inWk(x.date); }).map(function (x) { return x.word; });
+    var nz = C.desk && C.desk.noise, nd = nz ? (nz.days || []).filter(function (d) { return inWk(d.date); }) : [];
+    w.noise = nd.length ? { ret: (nd.reduce(function (m, d) { return m * (1 + (d.ret_pct || 0) / 100); }, 1) - 1) * 100, traded: nd.filter(function (d) { return d.traded; }).length, n: nd.length } : null;
+    return w;
+  }
+  function countUp(node, to, fmt) {
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches || !to) { node.textContent = fmt(to); return; }
+    var t0 = performance.now(), D = 900;
+    (function f(t) { var p = Math.min(1, (t - t0) / D), e = 1 - Math.pow(1 - p, 3); node.textContent = fmt(to * e); if (p < 1 && node.isConnected) requestAnimationFrame(f); else node.textContent = fmt(to); })(t0);
+  }
+  function weekCard(today) {
+    var w = weekStats(today), c = cardShell("week", "Week in Review", "01 · Sunday report");
+    var s0 = parseDay(w.start), s1 = parseDay(w.end);
+    c.appendChild(el("div", "ib-wkrange", MON[s0.getMonth()] + " " + s0.getDate() + " – " + MON[s1.getMonth()] + " " + s1.getDate()));
+    /* hero: EXP */
+    var hero = el("div", "ib-wkhero"); var ev = el("b"); hero.appendChild(ev); hero.appendChild(el("span", null, "EXP gained this week"));
+    c.appendChild(hero); countUp(ev, w.exp, function (v) { return "+" + Math.round(v); });
+    /* activity strip, Mon..Sun */
+    var strip = el("div", "ib-wkstrip"), mx = 1;
+    for (var i = 0; i < 7; i++) { var k = dayKey(new Date(s0.getFullYear(), s0.getMonth(), s0.getDate() + i)); mx = Math.max(mx, w.days[k] || 0); }
+    for (var j = 0; j < 7; j++) {
+      var d = new Date(s0.getFullYear(), s0.getMonth(), s0.getDate() + j), k2 = dayKey(d), n = w.days[k2] || 0;
+      var col = el("span", "col" + (k2 > today ? " future" : ""));
+      var bar = el("i"); bar.style.height = (n ? Math.max(12, n / mx * 100) : 4) + "%"; bar.style.animationDelay = (j * 60) + "ms";
+      col.appendChild(bar); col.appendChild(el("em", null, "MTWTFSS"[j])); strip.appendChild(col);
+    }
+    c.appendChild(strip);
+    function grid(label, cells) {
+      var sx = sect(c, label), g = el("div", "ib-wkgrid");
+      cells.forEach(function (x) { var cell = el("div", "cell" + (x[2] ? " " + x[2] : "")); var b = el("b"); cell.appendChild(b); cell.appendChild(el("span", null, x[0])); g.appendChild(cell); if (typeof x[1] === "number") countUp(b, x[1], function (v) { return String(Math.round(v)); }); else b.textContent = x[1]; });
+      sx.appendChild(g); return sx;
+    }
+    grid("Hunter", [["Quests", w.quests], ["Workout days", w.workouts], ["Level-ups", w.levels], ["Shadows", w.shadows]]);
+    if (w.ranks.length) c.lastChild.appendChild(el("p", "ib-p dim", "Ranked up to " + w.ranks[w.ranks.length - 1] + " this week."));
+    var rk = rankFor(mindPoints()).r;
+    grid("Briefing", [["SPY calls", w.calls[0] + "–" + w.calls[1], w.calls[0] > w.calls[1] ? "up" : w.calls[1] > w.calls[0] ? "dn" : ""], ["Fact or Fiction", w.ff[0] + "/" + w.ff[1]], ["New words", w.words.length], ["Fact Hunter", rk[0] + "-Rank"]]);
+    if (w.words.length) c.lastChild.appendChild(el("p", "ib-p dim", w.words.join(" · ")));
+    var mk = C.market && C.market.lev200;
+    var cells = [];
+    if (mk) cells.push(["LEV200", mk.state === "ON" ? "ON · QLD" : "OFF", mk.state === "ON" ? "up" : ""], ["QQQ vs 200-day", sgn(mk.pct_vs_sma, 1), mk.pct_vs_sma >= 0 ? "up" : "dn"]);
+    if (w.noise) cells.push(["NOISE week", sgn(w.noise.ret), w.noise.ret >= 0 ? "up" : "dn"], ["NOISE traded", w.noise.traded + " of " + w.noise.n]);
+    if (cells.length) grid("Systems", cells);
+    return c;
+  }
+
   function renderCard(kind) {
     var now = new Date(), today = dayKey(now), fresh = isFresh();
     var c;
-    if (kind === "market") {
+    if (kind === "week") {
+      c = weekCard(today);
+    } else if (kind === "market") {
       c = cardShell("market", "Market", "01 · Your read");
       var ml = marketLine(now);
       c.appendChild(el("div", "ib-mstat " + ml.s, ml.t));
@@ -1514,15 +1585,104 @@
     var jobs = [
       repoJSON("market.json").then(function (d) { if (cleanMarket(d)) C.market = d; }),
       repoJSON("brief.json").then(function (d) { var cb = cleanBrief(d); if (cb) { C.brief = d; if (cb.edition !== "trending") C.full = d; } }),
-      repoJSON("econ.json").then(function (d) { if (d && Array.isArray(d.events)) C.econ = d; })
+      repoJSON("econ.json").then(function (d) { if (d && Array.isArray(d.events)) C.econ = d; }),
+      repoJSON("desk.json").then(function (d) { if (d && d.noise) C.desk = d; })
     ];
     Promise.all(jobs.map(function (p) { return p.catch(function () {}); })).then(function () {
-      loading = false; hydrate(); scoreCalls(); save(); renderBox(); refreshCard();
+      loading = false; hydrate(); scoreCalls(); save(); renderBox(); refreshCard(); renderSystems();
     });
   }
   window.__briefing = { open: open, load: load };
 
-  hydrate(); scoreCalls(); renderBox(); renderSky();
+
+  /* ---------------- Systems box: LEV200 + NOISE BOT ----------------
+     LEV200 comes from the market job (QQQ vs its 200-day line, live
+     through the session) and is cross-checked against the Mac's own
+     signal script (via the Trading Desk) once that has run for the day.
+     NOISE comes from the Trading Desk's 4:45 refresh, percentages only. */
+  var DESK_URL = "https://claude.ai/artifact/X2M1Z3DAPcH5gBRC8dX4hM";
+  var sysBox = document.getElementById("sysBox");
+  function dayDiff(a, b) { return Math.round((parseDay(b) - parseDay(a)) / 864e5); }
+  function sgn(v, dp) { return (v > 0 ? "+" : v < 0 ? "−" : "") + Math.abs(v).toFixed(dp == null ? 2 : dp) + "%"; }
+  function renderSystems() {
+    if (!sysBox) return;
+    var mk = C.market && C.market.lev200, dk = C.desk || null, now = new Date(), p = ny(now);
+    var L = sysBox.querySelector(".sx-lev"), N = sysBox.querySelector(".sx-noise"), F = sysBox.querySelector(".sx-foot");
+    L.textContent = ""; N.textContent = ""; F.textContent = "";
+    /* ---- LEV200 ---- */
+    L.appendChild(el("span", "sx-k", "LEV200"));
+    var official = dk && dk.lev200 && dk.lev200.state ? dk.lev200 : null;
+    var state = mk ? mk.state : official ? official.state : null;
+    if (official && mk && official.date >= mk.date) state = official.state;
+    var live = mk && mk.live && mk.live.in_session && isSession(p.key) && p.min >= 570 && p.min < 960;
+    var pv = live ? mk.live.pct_vs_sma : mk ? mk.pct_vs_sma : official ? official.pct_vs_sma : null;
+    if (!state) { L.appendChild(el("span", "sx-big", "—")); L.appendChild(el("span", "sx-sub", "Waiting on data")); }
+    else {
+      var pill = el("span", "sx-pill " + (state === "ON" ? "on" : "off"), state === "ON" ? "ON · QLD" : "OFF · T-bills");
+      L.appendChild(pill);
+      if (pv != null) {
+        var big = el("span", "sx-big " + (pv >= 0 ? "up" : "dn"), sgn(pv, 1)); L.appendChild(big);
+        L.appendChild(el("span", "sx-sub", "QQQ vs 200-day" + (live ? " · live" : "")));
+      }
+      if (mk) {
+        /* the band: lower line, the 200-day, upper line, and where QQQ sits */
+        var px = live ? mk.live.price : mk.qqq_close, sma = live ? mk.live.sma200 : mk.sma200;
+        var flipAt = state === "ON" ? sma * 0.99 : sma * 1.01, away = (px / flipAt - 1) * 100;
+        var g = el("span", "sx-gauge"), lo = Math.min(-12, pv - 2), hi = Math.max(12, pv + 2);
+        function pos(v) { return ((v - lo) / (hi - lo) * 100).toFixed(1) + "%"; }
+        var band = el("i", "band"); band.style.left = pos(-1); band.style.width = (2 / (hi - lo) * 100).toFixed(1) + "%"; g.appendChild(band);
+        var mid = el("i", "mid"); mid.style.left = pos(0); g.appendChild(mid);
+        var dot = el("i", "dot " + (state === "ON" ? "on" : "off")); dot.style.left = pos(pv); g.appendChild(dot);
+        L.appendChild(g);
+        var warn = Math.abs(away) < 2;
+        L.appendChild(el("span", "sx-line" + (warn ? " warn" : ""), (warn ? "⚠ " : "") + "Flips " + (state === "ON" ? "OFF" : "ON") + " at " + money(flipAt) + " (" + Math.abs(away).toFixed(1) + "%)"));
+        if (mk.since) L.appendChild(el("span", "sx-mini", state + " since " + shortDate(parseDay(mk.since)).replace(/^\w+ · /, "") + " · " + dayDiff(mk.since, p.key) + "d"));
+        if (live && mk.live.state_if_closed !== state) L.appendChild(el("span", "sx-line warn", "⚠ Would flip " + mk.live.state_if_closed + " if it closed now"));
+      }
+      if (official && mk && official.date === mk.date && official.state !== mk.state) L.appendChild(el("span", "sx-line warn", "⚠ Mac signal says " + official.state + " — check the desk"));
+    }
+    /* ---- NOISE BOT ---- */
+    N.appendChild(el("span", "sx-k", "NOISE BOT"));
+    var nz = dk && dk.noise;
+    if (!nz) { N.appendChild(el("span", "sx-big", "—")); N.appendChild(el("span", "sx-sub", "Waiting on the desk")); }
+    else {
+      N.appendChild(el("span", "sx-pill paper", (nz.status || "Paper").replace(/ trading$/i, "")));
+      if (nz.since_start_pct != null) { N.appendChild(el("span", "sx-big " + (nz.since_start_pct >= 0 ? "up" : "dn"), sgn(nz.since_start_pct))); N.appendChild(el("span", "sx-sub", "Since start · " + nz.sessions + "d")); }
+      var strip = el("span", "sx-days");
+      var days = (nz.days || []).slice(-8);
+      var mx = Math.max(0.5, Math.max.apply(null, days.map(function (d) { return Math.abs(d.ret_pct || 0); })));
+      days.forEach(function (d) {
+        var b = el("i", !d.traded ? "sit" : d.ret_pct >= 0 ? "up" : "dn");
+        b.style.height = d.traded ? Math.max(14, Math.abs(d.ret_pct) / mx * 100).toFixed(0) + "%" : "10%";
+        b.title = d.date + (d.traded ? " " + sgn(d.ret_pct) : " sat out");
+        strip.appendChild(b);
+      });
+      N.appendChild(strip);
+      var last = days[days.length - 1];
+      var inSess = isSession(p.key) && p.min >= 570 && p.min < 1005 && (!last || last.date < p.key);
+      if (inSess) N.appendChild(el("span", "sx-line", p.min < 960 ? "In session · results 4:50" : "Results at 4:50"));
+      else if (last) N.appendChild(el("span", "sx-line", (last.date === p.key ? "Today " : shortDate(parseDay(last.date)).replace(/ · /, " ") + " ") + (last.traded ? sgn(last.ret_pct) : "· sat out")));
+      if (nz.dd_pct != null) {
+        var ddw = el("span", "sx-dd"), ddi = el("i"); ddi.style.width = Math.min(100, nz.dd_pct / (nz.stop_pct || 30) * 100).toFixed(1) + "%";
+        ddw.appendChild(ddi);
+        if (nz.review_pct && nz.stop_pct) { var rv = el("b"); rv.style.left = (nz.review_pct / nz.stop_pct * 100).toFixed(1) + "%"; ddw.appendChild(rv); }
+        N.appendChild(ddw);
+        N.appendChild(el("span", "sx-mini", "DD " + nz.dd_pct.toFixed(1) + "% · stop " + (nz.stop_pct || 30) + "%"));
+      }
+    }
+    /* foot: freshness */
+    var mt = C.market && Date.parse(C.market.updated), dt = dk && Date.parse(dk.updated);
+    F.appendChild(el("span", null, (mt ? "LEV200 " + clock(new Date(mt)) : "") + (dt ? (mt ? " · " : "") + "Desk " + shortDate(new Date(dt)).replace(/ · /, " ") : "")));
+    sysBox.classList.toggle("alert", !!sysBox.querySelector(".warn"));
+  }
+  if (sysBox) {
+    function openDesk() { buzz(8); window.location.href = DESK_URL; }
+    sysBox.addEventListener("click", openDesk);
+    sysBox.addEventListener("keydown", function (e) { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); openDesk(); } });
+  }
+  setInterval(function () { if (!document.hidden) renderSystems(); }, 60000);
+
+  hydrate(); scoreCalls(); renderBox(); renderSky(); renderSystems();
   if (box) {
     /* swipe the box left / right to step through the feed; a swipe
        never opens the briefing */
