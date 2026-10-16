@@ -502,7 +502,7 @@
       feedSig = sig; feed = items2;
       showFeed(0);
       if (feedTimer) clearInterval(feedTimer);
-      feedTimer = setInterval(feedTick, 7000);
+      feedTimer = setInterval(feedTick, 10000);
     }
     var pips = box.querySelector(".ib-pips"); pips.textContent = "";
     for (var i = 0; i < cards.length; i++) pips.appendChild(el("i", i < seen ? "on" : i === seen ? "next" : ""));

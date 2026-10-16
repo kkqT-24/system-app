@@ -1,8 +1,9 @@
 /* System v2 offline worker: the app shell is cached so it opens
    without a connection; the page itself is fetched fresh first
    (network-first) so updates show up on the next open. */
-var CACHE = "system-v2.12";
-var SHELL = ["./", "index.html", "motion.css", "quests.css", "v2.css", "polish.css", "intel.css", "motion.js", "bolts.js", "aura.js", "quests.js", "v2.js", "polish.js", "intel.js", "data/econ.json", "shadows3d.js",
+var CACHE = "system-v2.13";
+var V = "?v=2.13"; /* keep in step with the ?v= on the links in index.html */
+var SHELL = ["./", "index.html", "motion.css" + V, "quests.css" + V, "v2.css" + V, "polish.css" + V, "intel.css" + V, "motion.js" + V, "bolts.js" + V, "aura.js" + V, "quests.js" + V, "v2.js" + V, "polish.js" + V, "intel.js" + V, "data/econ.json", "shadows3d.js" + V,
   "manifest.webmanifest", "icon-512.png", "apple-touch-icon.png", "../x-logo.png"];
 self.addEventListener("install", function (e) {
   e.waitUntil(caches.open(CACHE).then(function (c) { return c.addAll(SHELL); }).then(function () { return self.skipWaiting(); }));
@@ -21,7 +22,9 @@ self.addEventListener("fetch", function (e) {
   var sameOrigin = url.origin === self.location.origin;
   /* pages and our own scripts/styles: network first, cache as fallback */
   if (sameOrigin && !/\.glb$/.test(url.pathname)) {
-    e.respondWith(fetch(req).then(function (res) {
+    /* no-cache = always ask the server (a cheap 304 when unchanged), so
+       GitHub Pages' 10-minute browser cache can't serve a stale build */
+    e.respondWith(fetch(req, { cache: "no-cache" }).then(function (res) {
       if (res && res.ok) { var copy = res.clone(); caches.open(CACHE).then(function (c) { c.put(req, copy); }); }
       return res;
     }).catch(function () { return caches.match(req).then(function (m) { return m || caches.match("index.html"); }); }));
