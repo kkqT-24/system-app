@@ -1595,91 +1595,244 @@
   window.__briefing = { open: open, load: load };
 
 
-  /* ---------------- Systems box: LEV200 + NOISE BOT ----------------
+  /* ---------------- Trading Desk module: LEV200 + NOISE BOT ----------------
      LEV200 comes from the market job (QQQ vs its 200-day line, live
-     through the session) and is cross-checked against the Mac's own
-     signal script (via the Trading Desk) once that has run for the day.
-     NOISE comes from the Trading Desk's 4:45 refresh, percentages only. */
+     through the session, with ~90 sessions of history and the ON/OFF
+     runs) and is cross-checked against the Mac's signal script via the
+     desk feed. NOISE comes from the Trading Desk's 4:45 refresh through
+     the 4:55 desk feed — percentages only. */
   var DESK_URL = "https://claude.ai/artifact/X2M1Z3DAPcH5gBRC8dX4hM";
-  var sysBox = document.getElementById("sysBox");
+  var deskRoot = document.getElementById("deskRoot"), deskTile = document.getElementById("deskTileState"), deskSec = document.getElementById("sec-desk");
   function dayDiff(a, b) { return Math.round((parseDay(b) - parseDay(a)) / 864e5); }
   function sgn(v, dp) { return (v > 0 ? "+" : v < 0 ? "−" : "") + Math.abs(v).toFixed(dp == null ? 2 : dp) + "%"; }
-  function renderSystems() {
-    if (!sysBox) return;
-    var mk = C.market && C.market.lev200, dk = C.desk || null, now = new Date(), p = ny(now);
-    var L = sysBox.querySelector(".sx-lev"), N = sysBox.querySelector(".sx-noise"), F = sysBox.querySelector(".sx-foot");
-    L.textContent = ""; N.textContent = ""; F.textContent = "";
-    /* ---- LEV200 ---- */
-    L.appendChild(el("span", "sx-k", "LEV200"));
-    var official = dk && dk.lev200 && dk.lev200.state ? dk.lev200 : null;
-    var state = mk ? mk.state : official ? official.state : null;
-    if (official && mk && official.date >= mk.date) state = official.state;
-    var live = mk && mk.live && mk.live.in_session && isSession(p.key) && p.min >= 570 && p.min < 960;
-    var pv = live ? mk.live.pct_vs_sma : mk ? mk.pct_vs_sma : official ? official.pct_vs_sma : null;
-    if (!state) { L.appendChild(el("span", "sx-big", "—")); L.appendChild(el("span", "sx-sub", "Waiting on data")); }
-    else {
-      var pill = el("span", "sx-pill " + (state === "ON" ? "on" : "off"), state === "ON" ? "ON · QLD" : "OFF · T-bills");
-      L.appendChild(pill);
-      if (pv != null) {
-        var big = el("span", "sx-big " + (pv >= 0 ? "up" : "dn"), sgn(pv, 1)); L.appendChild(big);
-        L.appendChild(el("span", "sx-sub", "QQQ vs 200-day" + (live ? " · live" : "")));
-      }
-      if (mk) {
-        /* the band: lower line, the 200-day, upper line, and where QQQ sits */
-        var px = live ? mk.live.price : mk.qqq_close, sma = live ? mk.live.sma200 : mk.sma200;
-        var flipAt = state === "ON" ? sma * 0.99 : sma * 1.01, away = (px / flipAt - 1) * 100;
-        var g = el("span", "sx-gauge"), lo = Math.min(-12, pv - 2), hi = Math.max(12, pv + 2);
-        function pos(v) { return ((v - lo) / (hi - lo) * 100).toFixed(1) + "%"; }
-        var band = el("i", "band"); band.style.left = pos(-1); band.style.width = (2 / (hi - lo) * 100).toFixed(1) + "%"; g.appendChild(band);
-        var mid = el("i", "mid"); mid.style.left = pos(0); g.appendChild(mid);
-        var dot = el("i", "dot " + (state === "ON" ? "on" : "off")); dot.style.left = pos(pv); g.appendChild(dot);
-        L.appendChild(g);
-        var warn = Math.abs(away) < 2;
-        L.appendChild(el("span", "sx-line" + (warn ? " warn" : ""), (warn ? "⚠ " : "") + "Flips " + (state === "ON" ? "OFF" : "ON") + " at " + money(flipAt) + " (" + Math.abs(away).toFixed(1) + "%)"));
-        if (mk.since) L.appendChild(el("span", "sx-mini", state + " since " + shortDate(parseDay(mk.since)).replace(/^\w+ · /, "") + " · " + dayDiff(mk.since, p.key) + "d"));
-        if (live && mk.live.state_if_closed !== state) L.appendChild(el("span", "sx-line warn", "⚠ Would flip " + mk.live.state_if_closed + " if it closed now"));
-      }
-      if (official && mk && official.date === mk.date && official.state !== mk.state) L.appendChild(el("span", "sx-line warn", "⚠ Mac signal says " + official.state + " — check the desk"));
+  function svgEl(tag, attrs) { var e = document.createElementNS("http://www.w3.org/2000/svg", tag); for (var k in attrs) e.setAttribute(k, attrs[k]); return e; }
+  function levNow() {
+    var mk = C.market && C.market.lev200, dk = C.desk && C.desk.lev200 && C.desk.lev200.state ? C.desk.lev200 : null, p = ny(new Date());
+    if (!mk && !dk) return null;
+    var live = !!(mk && mk.live && mk.live.in_session && isSession(p.key) && p.min >= 570 && p.min < 960);
+    var state = mk ? mk.state : dk.state;
+    if (dk && mk && dk.date >= mk.date) state = dk.state;
+    var pv = live ? mk.live.pct_vs_sma : mk ? mk.pct_vs_sma : dk.pct_vs_sma;
+    var r = { state: state, pv: pv, live: live, mk: mk, dk: dk };
+    if (mk) {
+      r.px = live ? mk.live.price : mk.qqq_close; r.sma = live ? mk.live.sma200 : mk.sma200;
+      r.flipAt = state === "ON" ? r.sma * 0.99 : r.sma * 1.01; r.away = (r.px / r.flipAt - 1) * 100;
+      r.days = mk.since ? dayDiff(mk.since, p.key) : null;
+      r.wouldFlip = live && mk.live.state_if_closed !== state ? mk.live.state_if_closed : null;
     }
-    /* ---- NOISE BOT ---- */
-    N.appendChild(el("span", "sx-k", "NOISE BOT"));
-    var nz = dk && dk.noise;
-    if (!nz) { N.appendChild(el("span", "sx-big", "—")); N.appendChild(el("span", "sx-sub", "Waiting on the desk")); }
-    else {
-      N.appendChild(el("span", "sx-pill paper", (nz.status || "Paper").replace(/ trading$/i, "")));
-      if (nz.since_start_pct != null) { N.appendChild(el("span", "sx-big " + (nz.since_start_pct >= 0 ? "up" : "dn"), sgn(nz.since_start_pct))); N.appendChild(el("span", "sx-sub", "Since start · " + nz.sessions + "d")); }
-      var strip = el("span", "sx-days");
-      var days = (nz.days || []).slice(-8);
-      var mx = Math.max(0.5, Math.max.apply(null, days.map(function (d) { return Math.abs(d.ret_pct || 0); })));
-      days.forEach(function (d) {
-        var b = el("i", !d.traded ? "sit" : d.ret_pct >= 0 ? "up" : "dn");
-        b.style.height = d.traded ? Math.max(14, Math.abs(d.ret_pct) / mx * 100).toFixed(0) + "%" : "10%";
-        b.title = d.date + (d.traded ? " " + sgn(d.ret_pct) : " sat out");
-        strip.appendChild(b);
-      });
-      N.appendChild(strip);
-      var last = days[days.length - 1];
-      var inSess = isSession(p.key) && p.min >= 570 && p.min < 1005 && (!last || last.date < p.key);
-      if (inSess) N.appendChild(el("span", "sx-line", p.min < 960 ? "In session · results 4:50" : "Results at 4:50"));
-      else if (last) N.appendChild(el("span", "sx-line", (last.date === p.key ? "Today " : shortDate(parseDay(last.date)).replace(/ · /, " ") + " ") + (last.traded ? sgn(last.ret_pct) : "· sat out")));
-      if (nz.dd_pct != null) {
-        var ddw = el("span", "sx-dd"), ddi = el("i"); ddi.style.width = Math.min(100, nz.dd_pct / (nz.stop_pct || 30) * 100).toFixed(1) + "%";
-        ddw.appendChild(ddi);
-        if (nz.review_pct && nz.stop_pct) { var rv = el("b"); rv.style.left = (nz.review_pct / nz.stop_pct * 100).toFixed(1) + "%"; ddw.appendChild(rv); }
-        N.appendChild(ddw);
-        N.appendChild(el("span", "sx-mini", "DD " + nz.dd_pct.toFixed(1) + "% · stop " + (nz.stop_pct || 30) + "%"));
-      }
+    r.disagree = !!(dk && mk && dk.date === mk.date && dk.state !== mk.state);
+    return r;
+  }
+  function renderDeskTile() {
+    if (!deskTile) return;
+    var L = levNow(), nz = C.desk && C.desk.noise, parts = [];
+    if (L) parts.push("LEV " + L.state);
+    if (nz && nz.since_start_pct != null) parts.push("NOISE " + sgn(nz.since_start_pct, 1));
+    deskTile.textContent = parts.length ? parts.join(" · ") : "LEV200 · NOISE";
+    var tile = deskTile.closest(".tab-tile");
+    if (tile) tile.classList.toggle("dk-alert", !!(L && (L.disagree || L.wouldFlip || (L.away != null && Math.abs(L.away) < 2))));
+  }
+
+  /* LEV200 hero: a half-dial from −15% to +15% vs the 200-day line */
+  function levHero(L) {
+    var w = el("div", "dk-hero " + (L.state === "ON" ? "on" : "off"));
+    var dial = el("div", "dk-dial"), svg = svgEl("svg", { viewBox: "0 0 220 128", "aria-hidden": "true" });
+    var R = 92, cx = 110, cy = 112, lo = -15, hi = 15;
+    function ang(v) { v = Math.max(lo, Math.min(hi, v)); return Math.PI * (1 - (v - lo) / (hi - lo)); }
+    function pt(v, r) { var a = ang(v); return [cx + Math.cos(a) * r, cy - Math.sin(a) * r]; }
+    function arc(v0, v1, r) { var p0 = pt(v0, r), p1 = pt(v1, r); return "M" + p0[0].toFixed(1) + " " + p0[1].toFixed(1) + " A" + r + " " + r + " 0 0 1 " + p1[0].toFixed(1) + " " + p1[1].toFixed(1); }
+    svg.appendChild(svgEl("path", { d: arc(lo, -1, R), class: "seg off" }));
+    svg.appendChild(svgEl("path", { d: arc(-1, 1, R), class: "seg band" }));
+    svg.appendChild(svgEl("path", { d: arc(1, hi, R), class: "seg on" }));
+    [-10, -5, 0, 5, 10].forEach(function (v) { var a = pt(v, R - 12), b = pt(v, R - 4); svg.appendChild(svgEl("line", { x1: a[0], y1: a[1], x2: b[0], y2: b[1], class: "tick" })); });
+    var needle = svgEl("g", { class: "needle" });
+    needle.appendChild(svgEl("line", { x1: cx, y1: cy, x2: cx, y2: cy - R + 14 }));
+    needle.appendChild(svgEl("circle", { cx: cx, cy: cy, r: 6 }));
+    svg.appendChild(needle);
+    dial.appendChild(svg);
+    var deg = (90 - ang(L.pv) * 180 / Math.PI);
+    needle.style.transform = "rotate(-90deg)";
+    requestAnimationFrame(function () { requestAnimationFrame(function () { needle.style.transform = "rotate(" + deg.toFixed(1) + "deg)"; }); });
+    var mid = el("div", "dk-dmid");
+    mid.appendChild(el("span", "dk-badge " + (L.state === "ON" ? "on" : "off"), L.state === "ON" ? "ON · QLD" : "OFF · T-bills"));
+    mid.appendChild(el("b", "dk-pv " + (L.pv >= 0 ? "up" : "dn"), sgn(L.pv, 1)));
+    mid.appendChild(el("span", "dk-k", "QQQ vs 200-day" + (L.live ? " · live" : "")));
+    dial.appendChild(mid);
+    w.appendChild(el("div", "dk-hk", "LEV200"));
+    w.appendChild(dial);
+    var facts = el("div", "dk-facts");
+    function fact(k, v, cls) { var f = el("div", "f" + (cls ? " " + cls : "")); f.appendChild(el("b", null, v)); f.appendChild(el("span", null, k)); facts.appendChild(f); }
+    if (L.flipAt) fact((L.state === "ON" ? "OFF" : "ON") + (L.state === "ON" ? " below" : " above"), money(L.flipAt), Math.abs(L.away) < 2 ? "warn" : "");
+    if (L.away != null) fact("Cushion", Math.abs(L.away).toFixed(1) + "%", Math.abs(L.away) < 2 ? "warn" : "");
+    if (L.days != null) { fact(L.state + " streak", L.days + "d", "streak"); }
+    w.appendChild(facts);
+    if (L.wouldFlip) w.appendChild(el("div", "dk-warn", "⚠ Would flip " + L.wouldFlip + " if the market closed now"));
+    if (L.disagree) w.appendChild(el("div", "dk-warn", "⚠ Mac signal says " + L.dk.state + " — check the full desk"));
+    return w;
+  }
+  /* QQQ vs its 200-day line, last ~90 sessions, band shaded */
+  function levChart(L) {
+    var ser = L.mk && L.mk.series; if (!ser || ser.length < 10) return null;
+    var pts = ser.slice();
+    if (L.live) pts.push([ny(new Date()).key, L.mk.live.price, L.mk.live.sma200]);
+    var W = 340, H = 140, P = 6;
+    var ys = []; pts.forEach(function (r) { ys.push(r[1], r[2] * 1.01, r[2] * 0.99); });
+    var y0 = Math.min.apply(null, ys), y1 = Math.max.apply(null, ys), pad = (y1 - y0) * 0.08; y0 -= pad; y1 += pad;
+    function X(i) { return P + i / (pts.length - 1) * (W - 2 * P); }
+    function Y(v) { return P + (1 - (v - y0) / (y1 - y0)) * (H - 2 * P); }
+    var svg = svgEl("svg", { viewBox: "0 0 " + W + " " + H, class: "dk-chart", preserveAspectRatio: "none", "aria-label": "QQQ vs its 200-day average" });
+    var defs = svgEl("defs", {}), gr = svgEl("linearGradient", { id: "dkFill", x1: 0, y1: 0, x2: 0, y2: 1 });
+    gr.appendChild(svgEl("stop", { offset: "0%", "stop-color": L.state === "ON" ? "#34d399" : "#fbbf24", "stop-opacity": 0.28 }));
+    gr.appendChild(svgEl("stop", { offset: "100%", "stop-color": L.state === "ON" ? "#34d399" : "#fbbf24", "stop-opacity": 0 }));
+    defs.appendChild(gr); svg.appendChild(defs);
+    var band = "M" + pts.map(function (r, i) { return X(i).toFixed(1) + " " + Y(r[2] * 1.01).toFixed(1); }).join(" L") + " L" + pts.slice().reverse().map(function (r, j) { return X(pts.length - 1 - j).toFixed(1) + " " + Y(r[2] * 0.99).toFixed(1); }).join(" L") + " Z";
+    svg.appendChild(svgEl("path", { d: band, class: "band" }));
+    svg.appendChild(svgEl("path", { d: "M" + pts.map(function (r, i) { return X(i).toFixed(1) + " " + Y(r[2]).toFixed(1); }).join(" L"), class: "sma" }));
+    var line = "M" + pts.map(function (r, i) { return X(i).toFixed(1) + " " + Y(r[1]).toFixed(1); }).join(" L");
+    svg.appendChild(svgEl("path", { d: line + " L" + X(pts.length - 1).toFixed(1) + " " + H + " L" + X(0) + " " + H + " Z", class: "area", fill: "url(#dkFill)" }));
+    var pl = svgEl("path", { d: line, class: "px " + (L.state === "ON" ? "on" : "off") }); svg.appendChild(pl);
+    var last = pts[pts.length - 1], lx = X(pts.length - 1), ly = Y(last[1]);
+    svg.appendChild(svgEl("circle", { cx: lx, cy: ly, r: 7, class: "ping" }));
+    svg.appendChild(svgEl("circle", { cx: lx, cy: ly, r: 3.2, class: "dot" }));
+    var box = el("div", "dk-chartbox");
+    var hd = el("div", "dk-sh"); hd.appendChild(el("span", null, "QQQ vs 200-day · " + pts.length + " sessions")); var lg = el("span", "lg"); lg.innerHTML = '<i class="l-px"></i>QQQ <i class="l-sma"></i>200-day <i class="l-band"></i>±1% band'; hd.appendChild(lg);
+    box.appendChild(hd); box.appendChild(svg);
+    var ax = el("div", "dk-ax"); ax.appendChild(el("span", null, shortDate(parseDay(pts[0][0])).replace(/^\w+ · /, ""))); ax.appendChild(el("span", null, money(last[1]))); box.appendChild(ax);
+    return box;
+  }
+  /* ON/OFF history as runs */
+  function levRuns(L) {
+    var runs = L.mk && L.mk.runs; if (!runs || !runs.length) return null;
+    var today = ny(new Date()).key, start = L.mk.first_date || runs[0].from, span = Math.max(1, dayDiff(start, today));
+    var box = el("div", "dk-runs"), bar = el("div", "bar");
+    box.appendChild(el("div", "dk-sh", "ON / OFF history"));
+    runs.forEach(function (r, i) {
+      var from = r.from < start ? start : r.from, to = runs[i + 1] ? runs[i + 1].from : today;
+      var seg = el("i", r.state === "ON" ? "on" : "off"); seg.style.width = (Math.max(0.8, dayDiff(from, to) / span * 100)).toFixed(2) + "%";
+      seg.title = r.state + " from " + from; bar.appendChild(seg);
+    });
+    box.appendChild(bar);
+    var lab = el("div", "dk-ax"); lab.appendChild(el("span", null, shortDate(parseDay(start)).replace(/^\w+ · /, "") + " '" + start.slice(2, 4))); lab.appendChild(el("span", null, "Today")); box.appendChild(lab);
+    var fl = (L.mk.flips || []).slice(-3).reverse();
+    if (fl.length) box.appendChild(el("div", "dk-mini", "Last flips: " + fl.map(function (f) { return f.to + " " + shortDate(parseDay(f.date)).replace(/^\w+ · /, "") + " '" + f.date.slice(2, 4); }).join(" · ")));
+    return box;
+  }
+  /* NOISE: live vs backtest, sessions, drawdown */
+  function noiseCard(nz, p) {
+    var w = el("div", "dk-noise");
+    var top = el("div", "dk-ntop");
+    var l = el("div", "l"); l.appendChild(el("div", "dk-hk", "NOISE BOT")); l.appendChild(el("span", "dk-badge paper", (nz.status || "Paper").replace(/ trading$/i, "") + " · QQQ"));
+    top.appendChild(l);
+    var r = el("div", "r"); if (nz.since_start_pct != null) { var bb = el("b", "dk-pv " + (nz.since_start_pct >= 0 ? "up" : "dn")); countUp(bb, nz.since_start_pct, function (v) { return sgn(v); }); r.appendChild(bb); } r.appendChild(el("span", "dk-k", "Since " + shortDate(parseDay(nz.first_session || p.key)).replace(/^\w+ · /, "")));
+    top.appendChild(r); w.appendChild(top);
+    var days = nz.days || [];
+    var last = days[days.length - 1];
+    var inSess = isSession(p.key) && p.min >= 570 && p.min < 1005 && (!last || last.date < p.key);
+    if (inSess) { var live = el("div", "dk-live"); live.appendChild(el("i")); live.appendChild(el("span", null, p.min < 960 ? "In session now · checking every 30 min · results at 4:50" : "Session done · results at 4:50")); w.appendChild(live); }
+    /* cumulative live vs backtest */
+    if (days.length >= 2) {
+      var a = [0], bt = [0], ca = 1, cb = 1;
+      days.forEach(function (d) { ca *= 1 + (d.ret_pct || 0) / 100; cb *= 1 + (d.backtest_pct || 0) / 100; a.push((ca - 1) * 100); bt.push((cb - 1) * 100); });
+      var W = 340, H = 96, P = 6, all = a.concat(bt, [0]), y0 = Math.min.apply(null, all), y1 = Math.max.apply(null, all), pad = Math.max(0.2, (y1 - y0) * 0.12); y0 -= pad; y1 += pad;
+      function X(i) { return P + i / (a.length - 1) * (W - 2 * P); }
+      function Y(v) { return P + (1 - (v - y0) / (y1 - y0)) * (H - 2 * P); }
+      var svg = svgEl("svg", { viewBox: "0 0 " + W + " " + H, class: "dk-chart small", preserveAspectRatio: "none" });
+      svg.appendChild(svgEl("line", { x1: 0, x2: W, y1: Y(0), y2: Y(0), class: "zero" }));
+      svg.appendChild(svgEl("path", { d: "M" + bt.map(function (v, i) { return X(i).toFixed(1) + " " + Y(v).toFixed(1); }).join(" L"), class: "bt" }));
+      svg.appendChild(svgEl("path", { d: "M" + a.map(function (v, i) { return X(i).toFixed(1) + " " + Y(v).toFixed(1); }).join(" L"), class: "px noise" }));
+      svg.appendChild(svgEl("circle", { cx: X(a.length - 1), cy: Y(a[a.length - 1]), r: 3.2, class: "dot noise" }));
+      var cb2 = el("div", "dk-chartbox");
+      var hd = el("div", "dk-sh"); hd.appendChild(el("span", null, "Paper vs backtest")); var lg = el("span", "lg"); lg.innerHTML = '<i class="l-noise"></i>Paper <i class="l-bt"></i>Backtest'; hd.appendChild(lg);
+      cb2.appendChild(hd); cb2.appendChild(svg); w.appendChild(cb2);
     }
-    /* foot: freshness */
-    var mt = C.market && Date.parse(C.market.updated), dt = dk && Date.parse(dk.updated);
-    F.appendChild(el("span", null, (mt ? "LEV200 " + clock(new Date(mt)) : "") + (dt ? (mt ? " · " : "") + "Desk " + shortDate(new Date(dt)).replace(/ · /, " ") : "")));
-    sysBox.classList.toggle("alert", !!sysBox.querySelector(".warn"));
+    /* session squares */
+    var sq = el("div", "dk-sq");
+    days.forEach(function (d, i) {
+      var c = el("span", !d.traded ? "sit" : d.ret_pct >= 0 ? "up" : "dn");
+      c.style.animationDelay = (i * 40) + "ms";
+      c.appendChild(el("b", null, String(parseDay(d.date).getDate())));
+      c.appendChild(el("i", null, d.traded ? sgn(d.ret_pct, 1) : "sat"));
+      sq.appendChild(c);
+    });
+    if (inSess) { var nw = el("span", "now"); nw.appendChild(el("b", null, String(parseDay(p.key).getDate()))); nw.appendChild(el("i", null, "live")); sq.appendChild(nw); }
+    w.appendChild(sq);
+    var stats = el("div", "dk-facts");
+    function fact(k, v, cls) { var f = el("div", "f" + (cls ? " " + cls : "")); f.appendChild(el("b", null, v)); f.appendChild(el("span", null, k)); stats.appendChild(f); }
+    fact("Sessions", String(nz.sessions));
+    fact("Traded / green", nz.traded_days + " / " + nz.up_days);
+    if (nz.avg_gap_vs_backtest_pct != null) fact("Off backtest", "±" + nz.avg_gap_vs_backtest_pct.toFixed(2) + "%", nz.avg_gap_vs_backtest_pct < 0.2 ? "good" : "");
+    w.appendChild(stats);
+    if (nz.dd_pct != null) {
+      var dd = el("div", "dk-dd"), stop = nz.stop_pct || 30;
+      dd.appendChild(el("div", "dk-sh", "Drawdown " + nz.dd_pct.toFixed(1) + "% · review " + (nz.review_pct || 20) + "% · stop " + stop + "%"));
+      var bar = el("div", "bar"), fill = el("i"); fill.style.width = Math.min(100, nz.dd_pct / stop * 100).toFixed(1) + "%"; bar.appendChild(fill);
+      var rv = el("b", "rv"); rv.style.left = ((nz.review_pct || 20) / stop * 100).toFixed(1) + "%"; bar.appendChild(rv);
+      dd.appendChild(bar); w.appendChild(dd);
+    }
+    return w;
   }
-  if (sysBox) {
-    function openDesk() { buzz(8); window.location.href = DESK_URL; }
-    sysBox.addEventListener("click", openDesk);
-    sysBox.addEventListener("keydown", function (e) { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); openDesk(); } });
+  /* milestones — unlocked ones glow; new unlocks flash when the desk opens */
+  function milestones(L, nz) {
+    var ms = [];
+    var sess = nz ? nz.sessions : 0, green = nz ? nz.up_days : 0, since = nz && nz.since_start_pct != null ? nz.since_start_pct : null;
+    var wkGreen = false;
+    if (nz && nz.days) { var wd = nz.days.slice(-5), wr = wd.reduce(function (m, d) { return m * (1 + (d.ret_pct || 0) / 100); }, 1); wkGreen = wd.length >= 5 && wr > 1; }
+    ms.push(["first", "First Session", "NOISE ran its first paper day", sess >= 1, sess + "/1"]);
+    ms.push(["green", "First Green Day", "A NOISE session closed up", green >= 1, green + "/1"]);
+    ms.push(["s10", "10 Sessions", "Ten paper days logged", sess >= 10, sess + "/10"]);
+    ms.push(["s25", "25 Sessions", "A month of data", sess >= 25, sess + "/25"]);
+    ms.push(["wk", "Green Week", "Last five sessions net positive", wkGreen, wkGreen ? "" : "—"]);
+    ms.push(["track", "Tracks the Backtest", "Average daily gap under 0.2%", !!(nz && nz.avg_gap_vs_backtest_pct != null && nz.traded_days >= 3 && nz.avg_gap_vs_backtest_pct < 0.2), nz && nz.traded_days < 3 ? (nz ? nz.traded_days : 0) + "/3 traded" : ""]);
+    ms.push(["plus5", "+5% NOISE", "Paper sleeve up 5% from start", since != null && since >= 5, since != null ? sgn(since, 1) : "—"]);
+    var dOn = L && L.state === "ON" && L.days != null ? L.days : 0;
+    ms.push(["on100", "100 Days ON", "LEV200 ON streak hits 100", dOn >= 100, dOn + "/100"]);
+    ms.push(["on250", "250 Days ON", "A long trend ride", dOn >= 250, dOn + "/250"]);
+    return ms;
   }
+  function badgePanel(ms) {
+    var box = el("div", "dk-badges");
+    var got = ms.filter(function (m) { return m[3]; }).length;
+    box.appendChild(el("div", "dk-sh", "Milestones · " + got + " / " + ms.length));
+    var g = el("div", "grid");
+    if (!C.deskBadges || typeof C.deskBadges !== "object") C.deskBadges = {};
+    var fresh = [];
+    ms.forEach(function (m) {
+      var b = el("div", "bd " + (m[3] ? "got" : "lock"));
+      b.appendChild(el("span", "ic", m[3] ? "★" : "☆"));
+      b.appendChild(el("b", null, m[1]));
+      b.appendChild(el("span", "d", m[3] ? m[2] : (m[4] || m[2])));
+      if (m[3] && !C.deskBadges[m[0]]) { C.deskBadges[m[0]] = dayKey(new Date()); fresh.push(m[1]); b.classList.add("new"); }
+      g.appendChild(b);
+    });
+    box.appendChild(g);
+    if (fresh.length) { save(); setTimeout(function () { var r = box.getBoundingClientRect(); burst(r.left + r.width / 2, r.top + 40, "#fbbf24", 26); buzz([10, 40, 10]); }, 700); }
+    return box;
+  }
+  function renderDesk() {
+    renderDeskTile();
+    if (!deskRoot) return;
+    var p = ny(new Date()), L = levNow(), nz = C.desk && C.desk.noise;
+    deskRoot.textContent = "";
+    var ml = marketLine(new Date());
+    var clk = el("div", "dk-clock " + ml.s); clk.appendChild(el("i")); clk.appendChild(el("span", null, ml.t)); deskRoot.appendChild(clk);
+    if (L) {
+      deskRoot.appendChild(levHero(L));
+      var ch = levChart(L); if (ch) deskRoot.appendChild(ch);
+      var rn = levRuns(L); if (rn) deskRoot.appendChild(rn);
+    } else deskRoot.appendChild(el("p", "ib-p dim", "LEV200 data loads with the market job."));
+    if (nz) deskRoot.appendChild(noiseCard(nz, p)); else deskRoot.appendChild(el("p", "ib-p dim", "NOISE results arrive after the 4:55 desk feed."));
+    deskRoot.appendChild(badgePanel(milestones(L, nz)));
+    var mt = C.market && Date.parse(C.market.updated), dt = C.desk && Date.parse(C.desk.updated);
+    deskRoot.appendChild(el("div", "dk-mini center", (mt ? "Market data " + clock(new Date(mt)) : "") + (dt ? " · Desk feed " + shortDate(new Date(dt)).replace(/ · /, " ") + " " + clock(new Date(dt)) : "")));
+    var go = el("a", "dk-open"); go.href = DESK_URL; go.appendChild(el("span", null, "Open the full Trading Desk")); go.appendChild(el("b", null, "↗"));
+    deskRoot.appendChild(go);
+    var ds = document.getElementById("deskState");
+    if (ds) ds.textContent = L ? (L.state === "ON" ? "LEV200 holding QLD" : "LEV200 in T-bills") + (nz ? " · NOISE " + (nz.status || "paper").toLowerCase() : "") : "LEV200 + NOISE BOT";
+  }
+  var renderSystems = function () { renderDeskTile(); if (deskSec && !deskSec.classList.contains("is-hidden")) renderDesk(); };
+  if (deskSec) new MutationObserver(function (list) {
+    list.forEach(function (m) { var was = /\bis-hidden\b/.test(m.oldValue || ""), nowHidden = deskSec.classList.contains("is-hidden"); if (was && !nowHidden) { load(false); renderDesk(); } });
+  }).observe(deskSec, { attributes: true, attributeFilter: ["class"], attributeOldValue: true });
   setInterval(function () { if (!document.hidden) renderSystems(); }, 60000);
 
   hydrate(); scoreCalls(); renderBox(); renderSky(); renderSystems();
