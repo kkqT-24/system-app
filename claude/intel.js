@@ -185,7 +185,7 @@
   }
   function cleanBrief(d) {
     if (!d || typeof d !== "object" || !/^\d{4}-\d{2}-\d{2}$/.test(d.date || "")) return null;
-    var ed = ["morning", "close", "evening"].indexOf(d.edition) >= 0 ? d.edition : "morning";
+    var ed = d.edition === "trending" ? "trending" : "update";
     var b = { date: d.date, edition: ed, written: str(d.written_at, 40) };
     var m = d.market || {};
     b.market = {
@@ -210,7 +210,7 @@
     if (d.fact && str(d.fact.claim, 280) && typeof d.fact.is_true === "boolean") b.fact = { claim: str(d.fact.claim, 280), truth: d.fact.is_true, explain: str(d.fact.explain, 400) };
     if (d.word && str(d.word.word, 40) && str(d.word.definition, 300)) b.word = { word: str(d.word.word, 40), pos: str(d.word.part_of_speech, 20), def: str(d.word.definition, 300), ex: str(d.word.example, 240) };
     var g = d.gbot || {};
-    b.gbot = { items: items(g.items, 4, 120, 300), sports: items(g.sports, 4, 120, 300), say: str(g.say, 160), mood: str(g.mood, 12).toLowerCase(), name: str(g.name, 14).toUpperCase() };
+    b.gbot = { items: items(g.items, 4, 120, 300), sports: items(g.sports, 4, 120, 300), say: str(g.say, 160), mood: str(g.mood, 12).toLowerCase(), name: str(g.name, 14).toUpperCase(), link: /^https:\/\/([a-z0-9-]+\.)*(grok\.com|x\.com)\//i.test(g.link || "") ? safeUrl(g.link) : null };
     return b;
   }
 
@@ -261,7 +261,10 @@
   function spyPctFor(session) {
     /* the bot's close/evening edition, or the GitHub job's SPY quote
        once it's stamped after that session's close */
-    if (brief && brief.date === session && brief.edition !== "morning" && brief.market.spy != null) return brief.market.spy;
+    if (brief && brief.date === session && brief.market.spy != null) {
+      var bw = Date.parse(brief.fullWritten || brief.written);
+      if (isFinite(bw)) { var bp = ny(new Date(bw)); if (bp.key > session || (bp.key === session && bp.min >= closeMin(session))) return brief.market.spy; }
+    }
     if (market) {
       var q = market.quotes.filter(function (x) { return x.symbol === "SPY"; })[0];
       if (q && q.time) {
@@ -298,14 +301,24 @@
 
   /* ---------------- preview box ---------------- */
   var CARDS = ["market", "catalyst", "trending", "mind", "gbot"];
-  function editionKey() { var t = dayKey(new Date()); return brief && brief.date === t ? t + ":" + brief.edition : t + ":base"; }
-  function edLabel() {
-    if (!brief || brief.date !== dayKey(new Date())) return brief ? "Last brief · " + shortDate(parseDay(brief.date)) : "Waiting on the bot";
+  var GROK_URL = "https://grok.com";
+  /* fresh = written within the last 14 hours (a 12 AM trending update
+     still counts for the day it belongs to) */
+  function isFresh() {
+    if (!brief) return false;
+    if (brief.date === dayKey(new Date())) return true;
     var w = Date.parse(brief.written);
-    return ({ morning: "Morning brief", close: "Closing bell", evening: "Evening brief" })[brief.edition] + (isFinite(w) ? " · " + clock(new Date(w)) : "");
+    return isFinite(w) && Date.now() - w < 14 * 3600000;
+  }
+  function editionKey() { var t = dayKey(new Date()); return isFresh() ? t + ":" + brief.written : t + ":base"; }
+  function edLabel() {
+    if (!brief) return "Waiting on the bot";
+    if (!isFresh()) return "Last brief · " + shortDate(parseDay(brief.date));
+    var w = Date.parse(brief.written);
+    return (brief.edition === "trending" ? "Trending" : "Update") + (isFinite(w) ? " · " + clock(new Date(w)) : "");
   }
   function activeCards() {
-    var today = dayKey(new Date()), fresh = brief && brief.date === today;
+    var fresh = isFresh();
     return CARDS.filter(function (c) {
       if (c === "trending") return fresh && (brief.trending.stocks.length + brief.trending.tech.length + brief.trending.world.length > 0);
       if (c === "gbot") return fresh && (brief.gbot.items.length + brief.gbot.sports.length > 0);
@@ -318,113 +331,112 @@
     list.sort(function (a, b) { return (a.date + (a.time || "99")).localeCompare(b.date + (b.time || "99")); });
     return list[0] || null;
   }
-  function quote(sym) { return market ? market.quotes.filter(function (q) { return q.symbol === sym; })[0] || null : null; }
 
-  /* the buddy: an original little bot drawn in code (not anyone's logo) */
-  var BOT_SVG = '<svg viewBox="0 0 64 64" aria-hidden="true">' +
-    '<line class="ant" x1="32" y1="13" x2="32" y2="5"/><circle class="tip" cx="32" cy="4.5" r="3"/>' +
-    '<path class="head" d="M14 18 Q14 13 19 13 H45 Q50 13 50 18 V40 Q50 46 44 46 H20 Q14 46 14 40 Z"/>' +
-    '<rect class="visor" x="18" y="21" width="28" height="13" rx="6.5"/>' +
-    '<g class="eyes"><rect class="eye" x="23" y="24.5" width="6" height="6" rx="3"/><rect class="eye" x="35" y="24.5" width="6" height="6" rx="3"/></g>' +
-    '<rect class="mouth" x="27" y="38.5" width="10" height="2.4" rx="1.2"/>' +
-    '<rect class="ear" x="9" y="24" width="5" height="11" rx="2"/><rect class="ear" x="50" y="24" width="5" height="11" rx="2"/>' +
-    '<path class="body" d="M22 49 H42 L39 60 H25 Z"/></svg>';
+  /* the core: an original holographic AI interface — rotating rings,
+     segmented arcs and a ring of voice bars around a glowing core */
+  function coreSVG() {
+    var ticks = "", bars = "";
+    for (var i = 0; i < 60; i++) {
+      var a = i / 60 * Math.PI * 2, r1 = 47, r2 = i % 5 ? 45 : 42.5;
+      ticks += '<line x1="' + (50 + Math.cos(a) * r1).toFixed(2) + '" y1="' + (50 + Math.sin(a) * r1).toFixed(2) + '" x2="' + (50 + Math.cos(a) * r2).toFixed(2) + '" y2="' + (50 + Math.sin(a) * r2).toFixed(2) + '"/>';
+    }
+    for (var j = 0; j < 28; j++) {
+      var b = j / 28 * 360;
+      bars += '<g transform="rotate(' + b.toFixed(1) + ' 50 50)"><rect class="vb" x="49.1" y="19" width="1.8" height="7" rx="0.9" style="animation-delay:' + (-(j * 137) % 900) + 'ms"/></g>';
+    }
+    return '<svg viewBox="0 0 100 100" aria-hidden="true">' +
+      '<defs><radialGradient id="jvCoreG"><stop offset="0" style="stop-color:#fff"/><stop offset="0.35" style="stop-color:var(--jv)"/><stop offset="1" style="stop-color:var(--jv);stop-opacity:0"/></radialGradient></defs>' +
+      '<g class="r-ticks">' + ticks + '</g>' +
+      '<g class="r-arcs"><circle cx="50" cy="50" r="39" pathLength="100" stroke-dasharray="18 7"/></g>' +
+      '<g class="r-thin"><circle cx="50" cy="50" r="34" pathLength="100" stroke-dasharray="3 9 22 9 6 51"/></g>' +
+      '<g class="r-bars">' + bars + '</g>' +
+      '<circle class="r-inner" cx="50" cy="50" r="15"/>' +
+      '<circle class="core" cx="50" cy="50" r="12" fill="url(#jvCoreG)"/>' +
+      '<g class="r-scan"><path d="M50 50 L50 11 A39 39 0 0 1 77.6 22.4 Z"/></g>' +
+      "</svg>";
+  }
   var QUIPS = {
-    pre: ["Pre-market's warming up. Lock your call before the bell.", "Futures are moving. Got a read yet?", "Bell's coming. Coffee, then the Setup."],
-    open: ["Market's live. Stick to the plan.", "Session's running. No chasing.", "Tape's moving. Breathe, then decide."],
-    after: ["Bell rang. How'd your call do?", "Session's done. Good time to log the day.", "Closed for the day. Review, then rest."],
-    closed: ["Markets are closed. Good time to get ahead on tomorrow.", "Quiet tape. Workouts don't skip themselves.", "Off hours. I'll have a fresh brief at 7."]
+    pre: ["Pre-market's warming up. Lock your call before the bell.", "Futures are moving. Got a read yet?"],
+    open: ["Market's live. Stick to the plan.", "Session's running. No chasing."],
+    after: ["Bell rang. How'd your call do?", "Session's done. Good time to log the day."],
+    closed: ["Markets are closed. Good time to get ahead on tomorrow.", "Quiet tape. Next update at 8."]
   };
-  function buddyLine(now) {
-    var today = dayKey(now);
-    if (brief && brief.date === today && brief.gbot.say) return { text: brief.gbot.say, mood: brief.gbot.mood };
-    var s = marketLine(now).s, k = s === "pre" ? "pre" : s === "open" ? "open" : (isSession(today) && ny(now).min >= 960 && ny(now).min < 1260 ? "after" : "closed");
-    var arr = QUIPS[k];
-    return { text: arr[hashStr(today + k) % arr.length], mood: k === "open" ? "alert" : k === "pre" ? "hype" : "chill" };
+  function quip(now) {
+    var today = dayKey(now), s = marketLine(now).s;
+    var k = s === "pre" ? "pre" : s === "open" ? "open" : (isSession(today) && ny(now).min >= 960 && ny(now).min < 1260 ? "after" : "closed");
+    return QUIPS[k][hashStr(today + k) % QUIPS[k].length];
   }
-  var typed = "", typeTimer = null;
-  function typeInto(node, text, bot) {
-    if (typed === text && node.textContent === text) return;
-    typed = text;
-    if (typeTimer) clearInterval(typeTimer);
+  /* the feed: Grok's own line leads (and comes back around), with
+     whatever's trending shuffled in between */
+  function feedItems(now) {
+    var out = [], fresh = isFresh();
+    var say = fresh && brief.gbot.say;
+    var tr = [];
+    if (fresh) [["stocks", "Stocks"], ["tech", "Tech"], ["world", "World"]].forEach(function (c) {
+      brief.trending[c[0]].forEach(function (it) { tr.push({ tag: "Trending · " + c[1], text: it.title, kind: "trend" }); });
+    });
+    /* interleave the three buckets so it doesn't read all-stocks first */
+    tr.sort(function (a, b) { return (hashStr(a.text) % 97) - (hashStr(b.text) % 97); });
+    if (say) out.push({ tag: (brief.gbot.name || "Grok"), text: say, kind: "say" });
+    tr.forEach(function (t, i) { out.push(t); if (say && i % 3 === 2 && i < tr.length - 1) out.push({ tag: (brief.gbot.name || "Grok"), text: say, kind: "say" }); });
+    if (!out.length) out.push({ tag: "Grok", text: quip(now), kind: "say" });
+    return out;
+  }
+  var feed = [], feedSig = "", feedIdx = 0, feedTimer = null, decodeTimer = null;
+  var GLYPHS = "ABCDEFGHJKLMNPQRSTUVWXYZ0123456789#%&*+<>/";
+  function decodeTo(node, text) {
+    if (decodeTimer) cancelAnimationFrame(decodeTimer);
+    var core = box && box.querySelector(".jv");
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) { node.textContent = text; return; }
-    var i = 0; node.textContent = "";
-    bot.classList.add("talking");
-    typeTimer = setInterval(function () {
-      i += 1 + (Math.random() < 0.3 ? 1 : 0);
-      node.textContent = text.slice(0, i);
-      if (i >= text.length) { clearInterval(typeTimer); typeTimer = null; bot.classList.remove("talking"); }
-    }, 34);
-  }
-  var lastTsla = null, tapeSig = "", countFrom = {};
-  function countUp(node, to, fmt) {
-    var from = countFrom[node.className] == null ? 0 : countFrom[node.className];
-    countFrom[node.className] = to;
-    if (from === to || window.matchMedia("(prefers-reduced-motion: reduce)").matches) { node.textContent = fmt(to); return; }
-    var t0 = performance.now();
+    if (core) core.classList.add("speaking");
+    var t0 = performance.now(), D = Math.min(1100, 280 + text.length * 9);
     (function step(t) {
-      var p = Math.min(1, (t - t0) / 700), e = 1 - Math.pow(1 - p, 3);
-      node.textContent = fmt(from + (to - from) * e);
-      if (p < 1) requestAnimationFrame(step);
+      var p = Math.min(1, (t - t0) / D), n = Math.floor(text.length * p), s = text.slice(0, n);
+      for (var i = n; i < Math.min(text.length, n + 6); i++) s += text[i] === " " ? " " : GLYPHS[(Math.random() * GLYPHS.length) | 0];
+      node.textContent = s;
+      if (p < 1) decodeTimer = requestAnimationFrame(step);
+      else { node.textContent = text; decodeTimer = null; setTimeout(function () { if (core) core.classList.remove("speaking"); }, 900); }
     })(t0);
+  }
+  function showFeed(i) {
+    if (!box || !feed.length) return;
+    feedIdx = (i + feed.length) % feed.length;
+    var it = feed[feedIdx];
+    var fd = box.querySelector(".jv-feed");
+    fd.classList.toggle("say", it.kind === "say");
+    fd.classList.remove("swap"); void fd.offsetWidth; fd.classList.add("swap");
+    box.querySelector(".jv-tag").textContent = it.tag;
+    decodeTo(box.querySelector(".jv-msg"), it.text);
+    var dots = box.querySelector(".jv-dots"); dots.textContent = "";
+    if (feed.length > 1) for (var d = 0; d < feed.length; d++) dots.appendChild(el("i", d === feedIdx ? "on" : feed[d].kind === "say" ? "s" : ""));
+  }
+  function feedTick() {
+    if (document.hidden || (player && player.classList.contains("show"))) return;
+    if (feed.length > 1) showFeed(feedIdx + 1);
   }
   function renderBox() {
     if (!box) return;
     var now = new Date(), today = dayKey(now), ek = editionKey();
     var cards = activeCards(), seen = Math.min(C.seen[ek] || 0, cards.length);
+    var done = !!C.wrap[today] && seen >= cards.length;
     box.classList.toggle("fresh", seen === 0);
-    box.classList.toggle("done", !!C.wrap[today] && seen >= cards.length);
-    box.querySelector(".ib-ed").textContent = C.wrap[today] && seen >= cards.length ? "Complete" : edLabel();
-    /* left: portfolio (or TSLA) big, TSLA price line, market clock */
-    var L = box.querySelector(".ib-left");
-    if (!L.firstChild) {
-      L.innerHTML = '<span class="ib-k"></span><span class="ib-big"></span><span class="ib-tsla"><b class="sym">TSLA</b> <span class="px"></span> <span class="ch"></span></span><span class="ib-sub"></span>';
-    }
-    var port = brief && brief.date === today && brief.market.portfolio, ts = quote("TSLA");
-    var big = L.querySelector(".ib-big");
-    var bigVal = port ? port.day : ts ? ts.pct : null;
-    L.querySelector(".ib-k").textContent = port ? "Portfolio" : "Tesla";
-    big.classList.remove("up", "dn");
-    if (bigVal != null) { big.classList.add(bigVal >= 0 ? "up" : "dn"); countUp(big, bigVal, function (v) { return pctTxt(v); }); }
-    else big.textContent = "—";
-    var tl = L.querySelector(".ib-tsla");
-    tl.style.display = ts ? "" : "none";
-    if (ts) {
-      tl.querySelector(".px").textContent = "$" + ts.price.toFixed(2);
-      var ch = tl.querySelector(".ch"); ch.textContent = (ts.pct >= 0 ? "▲" : "▼") + Math.abs(ts.pct).toFixed(2) + "%"; ch.className = "ch " + (ts.pct >= 0 ? "up" : "dn");
-      if (lastTsla != null && lastTsla !== ts.price) { tl.classList.remove("tick-up", "tick-dn"); void tl.offsetWidth; tl.classList.add(ts.price > lastTsla ? "tick-up" : "tick-dn"); }
-      lastTsla = ts.price;
-    }
-    var ml = marketLine(now);
-    var sub = L.querySelector(".ib-sub"); sub.textContent = ml.t.replace("Market ", "").replace(" · opens ", " · ").replace(" · closes in ", " · ") ; sub.className = "ib-sub " + ml.s;
-    /* right: the buddy */
-    var R = box.querySelector(".ib-right");
-    if (!R.firstChild) {
-      R.innerHTML = '<div class="bud"><div class="bud-bot">' + BOT_SVG + '</div><span class="bud-name"></span></div><div class="bud-bubble"><span class="bud-text"></span></div>';
-    }
-    var bl = buddyLine(now);
-    var bot = R.querySelector(".bud-bot");
-    bot.setAttribute("data-mood", ["hype", "chill", "alert", "thinking"].indexOf(bl.mood) >= 0 ? bl.mood : "thinking");
-    R.querySelector(".bud-name").textContent = (brief && brief.gbot.name) || "GROK";
-    typeInto(R.querySelector(".bud-text"), bl.text, bot);
-    /* foot: a scrolling tape of the watchlist + progress pips */
-    var watch = brief && brief.date === today && brief.market.watch.length ? brief.market.watch : (market ? market.quotes.map(function (q) { return { symbol: q.symbol, pct: q.pct }; }) : []);
-    var sig = watch.map(function (w) { return w.symbol + w.pct; }).join("|");
-    var tape = box.querySelector(".ib-tape-in");
-    if (sig !== tapeSig) {
-      tapeSig = sig; tape.textContent = "";
-      if (watch.length) {
-        for (var r = 0; r < 2; r++) watch.forEach(function (w) {
-          var s = el("span", "tk " + (w.pct >= 0 ? "up" : "dn"));
-          s.appendChild(el("b", null, w.symbol)); s.appendChild(document.createTextNode(" " + pctTxt(w.pct)));
-          tape.appendChild(s);
-        });
-        tape.style.animationDuration = Math.max(14, watch.length * 4) + "s";
-      } else tape.appendChild(el("span", "tk", "Watchlist appears with the first brief"));
-      tape.classList.toggle("roll", watch.length > 0);
+    box.classList.toggle("done", done);
+    box.querySelector(".ib-ed").textContent = done ? "Complete" : edLabel();
+    var core = box.querySelector(".jv");
+    if (!core.firstChild) core.innerHTML = coreSVG() + '<span class="jv-name"></span>';
+    var mood = isFresh() ? brief.gbot.mood : "";
+    core.setAttribute("data-mood", ["hype", "chill", "alert", "thinking"].indexOf(mood) >= 0 ? mood : "chill");
+    core.querySelector(".jv-name").textContent = (isFresh() && brief.gbot.name) || "GROK";
+    var items2 = feedItems(now), sig = items2.map(function (x) { return x.text; }).join("|");
+    if (sig !== feedSig) {
+      feedSig = sig; feed = items2;
+      showFeed(0);
+      if (feedTimer) clearInterval(feedTimer);
+      feedTimer = setInterval(feedTick, 7000);
     }
     var pips = box.querySelector(".ib-pips"); pips.textContent = "";
     for (var i = 0; i < cards.length; i++) pips.appendChild(el("i", i < seen ? "on" : i === seen ? "next" : ""));
+    box.querySelector(".ib-hint").textContent = seen === 0 ? "Tap to open briefing" : seen >= cards.length ? (done ? "All caught up" : "Swipe the last card to finish") : "Pick up at card " + (seen + 1);
   }
 
   /* ---------------- card player ---------------- */
@@ -549,48 +561,41 @@
     card.classList.add("cur"); stage.replaceChild(card, old); card.scrollTop = st;
   }
 
-  /* ---------------- finale: the wrap-up has no card ----------------
-     The cards fold away, a lone prompt asks for today's focus, the
-     ring charges and pays +5 EXP, then the whole briefing shrinks
-     back into its box on the home screen. Once wrapped, Finish just
-     plays the fold-back. */
+  /* ---------------- finale ----------------
+     Swiping past the last card (or tapping Finish) implodes the card
+     into a point of light, a shockwave rings out, +5 EXP rises (once
+     a day), then the briefing folds back into its box. */
   function finale() {
     if (busy) return;
-    var today = dayKey(new Date());
-    var fin = player.querySelector(".ibp-fin");
-    fin.textContent = "";
-    player.classList.add("finale");
-    if (C.wrap[today]) { setTimeout(collapseToBox, 380); return; }
-    var ring = el("div", "fin-ring");
-    ring.innerHTML = '<svg viewBox="0 0 120 120" aria-hidden="true"><circle cx="60" cy="60" r="52" class="tr"/><circle cx="60" cy="60" r="52" class="pg"/><circle cx="60" cy="60" r="40" class="in"/></svg><span class="fin-exp">+' + WRAP_EXP + "</span><span class=\"fin-unit\">EXP</span>";
-    fin.appendChild(ring);
-    fin.appendChild(el("div", "fin-q", "One thing that wins today?"));
-    var f = el("form", "fin-form");
-    var inp = el("input", "fin-in"); inp.type = "text"; inp.maxLength = 80; inp.placeholder = "Type your focus"; inp.setAttribute("aria-label", "Today's focus"); inp.autocomplete = "off";
-    var btn = el("button", "fin-go", "Lock in"); btn.type = "submit";
-    f.appendChild(inp); f.appendChild(btn); fin.appendChild(f);
-    var skip = el("button", "fin-skip", "Skip"); skip.type = "button"; fin.appendChild(skip);
-    skip.addEventListener("click", function () { collapseToBox(); });
-    f.addEventListener("submit", function (e) {
-      e.preventDefault();
-      if (busy || C.wrap[today]) return;
-      busy = true;
-      C.wrap[today] = { focus: str(inp.value, 80), at: new Date().toISOString() };
+    busy = true;
+    var today = dayKey(new Date()), first = !C.wrap[today];
+    if (first) {
+      C.wrap[today] = { at: new Date().toISOString() };
       var ks = Object.keys(C.wrap).sort(); while (ks.length > 60) delete C.wrap[ks.shift()];
-      save(); inp.blur();
-      fin.classList.add("locking");
-      buzz([12, 50, 12, 50, 30]);
-      ring.classList.add("charge");
-      setTimeout(function () {
-        var r = ring.getBoundingClientRect();
-        burst(r.left + r.width / 2, r.top + r.height / 2, "#c3b8fe", 40);
-        burst(r.left + r.width / 2, r.top + r.height / 2, "#fbbf24", 16);
-        ring.classList.add("done");
+      save();
+    }
+    var stage = player.querySelector(".ibp-stage"), card = stage.querySelector(".ib-card.cur");
+    if (card) { card.style.transition = ""; card.style.transform = ""; card.style.opacity = ""; card.classList.remove("in-right", "in-left", "in-up"); card.classList.add("implode"); }
+    player.classList.add("finale");
+    var fin = player.querySelector(".ibp-fin"); fin.textContent = "";
+    var cx = innerWidth / 2, cy = innerHeight * 0.46;
+    fin.style.setProperty("--fx", cx + "px"); fin.style.setProperty("--fy", cy + "px");
+    buzz(first ? [10, 60, 10, 60, 40] : 20);
+    setTimeout(function () {
+      fin.appendChild(el("i", "fin-flash"));
+      fin.appendChild(el("i", "fin-wave"));
+      fin.appendChild(el("i", "fin-wave w2"));
+      var t = el("div", "fin-pop" + (first ? "" : " quiet"));
+      t.appendChild(el("b", null, first ? "+" + WRAP_EXP : "✓"));
+      t.appendChild(el("span", null, first ? "EXP" : "Briefing complete"));
+      fin.appendChild(t);
+      burst(cx, cy, "#c3b8fe", first ? 42 : 18);
+      if (first) {
+        burst(cx, cy, "#67e8f9", 18);
         try { if (window.__ksGainExp) window.__ksGainExp(WRAP_EXP); } catch (err) {}
-      }, 950);
-      setTimeout(function () { busy = false; collapseToBox(); }, 2100);
-    });
-    setTimeout(function () { try { inp.focus({ preventScroll: true }); } catch (err) {} }, 500);
+      }
+    }, 420);
+    setTimeout(function () { busy = false; collapseToBox(); }, first ? 1750 : 1250);
   }
   function collapseToBox() {
     if (!box || !player) { close(); return; }
@@ -631,7 +636,7 @@
   }
 
   function renderCard(kind) {
-    var now = new Date(), today = dayKey(now), fresh = brief && brief.date === today;
+    var now = new Date(), today = dayKey(now), fresh = isFresh();
     var c;
     if (kind === "market") {
       c = cardShell("market", "Market", "01 · Your read");
@@ -643,7 +648,7 @@
         var pb = el("span", "v " + (port.day >= 0 ? "up" : "dn"), pctTxt(port.day));
         pr.appendChild(pb);
         var pm = el("span", "m");
-        pm.appendChild(el("span", "k", brief.edition === "morning" ? "Portfolio · last session" : "Portfolio · today"));
+        pm.appendChild(el("span", "k", ny(new Date(Date.parse(brief.fullWritten || brief.written) || Date.now())).min < 570 ? "Portfolio · last session" : "Portfolio · today"));
         if (port.week != null) pm.appendChild(el("span", "w", "Week " + pctTxt(port.week)));
         pr.appendChild(pm);
         c.appendChild(pr);
@@ -874,6 +879,17 @@
   function hydrate() {
     market = cleanMarket(C.market);
     brief = cleanBrief(C.brief);
+    /* a trending-only update (8 PM / 10 PM / 12 AM) carries just trending
+       + Grok's line; everything else comes from the last full update */
+    if (brief && brief.edition === "trending") {
+      var full = cleanBrief(C.full), tw = Date.parse(brief.written), fw = full ? Date.parse(full.written) : NaN;
+      if (full && isFinite(tw) && isFinite(fw) && tw - fw < 30 * 3600000 && tw >= fw) {
+        full.trending = brief.trending;
+        if (brief.gbot.say) { full.gbot.say = brief.gbot.say; full.gbot.mood = brief.gbot.mood || full.gbot.mood; }
+        full.fullWritten = full.written; full.written = brief.written; full.edition = "trending";
+        brief = full;
+      }
+    }
     if (brief && Math.round((parseDay(dayKey(new Date())) - parseDay(brief.date)) / 864e5) > 2) brief = null;
     econ = (C.econ && Array.isArray(C.econ.events) ? C.econ.events : []).filter(function (e) { return e && /^\d{4}-\d{2}-\d{2}$/.test(e.date) && str(e.name, 80); })
       .map(function (e) { return { date: e.date, time: /^\d{1,2}:\d{2}$/.test(e.time || "") ? e.time : "", name: str(e.name, 80) }; });
@@ -884,7 +900,7 @@
     loading = true; lastLoad = Date.now();
     var jobs = [
       repoJSON("market.json").then(function (d) { if (cleanMarket(d)) C.market = d; }),
-      repoJSON("brief.json").then(function (d) { if (cleanBrief(d)) C.brief = d; }),
+      repoJSON("brief.json").then(function (d) { var cb = cleanBrief(d); if (cb) { C.brief = d; if (cb.edition !== "trending") C.full = d; } }),
       repoJSON("econ.json").then(function (d) { if (d && Array.isArray(d.events)) C.econ = d; })
     ];
     Promise.all(jobs.map(function (p) { return p.catch(function () {}); })).then(function () {
@@ -895,7 +911,17 @@
 
   hydrate(); scoreCalls(); renderBox(); renderSky();
   if (box) {
-    box.addEventListener("click", function () { open(); load(false); });
+    box.addEventListener("click", function (e) {
+      /* the core is its own button: it opens the Grok bot */
+      if (e.target.closest(".jv")) {
+        e.stopPropagation();
+        var u = (brief && brief.gbot.link) || GROK_URL;
+        var w = null; try { w = window.open(u, "_blank", "noopener"); } catch (err) {}
+        if (!w) window.location.href = u;
+        return;
+      }
+      open(); load(false);
+    });
     box.addEventListener("keydown", function (e) { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); open(); } });
   }
   setTimeout(function () { load(true); }, 1200);

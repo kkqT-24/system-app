@@ -2361,8 +2361,11 @@
             <div class="intel-box" id="intelBox" role="button" tabindex="0" aria-label="Open Daily Briefing">
               <span class="ib-scan" aria-hidden="true"></span>
               <div class="ib-top"><span class="ib-name">Daily Briefing</span><span class="ib-ed"></span></div>
-              <div class="ib-panes"><div class="ib-left"></div><div class="ib-right"></div></div>
-              <div class="ib-foot"><div class="ib-tape"><div class="ib-tape-in"></div></div><span class="ib-pips"></span></div>
+              <div class="ib-main">
+                <button type="button" class="jv" aria-label="Open Grok bot"></button>
+                <div class="jv-feed"><span class="jv-tag"></span><span class="jv-msg"></span><span class="jv-dots"></span></div>
+              </div>
+              <div class="ib-foot"><span class="ib-hint"></span><span class="ib-pips"></span></div>
             </div>
             <div class="showcase-label">Select a module</div>
             <div class="showcase-grid" role="group" aria-label="All tabs">
@@ -2626,7 +2629,7 @@
         </div>
 
         <div class="main-top">
-          <span id="appVersion">Core v2.8</span>
+          <span id="appVersion">Core v2.9</span>
           <span>Louisville, KY</span>
         </div>
       </div>

@@ -1,15 +1,20 @@
 # Daily Briefing — instructions for the Grok bot
 
-You write the brief that powers the **Daily Briefing** in Kent's System app.
-Write it **three times every weekday** (Eastern time):
+You write the brief that powers the **Daily Briefing** in Kent's System app, and you're the
+voice of the holographic AI core on his home screen.
 
-| Edition | When | Focus |
+## Schedule (Eastern time, every day)
+
+| Time | Edition | What to write |
 |---|---|---|
-| `morning` | by **7:00 AM** | Set up the day: overnight moves, what's on the calendar, what to watch |
-| `close` | by **4:15 PM** | Recap: how the session went, portfolio result, data that hit, what it means |
-| `evening` | by **7:00 PM** | Look ahead to tomorrow + Sports Desk updates |
+| 8 AM, 10 AM, 12 PM, 2 PM, 4 PM, 6 PM | `update` | The **full** brief — every section below |
+| 8 PM, 10 PM, 12 AM | `trending` | **Only** `trending` + `gbot.say` / `gbot.mood` (plus version, date, edition, written_at). The app keeps everything else from the last full update |
 
-Weekends: one `evening` edition on Sunday (week-ahead focus) is enough; Saturday is optional.
+Weekends: same times, but `trending` editions only, except **Sunday 6 PM**, which is a full
+`update` focused on the week ahead.
+The 4 PM and 6 PM weekday updates must include `market.spy_day_pct` (SPY's % change at the
+4:00 PM close) — it scores Kent's daily SPY call.
+For the 12 AM update, use the date of the day that just ended.
 
 ## Where
 
@@ -38,7 +43,7 @@ Replace the whole file each time. Commit message: `Daily Briefing: <edition> YYY
 {
   "version": 2,
   "date": "2026-10-16",
-  "edition": "morning",
+  "edition": "update",
   "written_at": "2026-10-16T06:52:00-04:00",
 
   "market": {
@@ -82,6 +87,7 @@ Replace the whole file each time. Commit message: `Daily Briefing: <edition> YYY
   "gbot": {
     "name": "GROK",
     "mood": "hype",
+    "link": "https://grok.com/... (optional)",
     "say": "Your buddy line on the home screen. Talk to Kent like a friend who trades: whatever is worth saying right now. Max 120 chars.",
     "items": [ { "title": "Something you can help Kent with or noticed. Max 120 chars.", "detail": "Max 300 chars." } ],
     "sports": [ { "title": "Sports Desk update. Max 120 chars.", "detail": "Picks, results, bankroll % — no dollar amounts. Max 300 chars." } ]
@@ -95,21 +101,22 @@ Replace the whole file each time. Commit message: `Daily Briefing: <edition> YYY
 |---|---|---|
 | `version` | yes | `2` |
 | `date` | yes | Today in Eastern time, `YYYY-MM-DD` |
-| `edition` | yes | `morning`, `close` or `evening` |
+| `edition` | yes | `update` (full) or `trending` (trending + your line only) |
 | `written_at` | yes | ISO time with offset |
 | `market.headline` / `note` | yes | |
-| `market.portfolio.day_pct` | yes | Morning = last session's %, close/evening = today's %. Number, not a string |
+| `market.portfolio.day_pct` | yes | Before 9:30 AM = last session's %, after = today's %. Number, not a string |
 | `market.watchlist` | yes | Kent's Robinhood watchlist, up to 12, `pct` as a number |
-| `market.spy_day_pct` | close & evening | SPY's % change for the session at the 4:00 PM close — used to score Kent's daily call. Omit in the morning |
+| `market.spy_day_pct` | 4 PM & 6 PM | SPY's % change at the 4:00 PM close — used to score Kent's daily call. Omit before the close |
 | `catalyst.outlook` | yes | |
-| `catalyst.today` | when there's data | Only scheduled releases/events for today. `time` is 24h Eastern `HH:MM`. Morning: leave `actual` empty until released |
+| `catalyst.today` | when there's data | Only scheduled releases/events for today. `time` is 24h Eastern `HH:MM`. Leave `actual` empty until it's released |
 | `catalyst.week` | yes | Rest of the next 7 days: big data, Fed speakers, earnings Kent's watchlist cares about |
 | `trending` | yes | Up to 4 per bucket. What's genuinely trending on X today, not evergreen topics |
-| `fact` | morning | **Mix true and false roughly 50/50.** No repeats within 60 days. Later editions may copy the morning's |
-| `word` | morning | Useful, not obscure. No repeats within 90 days. Later editions may copy the morning's |
-| `gbot.say` | yes | Shows on the home screen in a speech bubble next to your little bot, typed out live. One or two sentences, max 120 chars, a different line every edition. Personal and specific beats generic |
-| `gbot.mood` | yes | `hype`, `chill`, `alert` or `thinking` — colors your bot's eyes (amber, cyan, red, lavender) |
-| `gbot.name` | optional | Your name as shown under the bot, max 14 chars (default `GROK`) |
+| `fact` | 8 AM | **Mix true and false roughly 50/50.** No repeats within 60 days. Later updates may repeat the 8 AM one |
+| `word` | 8 AM | Useful, not obscure. No repeats within 90 days. Later updates may repeat the 8 AM one |
+| `gbot.say` | yes | Your line on the home screen. The holographic core "speaks" it (it decodes onto the screen) and it rotates with the trending headlines. One or two sentences, max 120 chars, new every update. Personal and specific beats generic |
+| `gbot.mood` | yes | `hype`, `chill`, `alert` or `thinking` — tints the core (amber, cyan, red, lavender) |
+| `gbot.name` | optional | Your name, shown under the core and on your lines, max 14 chars (default `GROK`) |
+| `gbot.link` | optional | Your own chat link (`https://grok.com/...` or `https://x.com/...`). Tapping the core opens it; default is grok.com |
 | `gbot.items` | optional | Up to 4: anything you can help with — research you noticed, a pattern in his trades, a reminder |
 | `gbot.sports` | evening (optional otherwise) | Up to 4 Sports Desk updates |
 
