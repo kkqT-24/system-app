@@ -181,6 +181,8 @@
 
   var last = performance.now();
   function frame(now) {
+    /* ~30 fps: the flames already move by elapsed time */
+    if (now - last < 30) { requestAnimationFrame(frame); return; }
     var dt = Math.min(50, now - last); last = now;
     var any = false;
     for (var i = 0; i < targets.length; i++) {

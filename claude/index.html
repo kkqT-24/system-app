@@ -193,6 +193,9 @@
       html, body { overscroll-behavior-y: none; }
       /* ambient floating particles layer */
       .ambient { position: absolute; inset: 0; width: 100%; height: 100%; z-index: 1; pointer-events: none; }
+      /* the main screen's particles live in the viewport, not the whole
+         scroll height — same density on screen, a fraction of the pixels */
+      #main canvas.ambient { position: fixed; top: 0; left: 0; right: 0; bottom: 0; width: 100%; height: 100%; height: 100lvh; }
 
       /* the 100% core IS the enter button once the system is online */
       .core-btn {
@@ -2309,11 +2312,11 @@
         .showcase-status .gl::before, .showcase-status .gl::after { display: none; }
       }
     </style>
-      <link rel="stylesheet" href="motion.css?v=2.23" />
-    <link rel="stylesheet" href="quests.css?v=2.23" />
-    <link rel="stylesheet" href="v2.css?v=2.23" />
-    <link rel="stylesheet" href="polish.css?v=2.23" />
-    <link rel="stylesheet" href="intel.css?v=2.23" />
+      <link rel="stylesheet" href="motion.css?v=2.24" />
+    <link rel="stylesheet" href="quests.css?v=2.24" />
+    <link rel="stylesheet" href="v2.css?v=2.24" />
+    <link rel="stylesheet" href="polish.css?v=2.24" />
+    <link rel="stylesheet" href="intel.css?v=2.24" />
     <link rel="manifest" href="manifest.webmanifest" />
     <meta name="theme-color" content="#040410" />
     <meta name="mobile-web-app-capable" content="yes" />
@@ -2635,7 +2638,7 @@
         </div>
 
         <div class="main-top">
-          <span id="appVersion">Core v2.23</span>
+          <span id="appVersion">Core v2.24</span>
           <span>Louisville, KY</span>
         </div>
       </div>
@@ -6057,7 +6060,7 @@
           var host = a.cv.parentElement;
           var w = host.clientWidth, h = host.clientHeight;
           if (!w || !h) { a.w = 0; a.h = 0; return; }
-          var dpr = Math.min(2, window.devicePixelRatio || 1);
+          var dpr = Math.min(1.5, window.devicePixelRatio || 1);
           a.w = w; a.h = h;
           a.cv.width = Math.round(w * dpr);
           a.cv.height = Math.round(h * dpr);
@@ -6066,27 +6069,62 @@
           a.parts = [];
           for (var i = 0; i < n; i++) a.parts.push(ambientDot(w, h, true));
         }
+        /* the bigger dots glow: each colour's glowing dot is drawn once
+           (with the same shadow blur) and stamped, instead of running a
+           canvas blur for every dot on every frame */
+        var glowSprites = {};
+        function glowSprite(c) {
+          if (glowSprites[c]) return glowSprites[c];
+          var R = 2.3, S = 16, k = 3, cv = document.createElement("canvas");
+          cv.width = cv.height = S * 2 * k;
+          var g = cv.getContext("2d");
+          g.scale(k, k);
+          g.shadowColor = "rgba(143,94,248,0.85)"; g.shadowBlur = 9 * k;
+          g.fillStyle = "rgb(" + c + ")";
+          g.beginPath(); g.arc(S, S, R, 0, 6.2832); g.fill();
+          glowSprites[c] = { cv: cv, S: S, R: R };
+          return glowSprites[c];
+        }
         function ambientDraw(a, ts) {
-          a.ctx.clearRect(0, 0, a.w, a.h);
+          var ctx = a.ctx;
+          ctx.clearRect(0, 0, a.w, a.h);
           for (var i = 0; i < a.parts.length; i++) {
             var p = a.parts[i];
             var tw = 0.55 + 0.45 * Math.sin(ts * 0.0016 * p.tw + p.ph);
-            var x = p.x + Math.sin(ts * 0.00035 + p.ph) * p.swayAmp + (p.ox || 0);
-            a.ctx.beginPath();
-            a.ctx.arc(x, p.y + (p.oy || 0), p.r, 0, 6.2832);
-            a.ctx.fillStyle = "rgba(" + p.c + "," + (p.a * tw).toFixed(3) + ")";
-            if (p.r > 1.85) { a.ctx.shadowColor = "rgba(143,94,248,0.85)"; a.ctx.shadowBlur = 9; } else { a.ctx.shadowBlur = 0; }
-            a.ctx.fill();
-            a.ctx.shadowBlur = 0;
+            var x = p.x + Math.sin(ts * 0.00035 + p.ph) * p.swayAmp + (p.ox || 0), y = p.y + (p.oy || 0);
+            if (p.r > 1.85) {
+              var sp = glowSprite(p.c), sc = p.r / sp.R, half = sp.S * sc;
+              ctx.globalAlpha = p.a * tw;
+              ctx.drawImage(sp.cv, x - half, y - half, half * 2, half * 2);
+              ctx.globalAlpha = 1;
+            } else {
+              ctx.beginPath();
+              ctx.arc(x, y, p.r, 0, 6.2832);
+              ctx.fillStyle = "rgba(" + p.c + "," + (p.a * tw).toFixed(3) + ")";
+              ctx.fill();
+            }
           }
         }
+        /* drawn at ~30 fps (a 60 or 120 Hz screen otherwise redraws 2-4x as
+           often for the same look); the motion keeps its speed because the
+           physics still steps once per 1/60 s */
+        var ambLast = 0, ambAcc = 0;
         function ambientFrame(ts) {
+          if (!ambLast) ambLast = ts;
+          var dtA = ts - ambLast;
+          if (dtA < 30) { requestAnimationFrame(ambientFrame); return; }
+          ambLast = ts;
+          ambAcc = Math.min(ambAcc + dtA, 120);
+          var steps = 0; while (ambAcc >= 16.667) { ambAcc -= 16.667; steps++; }
+          if (!steps) steps = 1;
+          if (document.hidden) { requestAnimationFrame(ambientFrame); return; }
           for (var i = 0; i < ambient.length; i++) {
             var a = ambient[i];
             if (a.cv.clientWidth === 0) continue; /* that screen is hidden */
             if (!a.w || a.cv.clientWidth !== a.w || a.cv.clientHeight !== a.h) ambientSize(a);
             if (!a.w) continue;
             var prect = pointer.active ? a.cv.getBoundingClientRect() : null;
+            for (var st = 0; st < steps; st++)
             for (var j = 0; j < a.parts.length; j++) {
               var p = a.parts[j];
               p.y -= p.vy * (holdSpin ? 3.2 : 1);
@@ -7320,13 +7358,13 @@
         /* v2: the boot card's position is pure layout now (polish.css) — no script measuring */
       })();
     </script>
-    <script src="motion.js?v=2.23"></script>
-    <script src="bolts.js?v=2.23"></script>
-    <script src="aura.js?v=2.23"></script>
-    <script src="quests.js?v=2.23"></script>
-    <script src="v2.js?v=2.23"></script>
-    <script src="intel.js?v=2.23"></script>
-    <script src="polish.js?v=2.23"></script>
-    <script src="shadows3d.js?v=2.23"></script>
+    <script src="motion.js?v=2.24"></script>
+    <script src="bolts.js?v=2.24"></script>
+    <script src="aura.js?v=2.24"></script>
+    <script src="quests.js?v=2.24"></script>
+    <script src="v2.js?v=2.24"></script>
+    <script src="intel.js?v=2.24"></script>
+    <script src="polish.js?v=2.24"></script>
+    <script src="shadows3d.js?v=2.24"></script>
   </body>
 </html>

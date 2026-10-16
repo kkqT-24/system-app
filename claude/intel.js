@@ -392,7 +392,7 @@
     var REST = [2.6, -1.6];
     var eye = { nextBlink: 0, blinkT: -1, lx: REST[0], ly: REST[1], tx: REST[0], ty: REST[1], nextLook: 0 };
     function init(h) {
-      host = h; cv = h.querySelector("canvas"); cx2 = cv.getContext("2d");
+      host = h; if (typeof watch === "function") watch(); cv = h.querySelector("canvas"); cx2 = cv.getContext("2d");
       dpr = Math.min(2, window.devicePixelRatio || 1);
       cv.width = S * dpr; cv.height = S * dpr;
       shells = [];
@@ -411,12 +411,27 @@
       }
       return pts;
     }
+    var lastF = 0, coreSeen = true;
+    if ("IntersectionObserver" in window) {
+      var io = null;
+      var watch = function () {
+        if (io || !host) return;
+        io = new IntersectionObserver(function (es) { coreSeen = es[es.length - 1].isIntersecting; if (coreSeen) api.wake(); });
+        io.observe(host);
+      };
+    }
     function frame(ts) {
       raf = null;
       if (!host || !host.isConnected || document.hidden || (player && player.classList.contains("show"))) return;
+      /* covered by an open panel or scrolled away: stop drawing; check back cheaply */
+      if (!coreSeen) return;
+      if (document.body.classList.contains("tab-open")) { setTimeout(function () { api.wake(); }, 400); return; }
+      /* ~30 fps; everything below that moves per frame is scaled by k */
+      if (ts - lastF < 30) { raf = requestAnimationFrame(frame); return; }
+      var k = lastF ? Math.min(4, (ts - lastF) / 16.667) : 1; lastF = ts;
       var t = (ts - t0) / 1000, c = S / 2;
       var speaking = host.classList.contains("speaking");
-      level += ((speaking ? 0.75 : 0.3) - level) * 0.025;
+      level += ((speaking ? 0.75 : 0.3) - level) * (1 - Math.pow(0.975, k));
       var col = MOODS[host.getAttribute("data-mood")] || MOODS.chill, A = col[0], B = col[1];
       var g = cx2; g.setTransform(dpr, 0, 0, dpr, 0, 0); g.clearRect(0, 0, S, S);
       g.globalCompositeOperation = "lighter";
@@ -437,12 +452,12 @@
         });
       });
       /* energy arcs: short-lived jagged bolts thrown off the sphere */
-      if (Math.random() < 0.0025 + level * 0.012) {
+      if (Math.random() < (0.0025 + level * 0.012) * k) {
         var ang = Math.random() * Math.PI * 2, r0 = 12 + Math.random() * 6;
         arcs.push({ pts: bolt(c + Math.cos(ang) * r0, c + Math.sin(ang) * r0, ang, 18 + Math.random() * (16 + level * 10)), life: 1, w: 0.7 + Math.random() * 0.9, hue: Math.random() < 0.5 ? A : B });
       }
       for (var i = arcs.length - 1; i >= 0; i--) {
-        var ar = arcs[i]; ar.life -= 0.045;
+        var ar = arcs[i]; ar.life -= 0.045 * k;
         if (ar.life <= 0) { arcs.splice(i, 1); continue; }
         g.globalAlpha = ar.life;
         g.strokeStyle = ar.hue; g.lineWidth = ar.w * 2.6; g.shadowColor = ar.hue; g.shadowBlur = 8;
@@ -450,10 +465,10 @@
         g.strokeStyle = "#fff"; g.lineWidth = ar.w * 0.7; g.shadowBlur = 0; g.stroke();
       }
       /* sparks streaming outward */
-      var n = Math.random() < 0.12 + level * 0.12 ? 1 : 0;
+      var n = Math.random() < (0.12 + level * 0.12) * k ? 1 : 0;
       for (var k2 = 0; k2 < n; k2++) { var sa = Math.random() * Math.PI * 2; sparks.push({ x: c + Math.cos(sa) * 14, y: c + Math.sin(sa) * 14, vx: Math.cos(sa) * (0.25 + Math.random() * 0.6), vy: Math.sin(sa) * (0.25 + Math.random() * 0.6), life: 1, hue: Math.random() < 0.6 ? A : "#ffffff" }); }
       for (var q = sparks.length - 1; q >= 0; q--) {
-        var sp = sparks[q]; sp.x += sp.vx; sp.y += sp.vy; sp.vx *= 0.985; sp.vy *= 0.985; sp.life -= 0.012;
+        var sp = sparks[q], dmp = Math.pow(0.985, k); sp.x += sp.vx * k; sp.y += sp.vy * k; sp.vx *= dmp; sp.vy *= dmp; sp.life -= 0.012 * k;
         if (sp.life <= 0) { sparks.splice(q, 1); continue; }
         g.globalAlpha = sp.life; g.fillStyle = sp.hue; g.fillRect(sp.x - 0.8, sp.y - 0.8, 1.6, 1.6);
       }
@@ -478,7 +493,7 @@
         if (away || r < 0.55) { eye.tx = REST[0]; eye.ty = REST[1]; eye.nextLook = t + 2.5 + Math.random() * 3.5; }
         else { eye.tx = [-3, -2.6, 1, -0.5][(Math.random() * 4) | 0]; eye.ty = [-1, 1.2, 1.4, -2][(Math.random() * 4) | 0]; eye.nextLook = t + 0.9 + Math.random() * 1.2; }
       }
-      eye.lx += (eye.tx - eye.lx) * 0.12; eye.ly += (eye.ty - eye.ly) * 0.12;
+      var ee = 1 - Math.pow(0.88, k); eye.lx += (eye.tx - eye.lx) * ee; eye.ly += (eye.ty - eye.ly) * ee;
       /* rounded pill eyes */
       var ew = 2.1 + level * 0.25, eh = (5.4 + level * 0.8) * open, ex = c + eye.lx, ey = c - 1 + eye.ly;
       if (speaking) eh *= 1 + 0.08 * Math.sin(t * 9);
@@ -494,10 +509,11 @@
       g.globalAlpha = 1;
       raf = requestAnimationFrame(frame);
     }
-    return {
+    var api = {
       mount: function (h) { init(h); this.wake(); },
       wake: function () { if (!raf && host && !window.matchMedia("(prefers-reduced-motion: reduce)").matches) raf = requestAnimationFrame(frame); }
     };
+    return api;
   })();
   var QUIPS = {
     pre: ["Pre-market's warming up. Lock your call before the bell.", "Futures are moving. Got a read yet?"],

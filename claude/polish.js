@@ -324,6 +324,9 @@
     return null;
   }
   (function loop() {
+    /* only needed while a panel is open (it tracks the pull-down); with
+       the tiles showing it just checks back a few times a second */
+    if (!document.body.classList.contains("tab-open") && !wasOpen) { setTimeout(function () { requestAnimationFrame(loop); }, 250); if (last !== 0) { h.style.setProperty("--pp", "0"); last = 0; } return; }
     var p = 0, sec = document.body.classList.contains("tab-open") ? openSec() : null;
     if (sec) {
       var m = /translateY\((-?[\d.]+)px\)/.exec(sec.style.transform || "");

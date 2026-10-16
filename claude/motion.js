@@ -462,10 +462,15 @@
   var glow = mainEl ? mainEl.querySelector(".bg-glow") : null;
   var amb = mainEl ? mainEl.querySelector("canvas.ambient") : null;
   var rings3 = document.querySelector(".main-rings-wrap");
+  /* ~30 fps; the easing is scaled by elapsed time so the drift feels the same */
+  var driftLast = 0;
   (function drift(ts) {
+    if (ts - driftLast < 30) { requestAnimationFrame(drift); return; }
+    var kD = driftLast ? Math.min(4, (ts - driftLast) / 16.667) : 1; driftLast = ts;
     if (mainEl && !mainEl.classList.contains("is-hidden") && !document.hidden) {
       var dx = Math.sin(ts * 0.00013) * 0.12, dy = Math.cos(ts * 0.00011) * 0.1;
-      px += (tx + dx - px) * 0.04; py += (ty + dy - py) * 0.04;
+      var e = 1 - Math.pow(0.96, kD);
+      px += (tx + dx - px) * e; py += (ty + dy - py) * e;
       if (glow) glow.style.translate = (-px * 34).toFixed(1) + "px " + (-py * 26).toFixed(1) + "px";
       if (amb) amb.style.translate = (-px * 14).toFixed(1) + "px " + (-py * 10).toFixed(1) + "px";
       if (rings3) rings3.style.translate = (px * 10).toFixed(1) + "px " + (py * 8).toFixed(1) + "px";
