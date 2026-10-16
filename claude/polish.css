@@ -10,6 +10,7 @@
 .tab-tile[data-section="weather"] { --acc: #a3e635; }
 .tab-tile[data-section="vehicle"] { --acc: #ff4d6d; }
 .tab-tile[data-section="sports"] { --acc: #38bdf8; }
+.tab-tile[data-section="desk"] { --acc: #34d399; }
 .tab-tile[data-external] { --acc: #34d399; }
 .tab-tile { border-left-color: color-mix(in srgb, var(--acc, #8f5ef8) 55%, transparent) !important; }
 .tab-tile::after {
