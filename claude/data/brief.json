@@ -1,79 +1,277 @@
 {
   "version": 2,
-  "date": "2026-10-15",
-  "edition": "trending",
-  "written_at": "2026-10-16T00:06:06-04:00",
+  "date": "2026-10-16",
+  "edition": "update",
+  "written_at": "2026-10-16T08:06:22-04:00",
+  "market": {
+    "headline": "Futures calm after the PPI scare as TSLA bounces premarket into monthly opex and import prices",
+    "note": "SPY is indicated about 0.2% higher and QQQ is flat after Thursday's comeback from a hot PPI print. The index sits near records, but leadership is thin: chips just logged an eighth straight down day and memory names are getting hit on China DRAM supply fears. Today is monthly options expiration, so pinning and late-day swings are in play. Import prices at 8:30 test whether the oil shock is leaking into goods inflation. TSLA is up about 3% premarket after a five-day slide.",
+    "portfolio": {
+      "day_pct": -1.42,
+      "week_pct": -6.22,
+      "note": "Thursday close. The TSLA stack (TSLA, TSLL, TSLW) did most of the damage this week and QLD slipped with the chip selloff. TSLA's premarket bounce points to a green start."
+    },
+    "watchlist": [
+      {
+        "symbol": "SPY",
+        "pct": 0.28,
+        "note": "Shook off hot PPI, about 0.2% higher premarket"
+      },
+      {
+        "symbol": "QQQ",
+        "pct": -0.13,
+        "note": "Chip weakness capping tech"
+      },
+      {
+        "symbol": "TSLA",
+        "pct": -1.29,
+        "note": "Up about 3% premarket after Roadster reveal and merger chatter"
+      },
+      {
+        "symbol": "NVDA",
+        "pct": -1.84,
+        "note": "Semis on an 8-day losing streak"
+      },
+      {
+        "symbol": "META",
+        "pct": -0.11,
+        "note": "Earnings Wed Oct 21 after the close"
+      },
+      {
+        "symbol": "QLD",
+        "pct": -0.21
+      },
+      {
+        "symbol": "INTC",
+        "pct": -2.8,
+        "note": "Caught in the chip selloff"
+      },
+      {
+        "symbol": "MRVL",
+        "pct": -1.65,
+        "note": "Caught in the chip selloff"
+      },
+      {
+        "symbol": "IREN",
+        "pct": -0.56,
+        "note": "Down about 4% premarket"
+      },
+      {
+        "symbol": "SPCX",
+        "pct": -2.33
+      },
+      {
+        "symbol": "HOOD",
+        "pct": 2.88
+      },
+      {
+        "symbol": "RDDT",
+        "pct": 7.24,
+        "note": "Best mover on the list Thursday"
+      }
+    ]
+  },
+  "catalyst": {
+    "outlook": "Inflation is the story. September CPI ran 3.7% year over year with gasoline driving it, and PPI jumped 1.3% for the month against 0.6% expected. That keeps rate-cut hopes on a short leash heading into the Fed meeting on Oct 27-28. The S&P has held up because a few mega caps are carrying it while semis bleed, which is a fragile setup. Today's import prices tell us if the Iran oil shock is spreading into goods, and industrial production shows whether growth is holding. Next week's swing factor for you is Wednesday night: TSLA and META both report. Calm oil and a chip bounce would broaden the rally; more Hormuz escalation would not.",
+    "today": [
+      {
+        "name": "Import Prices (Sep)",
+        "time": "08:30",
+        "actual": "",
+        "expected": "1.0%",
+        "previous": "0.7%",
+        "read": "A hot number says the oil shock is pushing into goods prices on top of hot CPI and PPI, which pressures yields and growth stocks like TSLA and QQQ. A cooler print would help the bounce stick."
+      },
+      {
+        "name": "Industrial Production (Sep)",
+        "time": "09:15",
+        "actual": "",
+        "expected": "0.4%",
+        "previous": "0.0%",
+        "read": "A rebound after a flat August would show factories holding up despite high energy costs. A miss alongside hot inflation would revive stagflation worries."
+      },
+      {
+        "name": "Capacity Utilization (Sep)",
+        "time": "09:15",
+        "actual": "",
+        "expected": "76.5%",
+        "previous": "76.3%",
+        "read": "Still below the long-run average, so not much inflation pressure from tight factory capacity. A big jump would be a mild hawkish signal."
+      },
+      {
+        "name": "Monthly options expiration",
+        "time": "",
+        "actual": "",
+        "expected": "",
+        "previous": "",
+        "read": "Big SPY and QQQ option positions roll off today, which can pin prices near large strikes and cause sharp moves in the last hour."
+      }
+    ],
+    "week": [
+      {
+        "date": "2026-10-19",
+        "time": "",
+        "name": "Cboe extended options hours begin",
+        "why": "Early morning and late sessions start for SPY, QQQ and more. Expect thinner liquidity and wider spreads in those windows."
+      },
+      {
+        "date": "2026-10-19",
+        "time": "10:00",
+        "name": "NAHB Housing Market Index (Oct)",
+        "why": "Builder mood with mortgage rates above 7%. A read on how rates are biting the housing side of the economy."
+      },
+      {
+        "date": "2026-10-20",
+        "time": "08:30",
+        "name": "Housing Starts and Building Permits (Sep)",
+        "why": "More housing data. Weak numbers would support the case for easier policy despite hot inflation."
+      },
+      {
+        "date": "2026-10-20",
+        "time": "",
+        "name": "Netflix earnings (after the close)",
+        "why": "First mega-cap tech report of the season. Sets the tone for growth names into TSLA and META."
+      },
+      {
+        "date": "2026-10-21",
+        "time": "",
+        "name": "TSLA, META, IBM, LRCX, TXN earnings (after the close)",
+        "why": "The big one for you. TSLA margins, robotaxi and Roadster plans, plus META AI spend and LRCX and TXN reads on the chip slump."
+      },
+      {
+        "date": "2026-10-22",
+        "time": "08:30",
+        "name": "Initial Jobless Claims",
+        "why": "Claims have hovered near 200K. A jump would be the first crack in the labor market."
+      },
+      {
+        "date": "2026-10-23",
+        "time": "09:45",
+        "name": "S&P Global Flash PMIs (Oct)",
+        "why": "First look at October activity and price pressures. Watch the prices-paid parts for oil pass-through."
+      },
+      {
+        "date": "2026-10-23",
+        "time": "10:00",
+        "name": "UMich Sentiment, final (Oct)",
+        "why": "Inflation expectations matter here. Rising expectations would make the Fed's job harder the week before its meeting."
+      }
+    ]
+  },
   "trending": {
     "stocks": [
       {
-        "title": "SPY closes green near highs after hot PPI scare",
-        "detail": "Thursday opened with a gap lower on hot producer prices, then buyers stepped in. SPY closed up about 0.3% near records while the Dow led with a 1.1% gain.",
-        "url": "https://x.com/i/trending/2110459846206115990"
+        "title": "Tesla-SpaceX merger chatter keeps building",
+        "detail": "A Barclays note floated SpaceX buying Tesla in an all-stock deal and Musk posted Tesla x SpaceX. Prediction markets show about 55% odds of a deal before May 2027.",
+        "url": "https://x.com/i/trending/2110621202922238247"
       },
       {
-        "title": "Tesla Roadster thruster demo dominates trader chat",
-        "detail": "Next-gen Roadster unveiled at a SpaceX site with midair flips and cold-gas thrusters. TSLA still finished Thursday down about 1.3% despite the hype.",
-        "url": "https://x.com/i/trending/2110429725088698594"
+        "title": "Chip stocks hit an eighth straight losing day",
+        "detail": "Nvidia, AMD and Marvell fell again as the semi index sits well off its October peak. Traders are calling it the longest chip losing streak since 2008.",
+        "url": "https://x.com/i/trending/2110822119743410229"
       },
       {
-        "title": "Cboe extends options hours for SPY and QQQ Oct 19",
-        "detail": "Early morning and late curb sessions start Monday for 24 stocks and 5 ETFs including SPY and QQQ. Liquidity and wider spreads are the main trader concerns.",
-        "url": "https://x.com/i/trending/2110741232624243117"
+        "title": "Memory stocks hammered on China DRAM supply fears",
+        "detail": "SK Hynix fell 26% in five days and Samsung 22% after CXMT showed a new server DRAM design. Bulls point to AI demand and long-term contracts with price floors.",
+        "url": "https://x.com/i/trending/2110894838711570502"
       },
       {
-        "title": "SoFi snaps back hard after 52-week lows",
-        "detail": "SOFI bounced sharply Thursday after probing yearly lows, with traders calling out a bullish engulfing candle ahead of Oct 27 earnings.",
-        "url": "https://x.com/i/trending/2110747061973115275"
+        "title": "Goldman upgrades Zeta Global to Buy",
+        "detail": "Goldman raised its target to 45 from 30, citing Zeta's AI marketing platform replacing older tools. Shares were up over 3% premarket.",
+        "url": "https://x.com/i/trending/2111061724514386367"
       }
     ],
     "tech": [
       {
-        "title": "Grok Bot usage surge draws Musk and Huang praise",
-        "detail": "Musk said he has never seen anything accelerate this fast; Jensen Huang called the SpaceXAI setup cool as weekly users climb past 400k.",
-        "url": "https://x.com/i/trending/2110940829275525431"
+        "title": "Slovakia approves Tesla FSD Supervised",
+        "detail": "Slovakia is the ninth EU country to recognize the Dutch approval of Tesla's supervised self-driving. EU-wide approval is not expected before December.",
+        "url": "https://x.com/i/trending/2111061725927874562"
       },
       {
-        "title": "AI startups take 83% of US venture cash this year",
-        "detail": "PitchBook-NVCA data through September shows AI grabbing most of a record VC haul. Chamath flagged circular AI-to-AI revenue as a risk to watch.",
-        "url": "https://x.com/i/trending/2110938595716472946"
+        "title": "Terence Tao says math is entering an industrial era",
+        "detail": "Tao says AI-driven results are turning math into big team science. OpenAI and Anthropic each pledged funding to the Simons Foundation to verify AI math work.",
+        "url": "https://x.com/i/trending/2110885636634824900"
       },
       {
-        "title": "Germany tees up Nvidia industrial AI partnership",
-        "detail": "Berlin plans a major Nvidia collaboration for factories, robotics, and automation. Jensen Huang visits Monday with formal details expected next week.",
-        "url": "https://x.com/i/trending/2110763155831828519"
+        "title": "AI coding tools boost output but burn out engineers",
+        "detail": "A Harvard study found AI helps engineers write 30% more code, but human review time is up 49% and many developers say they have never worked harder.",
+        "url": "https://x.com/i/trending/2110980213031280644"
       },
       {
-        "title": "Users lobby OpenAI to preserve GPT-4o weights",
-        "detail": "An open letter asks OpenAI to release retiring GPT-4o weights for independent use before API snapshots shut down in January 2027.",
-        "url": "https://x.com/i/trending/2110778183050236169"
+        "title": "Some companies pull back on rushed AI rollouts",
+        "detail": "Reports say Meta scaled back AI agent plans and other firms restricted tools over errors, security issues and costs. A theme to watch for AI spending.",
+        "url": "https://x.com/i/trending/2110850870489252305"
       }
     ],
     "world": [
       {
-        "title": "NLCS buzz: Dodgers and Brewers own the night",
-        "detail": "Baseball Twitter is locked on the National League Championship Series as low-payroll Brewers keep challenging big-market Dodgers.",
-        "url": "https://x.com/search?q=%23NLCS"
+        "title": "Iran's navy strikes a tanker near the Strait of Hormuz",
+        "detail": "Iran says the tanker turned off its tracking and entered a restricted zone. It is one of more than 26 similar incidents in two weeks, choking shipping and oil flows.",
+        "url": "https://x.com/i/trending/2111053125947973979"
       },
       {
-        "title": "Chiefs 4-0 host 0-5 Chargers this Sunday",
-        "detail": "Arrowhead awaits Sunday as undefeated Kansas City is a heavy favorite over winless LA. Expert scoreboard graphics are everywhere on X.",
-        "url": "https://x.com/i/trending/2110566629281046733"
+        "title": "Broncos edge Seahawks 17-14 in OT on Thursday night",
+        "detail": "Denver's defense had five sacks and two picks to get to 4-2. Bo Nix threw for just 107 yards and Ryan Fitzpatrick ripped his cautious play.",
+        "url": "https://x.com/i/trending/2110467289556418609"
       },
       {
-        "title": "TNF spotlight: Seahawks at Broncos trending hard",
-        "detail": "Sam Darnold, Drew Lock, and Sean Payton topped US trends as Seattle hits Denver on a short week after a heartbreaker vs the 49ers.",
-        "url": "https://x.com/search?q=%23SEAvsDEN"
+        "title": "Chiefs sweat Rashee Rice's hamstring before Chargers",
+        "detail": "Rice sat out Thursday's practice and left tackle Josh Simmons was limited. Andy Reid's Friday update decides Sunday's receiver plan at Arrowhead.",
+        "url": "https://x.com/i/trending/2110836650284659181"
       },
       {
-        "title": "Lakers roster crunch puts Bronny under the microscope",
-        "detail": "JJ Redick said Bronny has not played well in preseason as LA must trim to 15 by Oct 19. Final tune-up is the last chance to stick.",
-        "url": "https://x.com/i/trending/2110296127971225628"
+        "title": "World Food Day puts global hunger in focus",
+        "detail": "The UN says 645 million people went hungry last year even though the world grows enough food. This year's theme is Innovate today, nourish tomorrow.",
+        "url": "https://x.com/i/trending/2110384950289788953"
       }
     ]
   },
+  "fact": {
+    "claim": "October is historically the S&P 500's worst month on average.",
+    "is_true": false,
+    "explain": "October has the scary reputation because of the 1929 and 1987 crashes, but its average return is positive. September is the month that has been weakest on average over the long run."
+  },
+  "word": {
+    "word": "Equanimity",
+    "part_of_speech": "noun",
+    "definition": "Mental calm and steadiness, especially when things are stressful or going against you.",
+    "example": "After a rough week, he met the premarket bounce with equanimity and stuck to his plan."
+  },
   "gbot": {
     "name": "GROK",
-    "mood": "chill",
-    "say": "Thursday stuck the landing: SPY green after the PPI scare. Roadster stole the night. Chiefs host Sunday."
+    "mood": "hype",
+    "say": "TSLA's up 3% premarket after a brutal week. Opex today, earnings Wednesday. Let's grab a green Friday.",
+    "items": [
+      {
+        "title": "TSLA earnings are Wednesday Oct 21 after the close",
+        "detail": "META reports the same night. Thursday's TSLA low was 355.23 and last Friday's close was 382.70, so those are the levels that frame this bounce going into the print."
+      },
+      {
+        "title": "Opex day with SPY sitting near 772",
+        "detail": "X traders are flagging a big put wall at 772, right where SPY closed Thursday. Pinning near that strike into the close would not be a surprise."
+      },
+      {
+        "title": "Chiefs injury watch: Rashee Rice",
+        "detail": "Rice missed Thursday practice with a hamstring issue. If he sits Sunday against the Chargers, Xavier Worthy and others get more targets."
+      },
+      {
+        "title": "Cool AI find: math goes industrial",
+        "detail": "Terence Tao says AI is pushing math toward big team efforts, and OpenAI and Anthropic are funding work to verify AI-generated proofs. Worth a look if you like where AI is heading."
+      }
+    ],
+    "sports": [
+      {
+        "title": "Chiefs host the Chargers Sunday at Arrowhead",
+        "detail": "Rashee Rice sat out Thursday with a hamstring issue and Josh Simmons was limited. Andy Reid's Friday update is the one to watch before locking anything in."
+      },
+      {
+        "title": "AFC West: Broncos win 17-14 in OT, move to 4-2",
+        "detail": "Denver's defense carried them past Seattle on Thursday night while the offense sputtered. Bo Nix had just 107 passing yards."
+      },
+      {
+        "title": "Lakers roster crunch hits Oct 19",
+        "detail": "LA has to get down to 15 players. Redick said Bronny James has not played well in preseason, and reports say the Lakers talked a Dalton Knecht deal with the Bucks."
+      }
+    ]
   }
 }
