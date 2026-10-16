@@ -761,6 +761,89 @@
     });
   }
 
+
+  /* ---------------- story + chat helpers (Trending, From the Bot) ---------------- */
+  var NAME_TICKERS = [
+    [/\btesla\b/i, "TSLA"], [/\bnvidia\b/i, "NVDA"], [/\bamd\b/i, "AMD"], [/\bmarvell\b/i, "MRVL"], [/\bmicron\b/i, "MU"],
+    [/\bapple\b/i, "AAPL"], [/\bmicrosoft\b/i, "MSFT"], [/\b(alphabet|google)\b/i, "GOOGL"], [/\bamazon\b/i, "AMZN"],
+    [/\bmeta\b/i, "META"], [/\bnetflix\b/i, "NFLX"], [/\bpalantir\b/i, "PLTR"], [/\bbroadcom\b/i, "AVGO"], [/\bintel\b/i, "INTC"],
+    [/\btsmc\b/i, "TSM"], [/\bzeta\b/i, "ZETA"], [/\bcoinbase\b/i, "COIN"], [/\bbitcoin\b/i, "BTC"], [/\buber\b/i, "UBER"],
+    [/\bsalesforce\b/i, "CRM"], [/\boracle\b/i, "ORCL"], [/\bsuper ?micro\b/i, "SMCI"], [/\bjpmorgan\b/i, "JPM"]
+  ];
+  var KNOWN = { SPY: 1, QQQ: 1, IWM: 1, DIA: 1, VIX: 1, TSLA: 1, NVDA: 1, AMD: 1, AAPL: 1, MSFT: 1, GOOGL: 1, AMZN: 1, META: 1, NFLX: 1, PLTR: 1, AVGO: 1, MU: 1, SMCI: 1, COIN: 1, MSTR: 1, HOOD: 1, ARM: 1, TSM: 1, QLD: 1, TQQQ: 1, SOXL: 1, SMH: 1 };
+  /* only today's move: a live quote stamped today, or the bot's watchlist
+     once it was written after the open. Before the open chips show just
+     the ticker, so last session's % never sits next to a premarket story. */
+  function pctFor(sym) {
+    var nowP = ny(new Date());
+    if (market) { var q = market.quotes.filter(function (x) { return x.symbol === sym; })[0]; if (q && q.time && ny(new Date(q.time)).key === nowP.key && ny(new Date(q.time)).min >= 570) return q.pct; }
+    if (isFresh()) {
+      var wt = ny(new Date(Date.parse(brief.fullWritten || brief.written) || 0));
+      if (wt.key === nowP.key && wt.min >= 570) { var w = brief.market.watch.filter(function (x) { return x.symbol === sym; })[0]; if (w) return w.pct; }
+    }
+    return null;
+  }
+  function tickersIn(text) {
+    var out = [], seen = {};
+    function add(t) { if (!seen[t] && out.length < 3) { seen[t] = 1; out.push(t); } }
+    (text.match(/\$[A-Z]{1,5}\b/g) || []).forEach(function (t) { add(t.slice(1)); });
+    var watch = isFresh() ? brief.market.watch.map(function (w) { return w.symbol; }) : [];
+    (text.match(/\b[A-Z]{2,5}\b/g) || []).forEach(function (t) { if (KNOWN[t] || watch.indexOf(t) >= 0) add(t); });
+    NAME_TICKERS.forEach(function (n) { if (n[0].test(text)) add(n[1]); });
+    return out;
+  }
+  function tickerChips(text) {
+    var ts = tickersIn(text);
+    if (!ts.length) return null;
+    var row = el("div", "ib-chips");
+    ts.forEach(function (t) {
+      var p = pctFor(t), ch = el("span", "ib-chip" + (p == null ? "" : p > 0 ? " up" : p < 0 ? " dn" : ""));
+      ch.appendChild(el("b", null, "$" + t));
+      if (p != null) ch.appendChild(el("i", null, (p > 0 ? "▲ " : p < 0 ? "▼ " : "") + pctTxt(p, 1).replace(/^[+−]/, "")));
+      row.appendChild(ch);
+    });
+    return row;
+  }
+  function glyph(name) {
+    var P = {
+      stocks: '<path d="M5 17V9M5 9V6M12 19v-9M12 10V5M19 15V8M19 8V4"/><rect x="3.5" y="9" width="3" height="6" rx=".5"/><rect x="10.5" y="10" width="3" height="6" rx=".5"/><rect x="17.5" y="8" width="3" height="5" rx=".5"/>',
+      tech: '<rect x="6" y="6" width="12" height="12" rx="2"/><rect x="9.5" y="9.5" width="5" height="5" rx=".5"/><path d="M9 3v3M15 3v3M9 18v3M15 18v3M3 9h3M3 15h3M18 9h3M18 15h3"/>',
+      world: '<circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c3 3.2 3 14.8 0 18M12 3c-3 3.2-3 14.8 0 18"/>',
+      chart: '<path d="M3 17l5-5 4 4 8-8"/><path d="M15 8h5v5"/>',
+      ball: '<ellipse cx="12" cy="12" rx="9" ry="5.5" transform="rotate(-35 12 12)"/><path d="M9.5 14.5l5-5M10.5 11l2.5 2.5M12 9.5l2.5 2.5"/>',
+      hoop: '<circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3v18M5.5 5.5c3 2.5 3 10.5 0 13M18.5 5.5c-3 2.5-3 10.5 0 13"/>',
+      spark: '<path d="M12 3l2.2 6.8L21 12l-6.8 2.2L12 21l-2.2-6.8L3 12l6.8-2.2z"/>',
+      bell: '<path d="M6 16V11a6 6 0 0 1 12 0v5l2 2H4z"/><path d="M10 20a2 2 0 0 0 4 0"/>',
+      fire: '<path d="M12 3c1 4 5 5.5 5 10a5 5 0 0 1-10 0c0-2.5 1.5-3.5 2-5 .8 1.5 1.5 2 2.5 2C11 7.5 11 5 12 3z"/>',
+      x: '<path d="M4 4l16 16M20 4L4 20"/>'
+    };
+    return '<svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">' + (P[name] || P.spark) + "</svg>";
+  }
+  function iconEl(name, cls) { var i = el("span", "ib-ico " + (cls || "")); i.innerHTML = glyph(name); return i; }
+  var NFL = /\b(nfl|afc|nfc|chiefs|chargers|broncos|raiders|bills|eagles|cowboys|49ers|ravens|bengals|packers|lions|bears|vikings|steelers|patriots|jets|giants|commanders|dolphins|texans|colts|jaguars|titans|browns|seahawks|rams|cardinals|saints|falcons|panthers|buccaneers|quarterback|touchdown|super bowl)\b/i;
+  var NBA = /\b(nba|lakers|celtics|warriors|knicks|bucks|nuggets|suns|heat|mavericks|76ers|sixers|clippers|thunder|timberwolves|cavaliers|pacers|magic|kings|hawks|grizzlies|pelicans|spurs|rockets|raptors|hornets|wizards|pistons|blazers|jazz|bulls|nets|preseason)\b/i;
+  function league(text) { return NFL.test(text) ? "NFL" : NBA.test(text) ? "NBA" : /\b(mlb|world series|yankees|dodgers)\b/i.test(text) ? "MLB" : /\b(nhl|stanley cup)\b/i.test(text) ? "NHL" : /\b(ncaa|college)\b/i.test(text) ? "NCAA" : "DESK"; }
+  function botTopic(text) {
+    if (NFL.test(text)) return "ball";
+    if (NBA.test(text)) return "hoop";
+    if (/\b(earnings|spy|qqq|opex|strike|put|call|premarket|levels?|chart|rally|sell-?off|stock|shares)\b/i.test(text) || tickersIn(text).length) return "chart";
+    if (/\b(ai|model|openai|anthropic|grok|tech|chip)\b/i.test(text)) return "spark";
+    if (/\b(remind|don't forget|deadline|today|tomorrow|watch)\b/i.test(text)) return "bell";
+    return "spark";
+  }
+  function clampable(node, text) {
+    var d = el("span", "d clamp", text);
+    node.appendChild(d);
+    node.addEventListener("click", function (e) { if (e.target.closest("a")) return; node.classList.toggle("open"); });
+    return d;
+  }
+  function xLink(url) {
+    if (!url) return null;
+    var a = el("a", "ib-xlink"); a.href = url; a.target = "_blank"; a.rel = "noopener noreferrer";
+    a.appendChild(document.createTextNode("On X ↗"));
+    return a;
+  }
+
   function renderCard(kind) {
     var now = new Date(), today = dayKey(now), fresh = isFresh();
     var c;
@@ -837,14 +920,43 @@
       c = cardShell("trending", "Trending", "03 · On X");
       var tr = brief.trending, tabs = [["stocks", "Stocks"], ["tech", "Tech"], ["world", "World"]].filter(function (t) { return tr[t[0]].length; });
       var sel = C.trendTab && tabs.some(function (t) { return t[0] === C.trendTab; }) ? C.trendTab : tabs[0][0];
-      var tb = el("div", "ib-tabs"), body = el("div", "ib-tbody");
-      function paint(k) {
+      var live = el("div", "ib-live"); live.appendChild(el("i")); live.appendChild(el("span", null, "Live on X"));
+      var wt = Date.parse(brief.written); if (isFinite(wt)) live.appendChild(el("span", "ago", "· " + clock(new Date(wt))));
+      c.appendChild(live);
+      var tb = el("div", "ib-tabs fancy"), ink = el("span", "ink"), body = el("div", "ib-tbody");
+      tb.appendChild(ink);
+      function paint(k, anim) {
         sel = k; C.trendTab = k; save();
-        Array.prototype.forEach.call(tb.children, function (b) { b.classList.toggle("on", b.getAttribute("data-k") === k); });
-        body.textContent = ""; itemList(body, tr[k]);
+        var ix = 0;
+        Array.prototype.forEach.call(tb.querySelectorAll("button"), function (b, i) { var on = b.getAttribute("data-k") === k; b.classList.toggle("on", on); if (on) ix = i; });
+        ink.style.width = (100 / tabs.length) + "%"; ink.style.transform = "translateX(" + (ix * 100) + "%)";
+        body.textContent = ""; body.className = "ib-tbody k-" + k + (anim ? " anim" : "");
+        tr[k].forEach(function (it, i) {
+          var row = el("div", i === 0 ? "ib-story hero" : "ib-story");
+          row.style.setProperty("--d", (i * 70) + "ms");
+          var rank = el("span", "rk", pad(i + 1)); row.appendChild(rank);
+          var main = el("div", "mn");
+          if (i === 0) { var tag = el("span", "top"); tag.appendChild(iconEl("fire")); tag.appendChild(document.createTextNode("Top story")); main.appendChild(tag); }
+          main.appendChild(el("span", "t", it.title));
+          if (it.detail) clampable(main, it.detail);
+          var foot = el("div", "ft");
+          var heat = el("span", "heat"); for (var h = 0; h < 4; h++) heat.appendChild(el("i", h < 4 - i ? "on" : ""));
+          foot.appendChild(heat);
+          var chips = tickerChips(it.title + " " + it.detail); if (chips) foot.appendChild(chips);
+          var xl = xLink(it.url); if (xl) foot.appendChild(xl);
+          main.appendChild(foot);
+          row.appendChild(main);
+          body.appendChild(row);
+        });
       }
-      tabs.forEach(function (t) { var b = el("button", "", t[1]); b.type = "button"; b.setAttribute("data-k", t[0]); b.addEventListener("click", function () { paint(t[0]); }); tb.appendChild(b); });
-      c.appendChild(tb); c.appendChild(body); paint(sel);
+      tabs.forEach(function (t) {
+        var b = el("button"); b.type = "button"; b.setAttribute("data-k", t[0]);
+        b.appendChild(iconEl(t[0])); b.appendChild(el("span", "lb", t[1])); b.appendChild(el("span", "ct", String(tr[t[0]].length)));
+        b.addEventListener("click", function () { if (sel !== t[0]) { buzz(8); paint(t[0], true); } });
+        tb.appendChild(b);
+      });
+      c.appendChild(tb); c.appendChild(body); paint(sel, true);
+      c.appendChild(el("div", "ib-hint", "Tap a story to read more"));
     } else if (kind === "mind") {
       c = cardShell("mind", "Fact or Fiction", "04 · Sharpen up");
       var dc = dayContent(today); save();
@@ -860,8 +972,66 @@
       if (rq) c.appendChild(recallPanel(today, rq));
     } else if (kind === "gbot") {
       c = cardShell("gbot", "From the Bot", "05 · Grok bot");
-      if (brief.gbot.items.length) { var gs = sect(c, "Can help with"); itemList(gs, brief.gbot.items); }
-      if (brief.gbot.sports.length) { var ss = sect(c, "Sports Desk"); itemList(ss, brief.gbot.sports); }
+      var g = brief.gbot, mood = ["hype", "chill", "alert", "thinking"].indexOf(g.mood) >= 0 ? g.mood : "chill", mc = MOODS[mood];
+      c.style.setProperty("--m1", mc[0]); c.style.setProperty("--m2", mc[1]);
+      var hd = el("div", "ib-bothead");
+      var av = el("span", "ib-av"); av.appendChild(el("i", "r1")); av.appendChild(el("i", "r2")); av.appendChild(el("i", "core"));
+      hd.appendChild(av);
+      var nm = el("div", "who"); nm.appendChild(el("b", null, g.name || "GROK"));
+      var st = el("span", "st"); st.appendChild(el("i")); st.appendChild(document.createTextNode("Online · " + mood)); nm.appendChild(st);
+      hd.appendChild(nm);
+      c.appendChild(hd);
+      var thread = el("div", "ib-thread");
+      c.appendChild(thread);
+      var msgs = [];
+      if (g.say) msgs.push({ say: g.say });
+      g.items.forEach(function (it) { msgs.push(it); });
+      var ck = "chat:" + editionKey(), played = !!(C.seen && C.seen[ck]);
+      function bubble(m) {
+        var b = el("div", m.say ? "ib-bub say" : "ib-bub");
+        if (m.say) { b.appendChild(el("span", "t", m.say)); return b; }
+        var top = el("div", "bh"); top.appendChild(iconEl(botTopic(m.title + " " + m.detail), "tp")); top.appendChild(el("span", "t", m.title)); b.appendChild(top);
+        if (m.detail) clampable(b, m.detail);
+        var chips = tickerChips(m.title + " " + m.detail); if (chips) b.appendChild(chips);
+        return b;
+      }
+      if (played || window.matchMedia("(prefers-reduced-motion: reduce)").matches) msgs.forEach(function (m) { thread.appendChild(bubble(m)); });
+      else {
+        C.seen[ck] = 1; save();
+        var n = 0;
+        (function next() {
+          if (n >= msgs.length || !thread.isConnected && n > 0) return;
+          var ty = el("div", "ib-typing"); ty.appendChild(el("i")); ty.appendChild(el("i")); ty.appendChild(el("i"));
+          thread.appendChild(ty);
+          setTimeout(function () {
+            ty.remove();
+            var b = bubble(msgs[n++]); b.classList.add("pop"); thread.appendChild(b); buzz(6);
+            setTimeout(next, 260);
+          }, n === 0 ? 650 : 520);
+        })();
+      }
+      if (g.sports.length) {
+        var sd = el("div", "ib-desk");
+        var dh = el("div", "dh"); dh.appendChild(el("span", "lbl", "Sports Desk")); dh.appendChild(el("span", "led", g.sports.length + " update" + (g.sports.length > 1 ? "s" : "")));
+        sd.appendChild(dh);
+        g.sports.forEach(function (it, i) {
+          var txt = it.title + " " + it.detail, lg = league(txt);
+          var tile = el("div", "ib-tile"); tile.style.setProperty("--d", (i * 80) + "ms");
+          var side = el("div", "lg " + lg.toLowerCase()); side.appendChild(iconEl(lg === "NBA" ? "hoop" : lg === "NFL" ? "ball" : "spark")); side.appendChild(el("span", null, lg));
+          tile.appendChild(side);
+          var mm = el("div", "mm");
+          var sc = (it.title.match(/\b(\d{1,3})\s*[-–]\s*(\d{1,3})\b/) || []);
+          if (sc[0]) { var big = el("span", "score"); big.appendChild(el("b", null, sc[1])); big.appendChild(el("i", null, "–")); big.appendChild(el("b", null, sc[2])); mm.appendChild(big); }
+          mm.appendChild(el("span", "t", it.title));
+          if (it.detail) clampable(mm, it.detail);
+          tile.appendChild(mm);
+          sd.appendChild(tile);
+        });
+        c.appendChild(sd);
+      }
+      var rp = el("a", "ib-reply"); rp.href = g.link || GROK_URL; rp.target = "_blank"; rp.rel = "noopener noreferrer";
+      rp.appendChild(el("span", null, "Reply to " + (g.name ? g.name.charAt(0) + g.name.slice(1).toLowerCase() : "Grok"))); rp.appendChild(el("b", null, "›"));
+      c.appendChild(rp);
     }
     return c;
   }
