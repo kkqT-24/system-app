@@ -539,7 +539,7 @@ body.ib-open { overflow: hidden; }
 .ib-ff .ib-pick.fic { color: var(--ib-dn); border-color: rgba(255, 90, 110, 0.5); }
 .ib-q .px { font-family: "Orbitron", sans-serif; font-size: 15px; color: var(--ink); letter-spacing: 0.02em; }
 .ib-q .px + .c { font-size: 12.5px; }
-.ib-av .eyes { position: absolute; left: 50%; top: 48%; display: flex; gap: 4px; transform: translate(-50%, -50%); animation: ibLook 6s ease-in-out infinite; }
-.ib-av .eyes i { width: 3.5px; height: 8px; border-radius: 50%; background: #14103a; animation: ibBlinkEye 4.2s ease-in-out infinite; }
+.ib-av .eyes { position: absolute; left: 50%; top: 48%; display: flex; gap: 3.5px; transform: translate(-68%, -62%); animation: ibLook 7s ease-in-out infinite; }
+.ib-av .eyes i { width: 4px; height: 8px; border-radius: 999px; background: #14103a; animation: ibBlinkEye 4.2s ease-in-out infinite; }
 @keyframes ibBlinkEye { 0%, 92%, 100% { transform: scaleY(1); } 96% { transform: scaleY(0.1); } }
-@keyframes ibLook { 0%, 30%, 100% { transform: translate(-50%, -50%); } 40%, 55% { transform: translate(-30%, -50%); } 65%, 80% { transform: translate(-70%, -55%); } }
+@keyframes ibLook { 0%, 38%, 54%, 100% { transform: translate(-68%, -62%); } 42%, 50% { transform: translate(-28%, -48%); } 72%, 76% { transform: translate(-45%, -38%); } 80% { transform: translate(-68%, -62%); } }

@@ -387,7 +387,8 @@
     var cv = null, cx2 = null, host = null, raf = null, S = 150, dpr = 1, t0 = performance.now();
     var shells = [], sparks = [], arcs = [], level = 0;
     /* eyes: blink every few seconds, glance around now and then */
-    var eye = { nextBlink: 0, blinkT: -1, lx: 0, ly: 0, tx: 0, ty: 0, nextLook: 0 };
+    var REST = [-2.6, -1.6];
+    var eye = { nextBlink: 0, blinkT: -1, lx: REST[0], ly: REST[1], tx: REST[0], ty: REST[1], nextLook: 0 };
     function init(h) {
       host = h; cv = h.querySelector("canvas"); cx2 = cv.getContext("2d");
       dpr = Math.min(2, window.devicePixelRatio || 1);
@@ -471,14 +472,23 @@
       if (eye.blinkT >= 0) { var bp = (t - eye.blinkT) / 0.16; if (bp >= 1) eye.blinkT = -1; else open = Math.max(0.08, Math.abs(1 - bp * 2)); }
       if (t >= eye.nextLook) {
         var r = Math.random();
-        if (r < 0.45) { eye.tx = 0; eye.ty = 0; } else { eye.tx = (Math.random() - 0.5) * 5; eye.ty = (Math.random() - 0.5) * 2.5; }
-        eye.nextLook = t + 1.2 + Math.random() * 2.8;
+        var away = !(eye.tx === REST[0] && eye.ty === REST[1]);
+        if (away || r < 0.55) { eye.tx = REST[0]; eye.ty = REST[1]; eye.nextLook = t + 2.5 + Math.random() * 3.5; }
+        else { eye.tx = [3, 2.6, -1, 0.5][(Math.random() * 4) | 0]; eye.ty = [-1, 1.2, 1.4, -2][(Math.random() * 4) | 0]; eye.nextLook = t + 0.9 + Math.random() * 1.2; }
       }
       eye.lx += (eye.tx - eye.lx) * 0.12; eye.ly += (eye.ty - eye.ly) * 0.12;
-      var ew = 2.3 + level * 0.3, eh = (5 + level * 0.8) * open, ex = c + eye.lx, ey = c - 1 + eye.ly;
+      /* rounded pill eyes */
+      var ew = 2.6 + level * 0.3, eh = (5.4 + level * 0.8) * open, ex = c + eye.lx, ey = c - 1 + eye.ly;
       if (speaking) eh *= 1 + 0.08 * Math.sin(t * 9);
       g.fillStyle = "#14103a"; g.globalAlpha = 0.92;
-      [ex - 4.6, ex + 4.6].forEach(function (x) { g.beginPath(); g.ellipse(x, ey, ew, Math.max(0.5, eh), 0, 0, Math.PI * 2); g.fill(); });
+      [ex - 4.4, ex + 4.4].forEach(function (x) {
+        var rr = ew, hh = Math.max(rr, eh);
+        g.beginPath();
+        g.arc(x, ey - hh + rr, rr, Math.PI, 0);
+        g.lineTo(x + rr, ey + hh - rr);
+        g.arc(x, ey + hh - rr, rr, 0, Math.PI);
+        g.closePath(); g.fill();
+      });
       g.globalAlpha = 1;
       raf = requestAnimationFrame(frame);
     }
