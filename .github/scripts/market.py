@@ -36,12 +36,22 @@ def yahoo(sym):
     d = json.loads(get("https://query1.finance.yahoo.com/v8/finance/chart/%s?range=5d&interval=1d" % urllib.request.quote(sym)))
     m = d["chart"]["result"][0]["meta"]
     price = float(m["regularMarketPrice"])
-    closes = [c for c in (d["chart"]["result"][0]["indicators"]["quote"][0].get("close") or []) if c is not None]
-    prev = m.get("previousClose") or m.get("chartPreviousClose")
-    # on a trading day the last daily bar is today; the bar before it is the previous close
-    if len(closes) >= 2 and abs(closes[-1] - price) < 1e-6:
-        prev = closes[-2]
     t = m.get("regularMarketTime")
+    res0 = d["chart"]["result"][0]
+    ts0 = res0.get("timestamp") or []
+    raw = res0["indicators"]["quote"][0].get("close") or []
+    bars = [(ts0[i], raw[i]) for i in range(min(len(ts0), len(raw))) if raw[i] is not None]
+    prev = None
+    if len(bars) >= 2 and t:
+        # during / after today's session the last daily bar is today, so the
+        # bar before it is the prior close (its close lags the live price, so
+        # match on the session date, not the price)
+        if ny_day(bars[-1][0]) == ny_day(t) or abs(bars[-1][1] - price) < 1e-6:
+            prev = bars[-2][1]
+        else:
+            prev = bars[-1][1]
+    if prev is None:
+        prev = m.get("previousClose") or m.get("chartPreviousClose")
     out = {"price": price, "prev": float(prev), "time": datetime.fromtimestamp(t, timezone.utc).isoformat() if t else None}
     # today's session bar (open / high / low) for the gap read
     try:
