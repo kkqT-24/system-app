@@ -2,90 +2,89 @@
   "version": 2,
   "date": "2026-10-16",
   "edition": "update",
-  "written_at": "2026-10-16T10:14:00-04:00",
+  "written_at": "2026-10-16T12:11:00-04:00",
   "market": {
-    "headline": "Premarket pop fades: SPY slips red and QQQ drops 1% as chips slide again, but TSLA clings to a gain into opex",
-    "note": "The hot import prices and strong factory data gave SPY an early lift, but it faded minutes after the open and SPY is now slightly red. QQQ is down about 1% with INTC, MRVL and META leading watchlist losses, so leadership is still thin. TSLA cut its 3% premarket gap to about 1% after tagging 363.37. On an opex Friday, watch whether SPY gets pinned near Thursday's 771.79 close into the final hour.",
+    "headline": "TSLA flips from morning green to -1% and QQQ drops 1.6% as chips keep selling into opex Friday",
+    "note": "The early Roadster bounce is gone: TSLA tagged 370.58 then slipped under 363 and is now red on the day. SPY is down about 0.6% and QQQ about 1.6%, with INTC, MRVL, META and IREN leading the watchlist losses. Semiconductors are on an eight-day skid and leadership stays thin into monthly options expiration. Watch the last hour for pin risk near large SPY and QQQ strikes.",
     "portfolio": {
-      "day_pct": 1.06,
-      "week_pct": -5.45,
-      "note": "Green today because the TSLA stack (TSLA, TSLL, TSLW) is up while QLD lags with QQQ. The week is still deep red from the TSLA slide since last Friday."
+      "day_pct": -1.68,
+      "week_pct": -7.93,
+      "note": "Red now as the TSLA stack (TSLA, TSLL, TSLW) flipped after the morning bounce and QLD doubles the QQQ drop. The week is deeper red from the TSLA slide since last Friday."
     },
     "watchlist": [
       {
         "symbol": "SPY",
-        "price": 770.85,
-        "pct": -0.12,
-        "note": "Premarket pop faded, now just under Thursday close"
+        "price": 767.11,
+        "pct": -0.61,
+        "note": "Premarket pop fully faded under Thursday close"
       },
       {
         "symbol": "QQQ",
-        "price": 720.7,
-        "pct": -1.0,
-        "note": "Down about 1% as chips and META weigh"
+        "price": 716.17,
+        "pct": -1.63,
+        "note": "Down about 1.6% as chips and META weigh"
       },
       {
         "symbol": "TSLA",
-        "price": 366.57,
-        "pct": 1.14,
-        "note": "3% premarket gap cut to about 1%, low so far 363.37"
+        "price": 357.85,
+        "pct": -1.27,
+        "note": "Morning gap gone; lost 363, low so far near 357"
       },
       {
         "symbol": "NVDA",
-        "price": 216.44,
-        "pct": -0.37,
-        "note": "Holding up better than the rest of the chips"
+        "price": 216.94,
+        "pct": -0.13,
+        "note": "Still holding up better than other chips"
       },
       {
         "symbol": "META",
-        "price": 724.72,
-        "pct": -1.63,
+        "price": 719.9,
+        "pct": -2.28,
         "note": "Lower into earnings Wed Oct 21 after the close"
       },
       {
         "symbol": "QLD",
-        "price": 90.44,
-        "pct": -2.08,
+        "price": 89.29,
+        "pct": -3.32,
         "note": "2x Nasdaq, so the QQQ drop hits double"
       },
       {
         "symbol": "INTC",
-        "price": 92.74,
-        "pct": -2.76,
-        "note": "Chip selloff rolls on"
+        "price": 91.05,
+        "pct": -4.53,
+        "note": "Chip selloff rolls on into day eight"
       },
       {
         "symbol": "MRVL",
-        "price": 233.41,
-        "pct": -3.25,
-        "note": "Chip selloff rolls on"
+        "price": 233.69,
+        "pct": -3.13,
+        "note": "Chip selloff rolls on into day eight"
       },
       {
         "symbol": "IREN",
-        "price": 28.54,
-        "pct": -6.1,
-        "note": "Worst mover on the list early"
+        "price": 27.56,
+        "pct": -9.31,
+        "note": "Worst mover on the list midday"
       },
       {
         "symbol": "SPCX",
-        "price": 146.61,
-        "pct": -1.35
+        "price": 145.76,
+        "pct": -1.92
       },
       {
         "symbol": "HOOD",
-        "price": 103.71,
-        "pct": -0.27
+        "price": 100.72,
+        "pct": -3.15
       },
       {
         "symbol": "RDDT",
-        "price": 159.56,
-        "pct": 0.12,
-        "note": "One of the few greens on the list"
+        "price": 158.5,
+        "pct": -0.54
       }
     ]
   },
   "catalyst": {
-    "outlook": "Inflation is still the story, and the open shows the market knows it. September import prices rose 1.1% and are up 8.1% year over year, the hottest annual pace since mid-2022, while industrial production jumped 0.7%. Growth is fine, but with CPI at 3.7% and PPI hot, rate-cut hopes stay on a short leash into the Oct 27-28 Fed meeting, and that hits long-duration tech first, which is why QQQ is lagging SPY. Posts on X are flagging how narrow this tape is, with the index near highs while a big chunk of stocks sit well off theirs. A real turn needs chips to stop sliding. Next week for you is Wednesday night: TSLA and META both report.",
+    "outlook": "Inflation is still the story, and midday confirms the market knows it. Hot September import prices and strong industrial production kept rate-cut hopes on a short leash into the Oct 27-28 Fed meeting, and that hits long-duration tech first. Semiconductors are on their longest losing streak in years while SPY sits near highs, so the tape stays narrow. TSLA's Roadster bounce faded and the stock is red again into Wednesday earnings. Next week for you is Wednesday night: TSLA and META both report.",
     "today": [
       {
         "name": "Import Prices (Sep)",
@@ -174,68 +173,68 @@
   "trending": {
     "stocks": [
       {
+        "title": "Semiconductor stocks on an eight-day losing streak, about $2T erased",
+        "detail": "Chip names keep sliding even as TSMC guided higher on AI demand. Traders blame hot inflation, AI spend doubts, and memory oversupply worries for NVDA, INTC and MRVL holders.",
+        "url": "https://x.com/i/trending/2110822119743410229"
+      },
+      {
         "title": "S&P 500 near a record while 200-plus members sit 30% off highs",
-        "detail": "Traders are calling it a bear-bull paradox: a handful of AI mega caps carry the index while most stocks lag. Bulls see bargains if oil eases, bears see a fragile, narrow market.",
+        "detail": "Traders call it a bear-bull paradox: a handful of AI mega caps carry the index while most stocks lag. Bulls see bargains if oil eases, bears see a fragile, narrow market.",
         "url": "https://x.com/i/trending/2111079974232895681"
       },
       {
-        "title": "TSMC says AI demand is extremely strong, but chips keep sliding",
-        "detail": "TSMC posted a record quarter with revenue up 41% and guided Q4 higher, yet US chip names are red again today. The disconnect is the big debate for NVDA, MRVL and INTC holders.",
-        "url": "https://x.com/i/trending/2110560736464527748"
+        "title": "Indonesia stocks crash hard on an MSCI downgrade threat",
+        "detail": "MSCI opened a consultation on moving Indonesia out of emerging market status. The index saw its worst drop since 1998 and trading was halted amid panic selling.",
+        "url": "https://x.com/i/trending/2110897849785319527"
       },
       {
         "title": "MSCI rules could boot Strategy from global indexes",
         "detail": "New MSCI rules treat firms dominated by bitcoin holdings as non-operating. Strategy and Metaplanet top the possible deletion list after Nov 30, which could force passive selling.",
         "url": "https://x.com/i/trending/2110843848704319669"
-      },
-      {
-        "title": "Indonesia stocks crash 11% on an MSCI downgrade threat",
-        "detail": "MSCI opened a consultation on moving Indonesia out of emerging market status over ownership transparency worries. It was the worst one-day drop since 1998 and trading was halted.",
-        "url": "https://x.com/i/trending/2110897849785319527"
       }
     ],
     "tech": [
       {
-        "title": "Tesla's new Roadster reveal sparks a design fight with Porsche",
-        "detail": "Tesla showed the next Roadster Thursday night with compressed-air thrusters and a 2028 target, the same day Porsche unveiled its Mission S concept. Heritage versus spectacle is the debate.",
-        "url": "https://x.com/i/trending/2111092823608991753"
+        "title": "Tesla Roadster demo: SpaceX thrusters, midair flips, 2028 target",
+        "detail": "Tesla showed the next Roadster at SpaceX McGregor with cold-gas thrusters and upside-down driving. Performance to Rocket trims, 0-60 under a second, reservations open for 2028.",
+        "url": "https://x.com/i/trending/2111118928948699586"
+      },
+      {
+        "title": "NVIDIA and Mercedes expand partnership for automated driving",
+        "detail": "Mercedes is integrating NVIDIA Hyperion compute and Alpamayo AI into MB.OS for advanced assistance and future Level 4. Another software-defined vehicle push with OTA updates.",
+        "url": "https://x.com/i/trending/2111060088169406489"
+      },
+      {
+        "title": "Taiwan to criminalize unauthorized AI chip exports to China",
+        "detail": "Part of a 2026 U.S.-Taiwan trade deal. China is also drafting new AI and chip export controls. Escalating tech restrictions around the AI hardware boom.",
+        "url": "https://x.com/i/trending/2111040513482563612"
       },
       {
         "title": "NVIDIA RTX Spark laptops arrive with Grace CPU and Blackwell GPU",
         "detail": "ASUS, Dell, HP, Lenovo, Microsoft and MSI are shipping them with up to 128GB of unified memory for running AI models locally. Early tests put them near NVIDIA's DGX Spark desktop.",
         "url": "https://x.com/i/trending/2110840241779269786"
-      },
-      {
-        "title": "Sam Altman says AI disruption is slower than he expected",
-        "detail": "Altman said habits and company inertia have slowed AI's impact since GPT-4, and called that a good thing. Big Tech keeps borrowing heavily to fund AI buildouts anyway.",
-        "url": "https://x.com/i/trending/2111074178766090411"
-      },
-      {
-        "title": "Bluesky users push back on its new Attie AI builder",
-        "detail": "Attie lets anyone make social sites, games and quizzes from prompts. Many longtime users say it betrays the platform's non-AI roots.",
-        "url": "https://x.com/i/trending/2110861179182559296"
       }
     ],
     "world": [
       {
-        "title": "Iran strikes another tanker and vows to push US ships farther out",
-        "detail": "Iran released video of a burning tanker east of Hormuz and says US warships are already 500 km from its coast. Two dozen-plus incidents in weeks keep oil flows and prices tense.",
-        "url": "https://x.com/i/trending/2111053125947973979"
+        "title": "Iran vows to push US Navy ships farther from its coast",
+        "detail": "Iran says US warships are already 500 km out and plans to force them farther, after claiming strikes on tankers east of Hormuz. Oil flows and prices stay tense.",
+        "url": "https://x.com/i/trending/2111107705016357162"
       },
       {
-        "title": "World Food Day: 645 million people went hungry last year",
-        "detail": "The UN theme is Innovate today, nourish tomorrow. Leaders are pushing tech and local food systems while people flood X with their favorite dishes.",
-        "url": "https://x.com/i/trending/2111095141276725569"
+        "title": "Reuters: Iran struck Gulf infrastructure 135 times since February",
+        "detail": "Precision hits on critical equipment in Saudi Arabia, UAE, Qatar and more. Experts say the damage is deeper than official debris claims, with heavy economic costs.",
+        "url": "https://x.com/i/trending/2110705395924938786"
       },
       {
-        "title": "BBC News launches on YouTube, stirring UK licence fee fears",
-        "detail": "The live channel targets younger viewers in the UK and US. Many Brits worry it is a step toward charging the TV licence fee for streaming platforms.",
-        "url": "https://x.com/i/trending/2110938596014236040"
+        "title": "Singapore ship GFS Pride sinks in Strait of Hormuz after strike",
+        "detail": "All 21 crew were evacuated safely. US CENTCOM said an IRGC projectile hit the vessel; Iran claimed a mine. Another reminder of risk in a key oil shipping lane.",
+        "url": "https://x.com/i/trending/2110177816587514057"
       },
       {
-        "title": "UN committee passes a Russian-backed resolution on modern colonialism",
-        "detail": "The vote was 85-49 with 23 abstentions. The US, UK and EU voted no, citing Russia's invasion of Ukraine as a contradiction.",
-        "url": "https://x.com/i/trending/2111043543640764768"
+        "title": "Japan's top banks test a yen stablecoin for cross-border payments",
+        "detail": "Mizuho, MUFG and SMBC finished a joint pilot with Mitsubishi UFJ Trust. Backed by Japan's FSA, they aim for commercial use by March 2027.",
+        "url": "https://x.com/i/trending/2111038995576881390"
       }
     ]
   },
@@ -254,42 +253,42 @@
   },
   "gbot": {
     "name": "GROK",
-    "mood": "thinking",
-    "say": "TSLA's 3% gap got cut to 1%, but it's still green while QQQ bleeds. 363 is the line to hold into the opex close.",
+    "mood": "alert",
+    "say": "TSLA flipped red and lost 363. QQQ's down 1.6% into opex - chips still dragging the tape.",
     "items": [
       {
-        "title": "TSLA levels for the rest of opex day",
-        "detail": "Today's range so far is 363.37 to 370.58, and Thursday closed at 362.44. Holding above 363 keeps the bounce alive going into Wednesday's earnings after the close."
+        "title": "TSLA lost the 363 hold midday",
+        "detail": "Range so far is about 356.88 to 370.58 after Thursday's 362.44 close. The morning Roadster bounce faded; holding above today's low matters more than the gap fill into Wednesday earnings."
       },
       {
-        "title": "Your portfolio is beating the tape today",
-        "detail": "You're up about 1% while QQQ is down 1%, because the TSLA stack is carrying you. QLD is the drag, and it moves double QQQ, so chip weakness hits it hardest."
+        "title": "Your book flipped with the TSLA stack",
+        "detail": "You were green when TSLA was up about 1%; now the stack is red and QLD is still doubling the QQQ drop. Chip weakness remains the main drag into the opex close."
       },
       {
-        "title": "Chiefs RB Kenneth Walker III is a problem",
-        "detail": "He's averaging a league-best 6.2 yards per carry through four games in KC. The 0-5 Chargers come to Arrowhead Sunday with Justin Herbert under fire."
+        "title": "Chiefs: Rice still unlikely for Sunday",
+        "detail": "Rashee Rice was DNP Wed and Thu with a hamstring/knee. Friday game statuses were not posted yet at midday. Walker still leads the NFL at 6.2 yards per carry vs the 0-5 Chargers."
       },
       {
-        "title": "Cool tech: NVIDIA's RTX Spark laptops",
-        "detail": "Arm-based Grace CPU plus a Blackwell GPU and up to 128GB of unified memory, built to run big AI models right on a laptop. A real shot at Apple's M-series and Intel."
+        "title": "Cool tech: NVIDIA plus Mercedes for robotaxis",
+        "detail": "Mercedes is folding NVIDIA Hyperion compute and Alpamayo AI into MB.OS for advanced driving and future Level 4. Another real software-defined vehicle buildout, not just a press slide."
       }
     ],
     "sports": [
       {
         "title": "Chiefs host the 0-5 Chargers Sunday at Arrowhead",
-        "detail": "Rashee Rice's hamstring is the question after he sat Thursday, and Josh Simmons was limited. Andy Reid's Friday update is the one to watch before locking anything in."
+        "detail": "Rice sat two straight practices and is unlikely to play. Simmons and Sneed were limited; Friday designations were still pending at midday. Watch Andy Reid's update before locking anything in."
       },
       {
         "title": "Kenneth Walker III leads the NFL at 6.2 yards per carry",
-        "detail": "Seattle fans are lamenting letting him walk after their Super Bowl win. The Chargers' run defense gets the next look on Sunday."
+        "detail": "537 yards on 87 carries through four games in KC. The Chargers' run defense gets the next look on Sunday with Herbert under fire."
       },
       {
-        "title": "AFC West: Broncos win 17-14 in OT, move to 4-2",
-        "detail": "Denver's defense carried them past Seattle Thursday night while Bo Nix threw for just 107 yards."
+        "title": "Chargers injury list is long into Arrowhead",
+        "detail": "Tre' Harris doubtful with a hamstring; Derwin James, Donte Jackson, Joe Alt and others were DNP or limited. Ladd McConkey was limited with a foot issue."
       },
       {
-        "title": "Lakers roster crunch hits Oct 19",
-        "detail": "LA has to get to 15 players. Reports say talks to send Dalton Knecht to the Bucks for Jericho Sims look unlikely, so a waiver is still on the table."
+        "title": "Lakers roster crunch hits Monday Oct 19",
+        "detail": "LA has to get to 15 players. Knecht-for-Sims talks with the Bucks look unlikely to land, so a waiver is still on the table if no trade clears."
       }
     ]
   }
