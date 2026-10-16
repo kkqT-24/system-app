@@ -1,8 +1,8 @@
 /* System v2 offline worker: the app shell is cached so it opens
    without a connection; the page itself is fetched fresh first
    (network-first) so updates show up on the next open. */
-var CACHE = "system-v2.19";
-var V = "?v=2.19"; /* keep in step with the ?v= on the links in index.html */
+var CACHE = "system-v2.20";
+var V = "?v=2.20"; /* keep in step with the ?v= on the links in index.html */
 var SHELL = ["./", "index.html", "motion.css" + V, "quests.css" + V, "v2.css" + V, "polish.css" + V, "intel.css" + V, "motion.js" + V, "bolts.js" + V, "aura.js" + V, "quests.js" + V, "v2.js" + V, "polish.js" + V, "intel.js" + V, "data/econ.json", "shadows3d.js" + V,
   "manifest.webmanifest", "icon-512.png", "apple-touch-icon.png", "../x-logo.png"];
 self.addEventListener("install", function (e) {

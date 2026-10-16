@@ -386,6 +386,8 @@
   var energy = (function () {
     var cv = null, cx2 = null, host = null, raf = null, S = 150, dpr = 1, t0 = performance.now();
     var shells = [], sparks = [], arcs = [], level = 0;
+    /* eyes: blink every few seconds, glance around now and then */
+    var eye = { nextBlink: 0, blinkT: -1, lx: 0, ly: 0, tx: 0, ty: 0, nextLook: 0 };
     function init(h) {
       host = h; cv = h.querySelector("canvas"); cx2 = cv.getContext("2d");
       dpr = Math.min(2, window.devicePixelRatio || 1);
@@ -462,6 +464,22 @@
       g.beginPath(); g.arc(c, c, 19 + level * 2, t * 0.6, t * 0.6 + Math.PI * 1.4); g.stroke();
       g.strokeStyle = rgba(B, 0.8); g.beginPath(); g.arc(c, c, 22, -t * 0.4, -t * 0.4 + Math.PI * 0.9); g.stroke();
       g.globalAlpha = 1; g.globalCompositeOperation = "source-over";
+      /* eyes */
+      if (!eye.nextBlink) { eye.nextBlink = t + 2 + Math.random() * 3; eye.nextLook = t + 1.5; }
+      if (t >= eye.nextBlink && eye.blinkT < 0) { eye.blinkT = t; eye.nextBlink = t + 2.5 + Math.random() * 3.5 + (Math.random() < 0.2 ? -2.2 : 0); }
+      var open = 1;
+      if (eye.blinkT >= 0) { var bp = (t - eye.blinkT) / 0.16; if (bp >= 1) eye.blinkT = -1; else open = Math.max(0.08, Math.abs(1 - bp * 2)); }
+      if (t >= eye.nextLook) {
+        var r = Math.random();
+        if (r < 0.45) { eye.tx = 0; eye.ty = 0; } else { eye.tx = (Math.random() - 0.5) * 5; eye.ty = (Math.random() - 0.5) * 2.5; }
+        eye.nextLook = t + 1.2 + Math.random() * 2.8;
+      }
+      eye.lx += (eye.tx - eye.lx) * 0.12; eye.ly += (eye.ty - eye.ly) * 0.12;
+      var ew = 2.3 + level * 0.3, eh = (5 + level * 0.8) * open, ex = c + eye.lx, ey = c - 1 + eye.ly;
+      if (speaking) eh *= 1 + 0.08 * Math.sin(t * 9);
+      g.fillStyle = "#14103a"; g.globalAlpha = 0.92;
+      [ex - 4.6, ex + 4.6].forEach(function (x) { g.beginPath(); g.ellipse(x, ey, ew, Math.max(0.5, eh), 0, 0, Math.PI * 2); g.fill(); });
+      g.globalAlpha = 1;
       raf = requestAnimationFrame(frame);
     }
     return {
@@ -1011,7 +1029,8 @@
       var g = brief.gbot, mood = ["hype", "chill", "alert", "thinking"].indexOf(g.mood) >= 0 ? g.mood : "chill", mc = MOODS[mood];
       c.style.setProperty("--m1", mc[0]); c.style.setProperty("--m2", mc[1]);
       var hd = el("div", "ib-bothead");
-      var av = el("span", "ib-av"); av.appendChild(el("i", "r1")); av.appendChild(el("i", "r2")); av.appendChild(el("i", "core"));
+      var av = el("span", "ib-av"); av.appendChild(el("i", "r1")); av.appendChild(el("i", "r2"));
+      var avc = el("i", "core"), eyes = el("i", "eyes"); eyes.appendChild(el("i")); eyes.appendChild(el("i")); avc.appendChild(eyes); av.appendChild(avc);
       hd.appendChild(av);
       var nm = el("div", "who"); nm.appendChild(el("b", null, g.name || "GROK"));
       var st = el("span", "st"); st.appendChild(el("i")); st.appendChild(document.createTextNode("Online · " + mood)); nm.appendChild(st);
@@ -1284,7 +1303,7 @@
 
   /* ---------------- Word of the Day: decode + Lexicon ---------------- */
   var lastDecode = 0, lexOpen = false;
-  var GLYPHS = "ΔΣΛΞΨΩ#%&*<>/\\|▓▒░01";
+  var WGLYPHS = "ΔΣΛΞΨΩ#%&*<>/\\|▓▒░01";
   function decode(node, word) {
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches || Date.now() - lastDecode < 8000) { node.textContent = word; return; }
     lastDecode = Date.now();
@@ -1295,7 +1314,7 @@
       var e = performance.now() - t0, out = "";
       for (var i = 0; i < n; i++) {
         if (e > 250 + i * 70 || word[i] === " ") out += word[i];
-        else out += GLYPHS[Math.floor(Math.random() * GLYPHS.length)];
+        else out += WGLYPHS[Math.floor(Math.random() * WGLYPHS.length)];
       }
       node.textContent = out;
       if (e < 250 + n * 70 + 40) requestAnimationFrame(f); else { node.textContent = word; node.classList.remove("decoding"); node.classList.add("decoded"); }
