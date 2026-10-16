@@ -192,7 +192,22 @@ body.ib-open { overflow: hidden; }
 .ib-stats b { display: block; font-family: "Orbitron", sans-serif; font-size: 18px; }
 .ib-stats i { font-style: normal; font-family: "Share Tech Mono", monospace; font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--ink-faint); }
 
-/* catalyst */
+/* catalyst (on the Market card) */
+.ib-alert {
+  position: relative; margin-top: 14px; padding: 12px 14px 10px;
+  border: 1px solid rgba(251, 191, 36, 0.65); background: linear-gradient(135deg, rgba(251, 191, 36, 0.12), rgba(251, 191, 36, 0.03) 60%);
+  box-shadow: 0 0 22px rgba(251, 191, 36, 0.18), inset 0 0 18px rgba(251, 191, 36, 0.06);
+  clip-path: polygon(10px 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%, 0 10px);
+  animation: ibAlert 2.6s ease-in-out infinite;
+}
+.ib-alert::before { content: ""; position: absolute; left: 0; top: 0; bottom: 0; width: 3px; background: #fbbf24; box-shadow: 0 0 10px #fbbf24; }
+@keyframes ibAlert { 50% { box-shadow: 0 0 34px rgba(251, 191, 36, 0.32), inset 0 0 22px rgba(251, 191, 36, 0.1); } }
+.ib-alert-h { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
+.ib-alert-h .lbl { font-family: "Orbitron", sans-serif; font-weight: 700; font-size: 13px; letter-spacing: 0.2em; text-transform: uppercase; color: #fbbf24; text-shadow: 0 0 12px rgba(251, 191, 36, 0.5); }
+.ib-alert-h .lbl::before { content: ""; display: inline-block; width: 7px; height: 7px; margin-right: 8px; border-radius: 50%; background: #fbbf24; box-shadow: 0 0 8px #fbbf24; vertical-align: 1px; animation: ibBlink 1.2s ease-in-out infinite; }
+.ib-alert-h .tag { font-family: "Share Tech Mono", monospace; font-size: 10px; letter-spacing: 0.18em; text-transform: uppercase; padding: 3px 7px; background: #fbbf24; color: #1a1203; }
+.ib-alert .ib-cat:first-of-type { border-top: none; padding-top: 2px; }
+.ib-alert .ib-mini { margin: 0 0 6px; }
 .ib-cat { padding: 10px 0; border-top: 1px solid rgba(203, 213, 225, 0.08); }
 .ib-sl + .ib-cat { border-top: none; padding-top: 0; }
 .ib-cat .top { display: flex; justify-content: space-between; gap: 10px; align-items: baseline; margin-bottom: 8px; }
@@ -290,7 +305,7 @@ body.ib-open { overflow: hidden; }
 .sky-mbox .k { font-family: "Share Tech Mono", monospace; font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--ink-faint); }
 
 @media (prefers-reduced-motion: reduce) {
-  .intel-box.fresh .ib-scan, .ib-card, .ibp-bars i.cur::after { animation: none !important; }
+  .intel-box.fresh .ib-scan, .ib-card, .ibp-bars i.cur::after, .ib-alert, .ib-alert-h .lbl::before { animation: none !important; }
 }
 
 /* pull-to-close: the edges catch a little light as the sheet lifts away */
