@@ -220,7 +220,7 @@
       headline: str(m.headline, 140), note: str(m.note, 600),
       portfolio: m.portfolio && num(m.portfolio.day_pct) != null ? { day: +m.portfolio.day_pct, week: num(m.portfolio.week_pct), note: str(m.portfolio.note, 200) } : null,
       watch: (Array.isArray(m.watchlist) ? m.watchlist : []).filter(function (w) { return w && str(w.symbol, 8) && num(w.pct) != null; }).slice(0, 12)
-        .map(function (w) { return { symbol: str(w.symbol, 8).toUpperCase(), pct: +w.pct, note: str(w.note, 80) }; }),
+        .map(function (w) { return { symbol: str(w.symbol, 8).toUpperCase(), pct: +w.pct, price: num(w.price), note: str(w.note, 80) }; }),
       spy: num(m.spy_day_pct)
     };
     var c = d.catalyst || {};
@@ -924,12 +924,14 @@
         c.appendChild(pr);
         if (port.note) c.appendChild(el("p", "ib-p dim", port.note));
       }
-      var watch = fresh && brief.market.watch.length ? brief.market.watch : (market ? market.quotes.map(function (q) { return { symbol: q.symbol, pct: q.pct, note: "" }; }) : []);
+      var watch = fresh && brief.market.watch.length ? brief.market.watch : (market ? market.quotes.map(function (q) { return { symbol: q.symbol, pct: q.pct, price: q.price, note: "" }; }) : []);
       if (watch.length) {
         var g = el("div", "ib-watch");
         watch.forEach(function (w) {
           var q = el("div", "ib-q " + (w.pct > 0 ? "up" : w.pct < 0 ? "dn" : "flat"));
-          q.appendChild(el("span", "s", w.symbol)); q.appendChild(el("span", "c", pctTxt(w.pct)));
+          q.appendChild(el("span", "s", w.symbol));
+          if (w.price != null && w.price > 0) q.appendChild(el("span", "px", "$" + w.price.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })));
+          q.appendChild(el("span", "c", pctTxt(w.pct)));
           if (w.note) q.appendChild(el("span", "n", w.note));
           g.appendChild(q);
         });

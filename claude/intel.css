@@ -537,3 +537,5 @@ body.ib-open { overflow: hidden; }
 .intel-box { touch-action: pan-y; }
 .ib-ff .ib-pick.fact { color: var(--ib-up); border-color: rgba(52, 211, 153, 0.5); }
 .ib-ff .ib-pick.fic { color: var(--ib-dn); border-color: rgba(255, 90, 110, 0.5); }
+.ib-q .px { font-family: "Orbitron", sans-serif; font-size: 15px; color: var(--ink); letter-spacing: 0.02em; }
+.ib-q .px + .c { font-size: 12.5px; }
