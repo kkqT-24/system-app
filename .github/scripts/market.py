@@ -142,6 +142,18 @@ def lev200():
     out = {"date": last_day, "state": state, "since": since, "qqq_close": round(last, 2), "sma200": round(sma, 2),
            "pct_vs_sma": round((last / sma - 1) * 100, 2), "upper": round(sma * 1.01, 2), "lower": round(sma * 0.99, 2),
            "flips": flips[-6:]}
+    # the last ~90 sessions of QQQ vs its 200-day line, for the desk chart
+    out["series"] = [[done[i][0], round(closes[i], 2), round(sum(closes[i - 199:i + 1]) / 200, 2)] for i in range(max(199, len(done) - 90), len(done))]
+    # every completed session's state since two years back, compressed to runs
+    runs, st2 = [], None
+    for i in range(199, len(done)):
+        sma_i = sum(closes[i - 199:i + 1]) / 200
+        c = closes[i]
+        n2 = "ON" if c > sma_i * 1.01 else "OFF" if c < sma_i * 0.99 else (st2 or ("ON" if c >= sma_i else "OFF"))
+        if n2 != st2: runs.append({"from": done[i][0], "state": n2})
+        st2 = n2
+    out["runs"] = runs[-12:]
+    out["first_date"] = done[199][0]
     lsma = (sum(closes[-199:]) + live_px) / 200
     lstate = "ON" if live_px > lsma * 1.01 else "OFF" if live_px < lsma * 0.99 else state
     out["live"] = {"price": round(live_px, 2), "sma200": round(lsma, 2), "pct_vs_sma": round((live_px / lsma - 1) * 100, 2),
