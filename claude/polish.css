@@ -555,3 +555,11 @@ body.sports-open #sec-sports .mx-embed-frame { border-bottom: 0 !important; min-
 .mx-embed-reload svg { width: 14px; height: 14px; }
 .mx-embed-reload.spin svg { animation: mxReloadSpin 0.7s cubic-bezier(0.4, 0, 0.2, 1); }
 @keyframes mxReloadSpin { to { transform: rotate(360deg); } }
+/* Sports Desk: top-left corner cut like the other modules (the bottom
+   runs off the screen, so only the top corner is cut), with a thin
+   edge drawn along the cut */
+#sec-sports.section.mx-embed { clip-path: polygon(12px 0, 100% 0, 100% 100%, 0 100%, 0 12px) !important; }
+#sec-sports.section.mx-embed:not(.assembling)::before {
+  content: ""; position: absolute; left: 0; top: 0; width: 17px; height: 1px; z-index: 3; pointer-events: none;
+  background: rgba(56, 189, 248, 0.65); transform-origin: 0 0; transform: translate(0, 12px) rotate(-45deg);
+}
