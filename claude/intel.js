@@ -332,29 +332,97 @@
     return list[0] || null;
   }
 
-  /* the core: an original holographic AI interface — rotating rings,
-     segmented arcs and a ring of voice bars around a glowing core */
-  function coreSVG() {
-    var ticks = "", bars = "";
-    for (var i = 0; i < 60; i++) {
-      var a = i / 60 * Math.PI * 2, r1 = 47, r2 = i % 5 ? 45 : 42.5;
-      ticks += '<line x1="' + (50 + Math.cos(a) * r1).toFixed(2) + '" y1="' + (50 + Math.sin(a) * r1).toFixed(2) + '" x2="' + (50 + Math.cos(a) * r2).toFixed(2) + '" y2="' + (50 + Math.sin(a) * r2).toFixed(2) + '"/>';
+  /* the core: an original energy core drawn on a canvas — a glowing
+     sphere inside tilted particle shells, throwing sparks and arcs of
+     energy outward; everything intensifies while it speaks. Colors come
+     from the bot's mood (an inner and an outer hue). */
+  var MOODS = { chill: ["#67e8f9", "#3b82f6"], hype: ["#fbbf24", "#fb7a2c"], alert: ["#ff7a8a", "#ff3b5c"], thinking: ["#c3b8fe", "#8f5ef8"] };
+  function rgba(hex, a) { var n = parseInt(hex.slice(1), 16); return "rgba(" + (n >> 16 & 255) + "," + (n >> 8 & 255) + "," + (n & 255) + "," + a + ")"; }
+  var energy = (function () {
+    var cv = null, cx2 = null, host = null, raf = null, S = 150, dpr = 1, t0 = performance.now();
+    var shells = [], sparks = [], arcs = [], level = 0;
+    function init(h) {
+      host = h; cv = h.querySelector("canvas"); cx2 = cv.getContext("2d");
+      dpr = Math.min(2, window.devicePixelRatio || 1);
+      cv.width = S * dpr; cv.height = S * dpr;
+      shells = [];
+      for (var k = 0; k < 3; k++) {
+        var pts = [];
+        for (var i = 0; i < 46; i++) pts.push({ a: i / 46 * Math.PI * 2 + Math.random() * 0.1, r: 0.9 + Math.random() * 0.2, s: 0.6 + Math.random() * 1.1, hot: Math.random() < 0.35 });
+        shells.push({ tilt: [0.25, 1.15, 2.1][k], squash: [0.38, 0.5, 0.3][k], speed: [0.55, -0.4, 0.8][k], R: [30, 34, 26][k], pts: pts });
+      }
     }
-    for (var j = 0; j < 28; j++) {
-      var b = j / 28 * 360;
-      bars += '<g transform="rotate(' + b.toFixed(1) + ' 50 50)"><rect class="vb" x="49.1" y="19" width="1.8" height="7" rx="0.9" style="animation-delay:' + (-(j * 137) % 900) + 'ms"/></g>';
+    function bolt(x0, y0, ang, len) {
+      var pts = [[x0, y0]], x = x0, y = y0, segs = 5 + (Math.random() * 4 | 0);
+      for (var i = 0; i < segs; i++) {
+        ang += (Math.random() - 0.5) * 0.9;
+        x += Math.cos(ang) * len / segs; y += Math.sin(ang) * len / segs;
+        pts.push([x, y]);
+      }
+      return pts;
     }
-    return '<svg viewBox="0 0 100 100" aria-hidden="true">' +
-      '<defs><radialGradient id="jvCoreG"><stop offset="0" style="stop-color:#fff"/><stop offset="0.35" style="stop-color:var(--jv)"/><stop offset="1" style="stop-color:var(--jv);stop-opacity:0"/></radialGradient></defs>' +
-      '<g class="r-ticks">' + ticks + '</g>' +
-      '<g class="r-arcs"><circle cx="50" cy="50" r="39" pathLength="100" stroke-dasharray="18 7"/></g>' +
-      '<g class="r-thin"><circle cx="50" cy="50" r="34" pathLength="100" stroke-dasharray="3 9 22 9 6 51"/></g>' +
-      '<g class="r-bars">' + bars + '</g>' +
-      '<circle class="r-inner" cx="50" cy="50" r="15"/>' +
-      '<circle class="core" cx="50" cy="50" r="12" fill="url(#jvCoreG)"/>' +
-      '<g class="r-scan"><path d="M50 50 L50 11 A39 39 0 0 1 77.6 22.4 Z"/></g>' +
-      "</svg>";
-  }
+    function frame(ts) {
+      raf = null;
+      if (!host || !host.isConnected || document.hidden || (player && player.classList.contains("show"))) return;
+      var t = (ts - t0) / 1000, c = S / 2;
+      var speaking = host.classList.contains("speaking");
+      level += ((speaking ? 1 : 0.35) - level) * 0.06;
+      var col = MOODS[host.getAttribute("data-mood")] || MOODS.chill, A = col[0], B = col[1];
+      var g = cx2; g.setTransform(dpr, 0, 0, dpr, 0, 0); g.clearRect(0, 0, S, S);
+      g.globalCompositeOperation = "lighter";
+      /* outer haze */
+      var pulse = 0.5 + 0.5 * Math.sin(t * (2 + level * 4));
+      var hz = g.createRadialGradient(c, c, 4, c, c, 62);
+      hz.addColorStop(0, rgba(A, 0.22 + level * 0.12)); hz.addColorStop(0.45, rgba(B, 0.10 + level * 0.08)); hz.addColorStop(1, rgba(B, 0));
+      g.fillStyle = hz; g.beginPath(); g.arc(c, c, 62, 0, Math.PI * 2); g.fill();
+      /* particle shells: points on tilted rings, the far side dimmer */
+      shells.forEach(function (sh, k) {
+        var rot = t * sh.speed * (1 + level * 0.8), ct = Math.cos(sh.tilt), st = Math.sin(sh.tilt);
+        sh.pts.forEach(function (p) {
+          var a = p.a + rot, x = Math.cos(a) * sh.R * p.r, y = Math.sin(a) * sh.R * p.r * sh.squash;
+          var X = c + x * ct - y * st, Y = c + x * st + y * ct, depth = Math.sin(a);
+          g.globalAlpha = Math.max(0.08, 0.35 + depth * 0.45) * (0.7 + level * 0.3);
+          g.fillStyle = p.hot ? (k === 1 ? B : "#ffffff") : A;
+          g.fillRect(X - p.s / 2, Y - p.s / 2, p.s, p.s);
+        });
+      });
+      /* energy arcs: short-lived jagged bolts thrown off the sphere */
+      if (Math.random() < 0.05 + level * 0.28) {
+        var ang = Math.random() * Math.PI * 2, r0 = 12 + Math.random() * 6;
+        arcs.push({ pts: bolt(c + Math.cos(ang) * r0, c + Math.sin(ang) * r0, ang, 26 + Math.random() * (30 + level * 24)), life: 1, w: 0.7 + Math.random() * 0.9, hue: Math.random() < 0.5 ? A : B });
+      }
+      for (var i = arcs.length - 1; i >= 0; i--) {
+        var ar = arcs[i]; ar.life -= 0.09;
+        if (ar.life <= 0) { arcs.splice(i, 1); continue; }
+        g.globalAlpha = ar.life;
+        g.strokeStyle = ar.hue; g.lineWidth = ar.w * 2.6; g.shadowColor = ar.hue; g.shadowBlur = 8;
+        g.beginPath(); ar.pts.forEach(function (p, j) { if (j) g.lineTo(p[0], p[1]); else g.moveTo(p[0], p[1]); }); g.stroke();
+        g.strokeStyle = "#fff"; g.lineWidth = ar.w * 0.7; g.shadowBlur = 0; g.stroke();
+      }
+      /* sparks streaming outward */
+      var n = Math.random() < 0.6 + level ? 1 + (level > 0.7 ? 2 : 0) : 0;
+      for (var k2 = 0; k2 < n; k2++) { var sa = Math.random() * Math.PI * 2; sparks.push({ x: c + Math.cos(sa) * 14, y: c + Math.sin(sa) * 14, vx: Math.cos(sa) * (0.5 + Math.random() * 1.4), vy: Math.sin(sa) * (0.5 + Math.random() * 1.4), life: 1, hue: Math.random() < 0.6 ? A : "#ffffff" }); }
+      for (var q = sparks.length - 1; q >= 0; q--) {
+        var sp = sparks[q]; sp.x += sp.vx; sp.y += sp.vy; sp.vx *= 0.985; sp.vy *= 0.985; sp.life -= 0.022;
+        if (sp.life <= 0) { sparks.splice(q, 1); continue; }
+        g.globalAlpha = sp.life; g.fillStyle = sp.hue; g.fillRect(sp.x - 0.8, sp.y - 0.8, 1.6, 1.6);
+      }
+      /* the core itself */
+      var cr = 11 + pulse * 2 + level * 3;
+      var cg = g.createRadialGradient(c, c, 0, c, c, cr * 1.9);
+      cg.addColorStop(0, "rgba(255,255,255,1)"); cg.addColorStop(0.28, rgba(A, 0.95)); cg.addColorStop(0.6, rgba(B, 0.45)); cg.addColorStop(1, rgba(B, 0));
+      g.globalAlpha = 1; g.shadowBlur = 0; g.fillStyle = cg; g.beginPath(); g.arc(c, c, cr * 1.9, 0, Math.PI * 2); g.fill();
+      /* a thin inner ring that flickers */
+      g.globalAlpha = 0.35 + pulse * 0.3; g.strokeStyle = rgba(A, 0.9); g.lineWidth = 0.8;
+      g.beginPath(); g.arc(c, c, 19 + level * 2, t * 1.5, t * 1.5 + Math.PI * 1.4); g.stroke();
+      g.globalAlpha = 1; g.globalCompositeOperation = "source-over";
+      raf = requestAnimationFrame(frame);
+    }
+    return {
+      mount: function (h) { init(h); this.wake(); },
+      wake: function () { if (!raf && host && !window.matchMedia("(prefers-reduced-motion: reduce)").matches) raf = requestAnimationFrame(frame); }
+    };
+  })();
   var QUIPS = {
     pre: ["Pre-market's warming up. Lock your call before the bell.", "Futures are moving. Got a read yet?"],
     open: ["Market's live. Stick to the plan.", "Session's running. No chasing."],
@@ -423,7 +491,8 @@
     box.classList.toggle("done", done);
     box.querySelector(".ib-ed").textContent = done ? "Complete" : edLabel();
     var core = box.querySelector(".jv");
-    if (!core.firstChild) core.innerHTML = coreSVG() + '<span class="jv-name"></span>';
+    if (!core.firstChild) { core.innerHTML = '<canvas class="jv-cv" aria-hidden="true"></canvas><span class="jv-name"></span>'; energy.mount(core); }
+    energy.wake();
     var mood = isFresh() ? brief.gbot.mood : "";
     core.setAttribute("data-mood", ["hype", "chill", "alert", "thinking"].indexOf(mood) >= 0 ? mood : "chill");
     core.querySelector(".jv-name").textContent = (isFresh() && brief.gbot.name) || "GROK";
@@ -477,7 +546,13 @@
       }
       if (e.cancelable) e.preventDefault();
       if (axis === "x" && card) { card.style.transform = "translateX(" + (dx * 0.55).toFixed(1) + "px)"; card.style.opacity = String(1 - Math.min(0.5, Math.abs(dx) / 600)); }
-      else if (pulling) { var py = Math.max(0, dy); player.style.transform = "translateY(" + (py * 0.85).toFixed(1) + "px)"; player.style.opacity = String(Math.max(0.35, 1 - py / 520)); }
+      else if (pulling) {
+        var py = Math.max(0, dy), k = Math.min(1, py / 260);
+        player.style.transform = "translateY(" + (py * 0.6).toFixed(1) + "px) scale(" + (1 - k * 0.06).toFixed(4) + ")";
+        player.style.borderRadius = (k * 26).toFixed(1) + "px";
+        player.style.filter = "brightness(" + (1 - k * 0.18).toFixed(3) + ")";
+        player.style.setProperty("--pull", k.toFixed(3));
+      }
     }, { passive: false });
     function end() {
       if (!tracking) return; tracking = false;
@@ -485,7 +560,7 @@
       if (card) { card.style.transition = ""; card.style.transform = ""; card.style.opacity = ""; }
       if (pulling) {
         if (dy > 120 || (fast && dy > 50)) { dropAway(); return; }
-        player.style.transition = ""; player.style.transform = ""; player.style.opacity = "";
+        player.style.transition = ""; player.style.transform = ""; player.style.opacity = ""; player.style.borderRadius = ""; player.style.filter = ""; player.style.removeProperty("--pull");
         return;
       }
       player.style.transition = "";
@@ -496,11 +571,14 @@
     player.addEventListener("touchend", end); player.addEventListener("touchcancel", end);
   }
   /* the pulled-down sheet keeps falling instead of snapping */
+  /* release past the threshold: the sheet settles down and fades out,
+     a soft glow line sweeping off the bottom edge */
   function dropAway() {
     busy = true;
-    player.style.transition = "transform 0.3s cubic-bezier(0.4, 0, 1, 1), opacity 0.3s ease";
-    player.style.transform = "translateY(100%)"; player.style.opacity = "0";
-    setTimeout(function () { busy = false; close(true); }, 310);
+    player.classList.add("dismiss");
+    player.style.transition = "transform 0.42s cubic-bezier(0.3, 0.7, 0.2, 1), opacity 0.36s ease, border-radius 0.42s ease";
+    player.style.transform = "translateY(70px) scale(0.9)"; player.style.opacity = "0"; player.style.borderRadius = "30px";
+    setTimeout(function () { busy = false; player.classList.remove("dismiss"); close(true); }, 430);
   }
   function open(at) {
     if (!player) buildPlayer();
@@ -520,10 +598,11 @@
   }
   function close(instant) {
     if (!player) return;
+    setTimeout(function () { energy.wake(); }, 80);
     if (instant) { player.style.transition = "none"; }
     player.classList.remove("show", "finale", "collapse");
     document.body.classList.remove("ib-open");
-    setTimeout(function () { player.style.transition = ""; player.style.transform = ""; player.style.opacity = ""; player.style.clipPath = ""; }, 60);
+    setTimeout(function () { player.style.transition = ""; player.style.transform = ""; player.style.opacity = ""; player.style.clipPath = ""; player.style.borderRadius = ""; player.style.filter = ""; player.style.removeProperty("--pull"); }, 60);
     save(); renderBox();
   }
   function go(i, first) {

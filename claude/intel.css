@@ -48,31 +48,14 @@
 /* the core + its feed */
 .ib-main { display: flex; align-items: center; gap: 12px; padding: 8px 14px 8px 10px; min-height: 104px; }
 .jv {
-  --jv: #67e8f9; position: relative; flex: none; width: 92px; height: 92px; padding: 0; margin: 0;
+  --jv: #67e8f9; position: relative; flex: none; width: 96px; height: 96px; padding: 0; margin: 0;
   appearance: none; background: none; border: none; color: var(--jv); cursor: pointer; -webkit-tap-highlight-color: transparent;
   display: grid; place-items: center; transition: transform 0.15s ease;
 }
 .jv[data-mood="hype"] { --jv: #fbbf24; } .jv[data-mood="alert"] { --jv: #ff7a8a; } .jv[data-mood="thinking"] { --jv: #c3b8fe; } .jv[data-mood="chill"] { --jv: #67e8f9; }
 .jv:active { transform: scale(0.92); }
 .jv:focus-visible { outline: 2px solid var(--jv); outline-offset: 2px; border-radius: 50%; }
-.jv svg { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; filter: drop-shadow(0 0 5px color-mix(in srgb, var(--jv) 55%, transparent)); }
-.jv .r-ticks, .jv .r-arcs, .jv .r-thin, .jv .r-scan, .jv .core { transform-origin: 50px 50px; }
-.jv .r-ticks line { stroke: var(--jv); stroke-width: 0.7; opacity: 0.55; }
-.jv .r-ticks { animation: jvSpin 40s linear infinite; }
-.jv .r-arcs circle { fill: none; stroke: var(--jv); stroke-width: 2.2; opacity: 0.85; }
-.jv .r-arcs { animation: jvSpin 14s linear infinite reverse; }
-.jv .r-thin circle { fill: none; stroke: var(--jv); stroke-width: 1; opacity: 0.7; }
-.jv .r-thin { animation: jvSpin 6s linear infinite; }
-.jv .vb { fill: var(--jv); opacity: 0.55; transform-box: fill-box; transform-origin: 50% 100%; animation: jvBar 0.9s ease-in-out infinite alternate; animation-play-state: paused; transform: scaleY(0.35); }
-.jv.speaking .vb { animation-play-state: running; opacity: 0.95; }
-.jv .r-inner { fill: rgba(5, 10, 30, 0.85); stroke: var(--jv); stroke-width: 0.8; opacity: 0.9; }
-.jv .core { animation: jvCore 2.6s ease-in-out infinite; }
-.jv.speaking .core { animation-duration: 0.5s; }
-.jv .r-scan path { fill: var(--jv); opacity: 0.08; }
-.jv .r-scan { animation: jvSpin 4s linear infinite; }
-@keyframes jvSpin { to { transform: rotate(1turn); } }
-@keyframes jvBar { from { transform: scaleY(0.25); } to { transform: scaleY(1.15); } }
-@keyframes jvCore { 0%, 100% { opacity: 0.75; transform: scale(0.92); } 50% { opacity: 1; transform: scale(1.06); } }
+.jv-cv { position: absolute; left: 50%; top: 50%; width: 150px; height: 150px; transform: translate(-50%, -50%); pointer-events: none; }
 .jv-name { position: absolute; bottom: -2px; left: 50%; transform: translateX(-50%); font-family: "Share Tech Mono", monospace; font-size: 8px; letter-spacing: 0.24em; color: var(--jv); opacity: 0.8; white-space: nowrap; }
 .jv-feed { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 4px; }
 .jv-tag { font-family: "Share Tech Mono", monospace; font-size: 9.5px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--ink-faint); }
@@ -318,3 +301,11 @@ body.ib-open { overflow: hidden; }
 @media (prefers-reduced-motion: reduce) {
   .intel-box.fresh .ib-scan, .ib-card, .ibp-bars i.cur::after { animation: none !important; }
 }
+
+/* pull-to-close: the edges catch a little light as the sheet lifts away */
+.ib-player { overflow: hidden; }
+.ib-player::after {
+  content: ""; position: absolute; inset: 0; pointer-events: none; border-radius: inherit;
+  box-shadow: inset 0 0 0 1px rgba(195, 184, 254, calc(var(--pull, 0) * 0.5)), inset 0 -30px 60px -30px rgba(143, 94, 248, calc(var(--pull, 0) * 0.6));
+}
+.ib-player.dismiss::after { box-shadow: inset 0 0 0 1px rgba(195, 184, 254, 0.5), inset 0 -40px 70px -30px rgba(143, 94, 248, 0.7); transition: box-shadow 0.3s ease; }
