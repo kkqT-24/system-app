@@ -1,17 +1,17 @@
 {
  "version": 1,
- "updated": "2026-10-16T16:31:06+00:00",
+ "updated": "2026-10-16T21:06:47+00:00",
  "noise": {
   "status": "Paper trading",
   "first_session": "2026-10-12",
-  "sessions": 4,
-  "traded_days": 2,
-  "up_days": 1,
-  "since_start_pct": 1.96,
+  "sessions": 5,
+  "traded_days": 3,
+  "up_days": 2,
+  "since_start_pct": 5.34,
   "dd_pct": 0.0,
   "review_pct": 20.0,
   "stop_pct": 30.0,
-  "avg_gap_vs_backtest_pct": 0.092,
+  "avg_gap_vs_backtest_pct": 0.113,
   "days": [
    {
     "date": "2026-10-12",
@@ -40,13 +40,20 @@
     "ret_pct": 0.0,
     "backtest_pct": 0.0,
     "sat_out": ""
+   },
+   {
+    "date": "2026-10-16",
+    "traded": true,
+    "ret_pct": 3.32,
+    "backtest_pct": 3.47,
+    "sat_out": ""
    }
   ]
  },
  "lev200": {
-  "date": "2026-10-15",
+  "date": "2026-10-16",
   "state": "ON",
-  "pct_vs_sma": 7.94,
+  "pct_vs_sma": 5.17,
   "action": "Hold QLD",
   "review_pct": 65.0,
   "stop_pct": 78.0
