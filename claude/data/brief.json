@@ -2,102 +2,103 @@
   "version": 2,
   "date": "2026-10-16",
   "edition": "update",
-  "written_at": "2026-10-16T14:20:00-04:00",
+  "written_at": "2026-10-16T16:22:00-04:00",
   "market": {
-    "headline": "Selling speeds up after lunch: QQQ -2.3%, SPY -1.1%, TSLA under Thursday's low as chips and oil squeeze opex Friday",
-    "note": "The afternoon got worse, not better. SPY slid from its 772 open area to about 763 and QQQ broke the 715 support traders were watching, trading near 711. Chips are down another 3% on day nine of the skid, and oil jumped back toward 100 on new Iran alerts, which revives the inflation worry right after hot import prices. TSLA lost Thursday's 355 low. Into the opex close, watch whether SPY can reclaim 766 or keeps pressing toward the lows.",
+    "headline": "Opex Friday closes red: SPY -1.10%, QQQ -2.49%, chips slide again and TSLA bounces off 349 late",
+    "note": "SPY opened near 773, hit its high in the first minutes and bled to a 760.64 low before closing at 763.30, down 1.10% and 2% on the week. QQQ did twice the damage at -2.49% and -5.5% for the week as chips sold off again and oil pushed past 100 on Iran tension. That combo, hot inflation plus higher oil plus 5% yields, is what is hitting long-duration tech. TSLA found buyers near 349 and closed at 354.67, right under Thursday's 355.23 low. Monday's test is whether SPY can get back above 766.",
     "portfolio": {
-      "day_pct": -3.37,
-      "week_pct": -9.51,
-      "note": "Deeper red this afternoon. The TSLA stack (TSLA, TSLL, TSLW) is down about 3 to 6% and QLD about 4.7% as the QQQ drop doubles. The week is mostly the TSLA slide from last Friday."
+      "day_pct": -2.79,
+      "week_pct": -8.97,
+      "note": "TSLL -4.5% and QLD -5.0% led the drop, TSLA -2.1% after its late bounce. The week is the TSLA stack and QLD sliding with QQQ."
     },
     "watchlist": [
       {
         "symbol": "SPY",
-        "price": 763.11,
+        "price": 763.3,
         "prev_close": 771.79,
-        "pct": -1.12,
-        "note": "Afternoon leg lower; low so far 762.58"
+        "pct": -1.1,
+        "note": "Closed near 763 after a 760.64 low; -2% on the week"
       },
       {
         "symbol": "QQQ",
-        "price": 711.45,
+        "price": 709.86,
         "prev_close": 728.0,
-        "pct": -2.27,
-        "note": "Broke 715 support traders were watching"
+        "pct": -2.49,
+        "note": "Low 707.23; down 5.5% for the week"
       },
       {
         "symbol": "TSLA",
-        "price": 352.63,
+        "price": 354.67,
         "prev_close": 362.44,
-        "pct": -2.71,
-        "note": "Lost Thursday's 355.23 low; day low near 351"
+        "pct": -2.14,
+        "note": "Bounced from 349.33 low but closed just under 355.23"
       },
       {
         "symbol": "NVDA",
-        "price": 215.07,
+        "price": 214.14,
         "prev_close": 217.23,
-        "pct": -0.99,
-        "note": "Still the steadiest chip name on the list"
+        "pct": -1.42,
+        "note": "Held up better than most chip names again"
       },
       {
         "symbol": "META",
-        "price": 706.78,
+        "price": 709.34,
         "prev_close": 736.72,
-        "pct": -4.06,
-        "note": "Down 4% into earnings Wed Oct 21 after the close"
+        "pct": -3.72,
+        "note": "Low near 703; reports Wed Oct 21 after the close"
       },
       {
         "symbol": "QLD",
-        "price": 88.05,
+        "price": 87.72,
         "prev_close": 92.36,
-        "pct": -4.67,
-        "note": "2x Nasdaq, so the QQQ drop hits double"
+        "pct": -5.02,
+        "note": "2x Nasdaq; down about 11% on the week"
       },
       {
         "symbol": "INTC",
-        "price": 90.65,
+        "price": 89.8,
         "prev_close": 95.37,
-        "pct": -4.95,
-        "note": "Chip selloff rolls on into day nine"
+        "pct": -5.84,
+        "note": "Chip selloff rolls on"
       },
       {
         "symbol": "MRVL",
-        "price": 230.74,
+        "price": 227.74,
         "prev_close": 241.24,
-        "pct": -4.35,
-        "note": "Chip selloff rolls on into day nine"
+        "pct": -5.6,
+        "note": "Chip selloff rolls on"
       },
       {
         "symbol": "IREN",
-        "price": 27.3,
+        "price": 27.0,
         "prev_close": 30.39,
-        "pct": -10.17,
-        "note": "AI data-center names hit by funding worries"
+        "pct": -11.16,
+        "note": "Worst on the list as AI data-center names get hit"
       },
       {
         "symbol": "SPCX",
-        "price": 144.8,
+        "price": 146.03,
         "prev_close": 148.62,
-        "pct": -2.57
+        "pct": -1.74
       },
       {
         "symbol": "HOOD",
-        "price": 99.29,
+        "price": 98.88,
         "prev_close": 103.99,
-        "pct": -4.52,
-        "note": "Under 100 as risk appetite fades"
+        "pct": -4.91,
+        "note": "Closed under 100 as risk appetite fades"
       },
       {
         "symbol": "RDDT",
-        "price": 155.29,
+        "price": 156.08,
         "prev_close": 159.36,
-        "pct": -2.55
+        "pct": -2.06
       }
-    ]
+    ],
+    "spy_day_pct": -1.1
   },
   "catalyst": {
-    "outlook": "Two inflation forces are hitting at once. Hot import prices and strong industrial production this morning already trimmed rate-cut hopes before the Oct 27-28 Fed meeting, and now oil is spiking back toward 100 on Iran alerts. That combo hits long-duration tech first, which is why QQQ is down twice as much as SPY and chips are on day nine. If oil holds above 100 into next week, growth names stay under pressure into Wednesday night, when TSLA and META both report.",
+    "outlook": "Today confirmed the morning's warning. Hot import prices and strong factory output already trimmed rate-cut hopes before the Oct 27-28 Fed meeting, and oil above 100 on Iran tension added fuel. That mix hits long-duration tech first, which is why QQQ fell more than twice as much as SPY and chips extended their slide. Next week the tone flips to earnings: Netflix Tuesday, then TSLA and META Wednesday night. If oil cools and those reports hold up, growth can bounce. If oil stays above 100, the pressure on QQQ and the TSLA stack likely continues.",
     "today": [
       {
         "name": "Import Prices (Sep)",
@@ -129,7 +130,7 @@
         "actual": "",
         "expected": "",
         "previous": "",
-        "read": "Big SPY and QQQ option positions roll off today, which can pin prices near large strikes and cause sharp moves in the last hour."
+        "read": "Opex did not pin SPY near the big 770 to 772 strikes. It broke below them and kept selling to a 760.64 low before closing at 763.30. With those positions gone, Monday can move more freely in either direction."
       }
     ],
     "week": [
@@ -186,68 +187,68 @@
   "trending": {
     "stocks": [
       {
-        "title": "QQQ and SPY slide harder on opex Friday",
-        "detail": "Traders flagged a gamma cliff near SPY 772 and max pain near 770; SPY has since dropped through both toward 763. QQQ broke the 715 to 724 support zone many were watching.",
-        "url": "https://x.com/i/trending/2111144498181087635"
+        "title": "QQQ and SPY close lower on opex Friday",
+        "detail": "SPY broke the 772 gamma level traders flagged and closed at 763.30, down 1.10%. QQQ fell 2.49% after losing the 715 to 724 support zone, and put buyers were posting big wins.",
+        "url": "https://x.com/i/trending/2111176037661126816"
       },
       {
-        "title": "Chip stocks extend the longest losing streak in over a decade",
-        "detail": "SOXX is down another 3% today after eight straight losses, the longest run in over a decade. AI spend doubts and higher borrowing costs are the main blame on X.",
+        "title": "Chip stocks extend their longest losing streak since 2010",
+        "detail": "SOXX fell another 4.2% today. X blames AI spending doubts and higher borrowing costs, with Micron swinging hard around 900.",
         "url": "https://x.com/i/trending/2110822119743410229"
       },
       {
-        "title": "Oil jumps back toward 100 on Iran high alert reports",
-        "detail": "USO is up about 2.8% and XLE about 2.2% today after reports of Iran forces on highest alert and more tanker attacks. Higher oil feeds the inflation fear hitting tech.",
+        "title": "Oil pushes past 100 as Iran tension escalates",
+        "detail": "USO closed up 2.8% after reports of Iran forces on high alert and more tanker strikes near Hormuz. Higher oil feeds the inflation fears that are hitting tech.",
         "url": "https://x.com/i/trending/2111138243748237473"
       },
       {
-        "title": "AI data-center stocks Nebius and IREN drop on funding worries",
-        "detail": "A Gartner warning that most neocloud providers may not stay independent by 2030 is circulating. IREN is down about 10% today, the worst on your watchlist.",
-        "url": "https://x.com/i/trending/2111135172938568182"
+        "title": "Traders notice Monday is October 19, the Black Monday anniversary",
+        "detail": "The 1987 crash happened on Monday Oct 19, and the date falls on a Monday again. Most posts call it a fun parallel, not a prediction, with QQQ and AI names already under pressure.",
+        "url": "https://x.com/i/trending/2111176035484271084"
       }
     ],
     "tech": [
       {
-        "title": "China proposes export limits on 23 AI technologies",
-        "detail": "Draft rules would require approval to export large model weights and source code, AI agents and computing clusters. Comments are open until Nov 15. Another step in the AI chip and tech standoff.",
-        "url": "https://x.com/i/trending/2111128512610599140"
+        "title": "Simulation says the new Tesla Roadster could beat an F1 pole lap at COTA",
+        "detail": "An engineer's sim using Tesla's specs puts it at 1:27.9 around Circuit of the Americas, versus a 1:32.5 F1 pole. Skeptics point to tires and braking the model skips.",
+        "url": "https://x.com/i/trending/2111128517169869206"
       },
       {
-        "title": "Slovakia becomes the ninth EU country to approve Tesla Assisted Driving",
-        "detail": "The system formerly called FSD Supervised is cleared there, covering about 14% of the EU population across nine countries. Germany and other big markets are still waiting.",
+        "title": "Slovakia becomes the ninth EU country to approve Tesla supervised driving",
+        "detail": "Tesla Assisted Driving got preliminary approval Oct 16 based on the Dutch RDW type approval. Drivers stay responsible, and a wider EU decision is still pending.",
         "url": "https://x.com/i/trending/2111061725927874562"
       },
       {
-        "title": "Sam Altman says AI disruption is slower than he expected",
-        "detail": "On a podcast he said habits and company inertia slowed the impact he predicted after GPT-4, even as Big Tech keeps borrowing heavily for AI buildouts.",
-        "url": "https://x.com/i/trending/2111074178766090411"
+        "title": "Big debate: do AI models understand anything or just calculate?",
+        "detail": "Ctrl IQ CEO Gregory Kurtzer called LLMs next-word predictors with no comprehension, and Gergely Orosz pushed back on the AI psychosis label. Thousands of replies on both sides.",
+        "url": "https://x.com/i/trending/2111110474163191893"
       },
       {
-        "title": "Terence Tao says math's era of lone heroes is ending",
-        "detail": "He described a shift to team and AI-driven math. Anthropic and OpenAI each pledged funding through the Simons Foundation to help verify AI-generated results.",
-        "url": "https://x.com/i/trending/2110885636634824900"
+        "title": "Developers say AI tools mean longer days, not shorter ones",
+        "detail": "Engineers report bigger scopes and more time reviewing AI output. Economists call it the Jevons paradox: efficiency leads to more work, not less.",
+        "url": "https://x.com/i/trending/2111099938876833853"
       }
     ],
     "world": [
       {
         "title": "Iran vows to push US Navy ships farther from its coast",
-        "detail": "Iran says US warships are 500 km out and plans operations to push them farther, after strikes on commercial ships near Hormuz. Oil flows and prices stay on edge.",
+        "detail": "Iran says it will force US warships beyond 500 km and reports hitting another tanker near Hormuz, with over 26 incidents in two weeks. US Central Command says commercial ships still pass.",
         "url": "https://x.com/i/trending/2111053125947973979"
       },
       {
         "title": "Indonesia stocks crash 11% on MSCI downgrade threat",
-        "detail": "The worst drop since 1998 triggered a trading halt after MSCI proposed moving Indonesia out of emerging market status. Analysts warn of large foreign outflows.",
+        "detail": "The worst one-day drop in nearly 30 years forced a trading halt after MSCI opened a consultation on moving Indonesia out of emerging market status. The rupiah weakened too.",
         "url": "https://x.com/i/trending/2110897849785319527"
       },
       {
-        "title": "WhatsApp outage hits parts of Europe",
-        "detail": "Messages stuck on one gray tick in the UK, Germany, Spain and Italy this afternoon. WABetaInfo says it is regional, not global.",
-        "url": "https://x.com/i/trending/2111147558592749943"
+        "title": "Pakistan will chair the IMF and World Bank boards in 2027",
+        "detail": "Announced at the annual meetings in Bangkok, it is Pakistan's first time in the role since 1953. The chair rotates among members.",
+        "url": "https://x.com/i/trending/2111040517421019144"
       },
       {
-        "title": "FIFA reviews the Peace Prize it gave Trump",
-        "detail": "FIFA's council asked a committee to review how the prize was created and whether to keep, reform or scrap it, with a recommendation due Dec 16.",
-        "url": "https://x.com/i/trending/2111107702168469663"
+        "title": "World Food Day street feast feeds over 50,000 in Ghana",
+        "detail": "Chef Abbys' Big Street Feast served free Ghanaian food across Accra and Kumasi on Oct 16, under the UN theme Innovate Today, Nourish Tomorrow.",
+        "url": "https://x.com/i/trending/2111095141276725569"
       }
     ]
   },
@@ -266,42 +267,42 @@
   },
   "gbot": {
     "name": "GROK",
-    "mood": "alert",
-    "say": "TSLA just cracked Thursday's 355 low and QQQ lost 715. Rough opex Friday, and Rice is officially out Sunday.",
+    "mood": "thinking",
+    "say": "SPY settled -1.10% to score your call. TSLA bounced off 349 into the bell, and Monday is the Black Monday date.",
     "items": [
       {
-        "title": "TSLA broke Thursday's low",
-        "detail": "Thursday's low was 355.23 and today's low so far is about 351 after a 370 high this morning. That is a full reversal of the Roadster pop. A close back above 355 would look much better heading into Wednesday's earnings."
+        "title": "TSLA closed a hair under Thursday's low",
+        "detail": "TSLA hit 349.33, bounced into the close and settled at 354.67, just under Thursday's 355.23 low. Reclaiming 355 to 363 early next week would be a better setup into Wednesday night's earnings."
       },
       {
-        "title": "Oil is the new drag on tech",
-        "detail": "USO is up about 2.8% today on Iran alert reports while QQQ falls 2.3%. Higher oil means hotter inflation and fewer rate cuts, which is the exact setup that hits QLD and the TSLA stack hardest."
+        "title": "The leveraged names took the real hit this week",
+        "detail": "SPY was down about 2% on the week and QQQ about 5.5%, but QLD fell about 11% and TSLL about 14%. That is the 2x math working against you on a falling week."
       },
       {
-        "title": "META reports Wednesday with TSLA",
-        "detail": "META is down about 4% today and both report after the close on Oct 21. That night is the biggest event for your watchlist next week."
+        "title": "Brewers swept the Dodgers out of the NLCS",
+        "detail": "That ends LA's three-peat bid with a 6-4 Game 4 win. X is pointing out that the Kobe and Shaq Lakers of 2000 to 2002 are still the last Big Four team to three-peat."
       },
       {
-        "title": "Lakers wrap preseason tonight vs Denver",
-        "detail": "Final tune-up at Crypto.com Arena before the regular season starts Oct 20. The roster has to be at 15 by Monday, and a Knecht waiver is still possible if no trade lands."
+        "title": "The new Roadster versus an F1 car",
+        "detail": "An engineer's simulation using Tesla's specs has the Roadster lapping COTA in 1:27.9, about five seconds faster than an F1 pole. Production is aimed at 2028."
       }
     ],
     "sports": [
       {
-        "title": "Rashee Rice ruled out vs the Chargers",
-        "detail": "Andy Reid confirmed Friday that Rice is out with hamstring and knee issues, his first missed game this year. LT Josh Simmons is also out but did return to practice this week."
+        "title": "Rice and Simmons are out vs the Chargers",
+        "detail": "Andy Reid ruled out Rashee Rice (hamstring) and LT Josh Simmons for Sunday. Xavier Worthy, Jalen Royals and rookie Kahlil Benson are in line for more snaps."
       },
       {
-        "title": "Chiefs host the 0-5 Chargers Sunday at Arrowhead",
-        "detail": "KC is without Rice, so more targets shift elsewhere. Sneed was limited Wed and Thu; check his final status before locking anything in."
+        "title": "Kenneth Walker III is rolling for KC",
+        "detail": "He has 537 rushing yards and four touchdowns in four games as a Chief, with three 100-yard games. X posts say a revenge trip to Seattle comes next week."
       },
       {
-        "title": "Khalil Mack trade buzz around the Chargers",
-        "detail": "The Bears lead reported interest and the 49ers have called, but Mack says he is still ring chasing with LA. The trade deadline is Nov 10."
+        "title": "Lakers wrap preseason tonight vs Denver",
+        "detail": "Final exhibition at Crypto.com Arena before the Oct 20 opener. Reports say LA talked with Milwaukee about Dalton Knecht for Jericho Sims and a second-round pick, or may waive him to get to 15."
       },
       {
-        "title": "Lakers face the Nuggets in tonight's preseason finale",
-        "detail": "Last exhibition before the Oct 20 opener. Watch who sits and who closes games as a hint at the rotation."
+        "title": "Chiefs host the Chargers Sunday at Arrowhead",
+        "detail": "KC plays without Rice. Check Sneed's final status before locking in any picks, and remember a bet against KC needs High confidence and a 5-point edge."
       }
     ]
   }
