@@ -123,25 +123,53 @@
 
   /* ---------------- built-in fallbacks (no brief yet) ---------------- */
   var FF = [
-    ["Octopuses have three hearts.", true, "Two pump blood through the gills, one through the rest of the body."],
-    ["Goldfish only have a three-second memory.", false, "Studies show goldfish can remember things for months."],
-    ["A day on Venus is longer than its year.", true, "Venus spins so slowly that one rotation (243 Earth days) outlasts its orbit (225)."],
-    ["The Great Wall of China is visible from the Moon with the naked eye.", false, "It's far too narrow; even from low orbit it's very hard to spot."],
-    ["Honey found in ancient Egyptian tombs was still edible.", true, "Honey's low moisture and acidity keep bacteria from growing."],
-    ["Bananas are berries, but strawberries aren't.", true, "Botanically, a berry comes from one flower with one ovary — bananas qualify, strawberries don't."],
-    ["Bulls get angry at the color red.", false, "Bulls are red-green colorblind; it's the cape's movement that provokes them."],
-    ["Sharks existed before trees.", true, "Sharks go back about 400+ million years; the first trees appeared around 385 million years ago."],
-    ["Humans only use 10% of their brains.", false, "Brain scans show activity across virtually all regions over a day."],
-    ["Wombat droppings are cube-shaped.", true, "The varying elasticity of their intestines shapes it into cubes."],
-    ["Lightning never strikes the same place twice.", false, "The Empire State Building is hit roughly 20–25 times a year."],
-    ["A bolt of lightning is hotter than the surface of the Sun.", true, "Lightning reaches about 30,000 K; the Sun's surface is about 5,800 K."],
-    ["Napoleon was unusually short.", false, "He was about 5'7\", average for a Frenchman of his time; the myth came from unit confusion and propaganda."],
-    ["The Eiffel Tower gets taller in summer.", true, "Iron expands in the heat, adding up to about 15 cm."],
-    ["Bats are blind.", false, "All bats can see, and many species see quite well; echolocation is an extra sense."],
-    ["The first computer 'bug' was an actual insect.", true, "In 1947 a moth was found stuck in a relay of Harvard's Mark II computer."],
-    ["Chameleons change color mainly to blend in.", false, "They mostly change color to signal mood and regulate temperature."],
-    ["There are more possible chess games than atoms in the observable universe.", true, "Estimates of possible games (around 10^120) dwarf the ~10^80 atoms."]
+    ["Octopuses have three hearts.", true, "Two pump blood through the gills, one through the rest of the body.", "animals"],
+    ["Goldfish only have a three-second memory.", false, "Studies show goldfish can remember things for months.", "animals"],
+    ["A day on Venus is longer than its year.", true, "Venus spins so slowly that one rotation (243 Earth days) outlasts its orbit (225).", "space"],
+    ["The Great Wall of China is visible from the Moon with the naked eye.", false, "It's far too narrow; even from low orbit it's very hard to spot.", "history"],
+    ["Honey found in ancient Egyptian tombs was still edible.", true, "Honey's low moisture and acidity keep bacteria from growing.", "food"],
+    ["Bananas are berries, but strawberries aren't.", true, "Botanically, a berry comes from one flower with one ovary — bananas qualify, strawberries don't.", "food"],
+    ["Bulls get angry at the color red.", false, "Bulls are red-green colorblind; it's the cape's movement that provokes them.", "animals"],
+    ["Sharks existed before trees.", true, "Sharks go back about 400+ million years; the first trees appeared around 385 million years ago.", "animals"],
+    ["Humans only use 10% of their brains.", false, "Brain scans show activity across virtually all regions over a day.", "body"],
+    ["Wombat droppings are cube-shaped.", true, "The varying elasticity of their intestines shapes it into cubes.", "animals"],
+    ["Lightning never strikes the same place twice.", false, "The Empire State Building is hit roughly 20–25 times a year.", "science"],
+    ["A bolt of lightning is hotter than the surface of the Sun.", true, "Lightning reaches about 30,000 K; the Sun's surface is about 5,800 K.", "science"],
+    ["Napoleon was unusually short.", false, "He was about 5'7\", average for a Frenchman of his time; the myth came from unit confusion and propaganda.", "history"],
+    ["The Eiffel Tower gets taller in summer.", true, "Iron expands in the heat, adding up to about 15 cm.", "science"],
+    ["Bats are blind.", false, "All bats can see, and many species see quite well; echolocation is an extra sense.", "animals"],
+    ["The first computer 'bug' was an actual insect.", true, "In 1947 a moth was found stuck in a relay of Harvard's Mark II computer.", "tech"],
+    ["Chameleons change color mainly to blend in.", false, "They mostly change color to signal mood and regulate temperature.", "animals"],
+    ["There are more possible chess games than atoms in the observable universe.", true, "Estimates of possible games (around 10^120) dwarf the ~10^80 atoms.", "science"],
+    ["Mars is home to the tallest volcano in the solar system.", true, "Olympus Mons rises about 22 km — roughly two and a half times the height of Everest.", "space"],
+    ["The Moon gives off its own light.", false, "Moonlight is sunlight reflected off the lunar surface.", "space"],
+    ["A teaspoon of neutron star would weigh billions of tons.", true, "Neutron stars pack more than the Sun's mass into a city-sized ball.", "space"],
+    ["Ostriches bury their heads in the sand when scared.", false, "They lower their heads to tend eggs in ground nests or to hide by lying flat.", "animals"],
+    ["A group of flamingos is called a flamboyance.", true, "Yes, really — it's the accepted collective noun.", "animals"],
+    ["Sea otters hold hands while they sleep.", true, "They link up so they don't drift apart on the water.", "animals"],
+    ["Vikings wore horned helmets into battle.", false, "No horned Viking battle helmet has ever been found; the look came from 1800s opera costumes.", "history"],
+    ["Cleopatra lived closer in time to the Moon landing than to the building of the Great Pyramid.", true, "The Great Pyramid is about 2,500 years older than her; she lived about 2,000 years before Apollo 11.", "history"],
+    ["Oxford University is older than the Aztec Empire.", true, "Teaching at Oxford began around 1096; Tenochtitlan was founded in 1325.", "history"],
+    ["Cracking your knuckles causes arthritis.", false, "Studies have found no link; the pop is gas bubbles in the joint fluid.", "body"],
+    ["Your stomach lining replaces itself every few days.", true, "The cells lining the stomach renew roughly every 3–5 days to survive the acid.", "body"],
+    ["Blood is blue inside your body.", false, "It's always red — darker when low on oxygen. Veins only look blue through skin.", "body"],
+    ["Mount Everest is the tallest mountain on Earth from base to peak.", false, "Mauna Kea in Hawaii is taller base to peak, but most of it is underwater.", "earth"],
+    ["Antarctica is the largest desert in the world.", true, "Deserts are defined by low precipitation, and Antarctica gets very little.", "earth"],
+    ["Peanuts aren't actually nuts.", true, "They're legumes, in the same family as beans and lentils.", "food"],
+    ["Eating carrots gives you night vision.", false, "Vitamin A helps eyesight if you're deficient; the super-vision myth was WWII cover for radar.", "food"],
+    ["The US once printed a $100,000 bill.", true, "The 1934 gold certificate was only used between Federal Reserve banks.", "money"],
+    ["The New York Stock Exchange traces back to an agreement signed under a tree.", true, "The 1792 Buttonwood Agreement was reportedly signed under a buttonwood tree on Wall Street.", "money"],
+    ["Someone has played golf on the Moon.", true, "Alan Shepard hit two golf balls on Apollo 14 in 1971.", "sports"],
+    ["The first iPhone came out in 2007.", true, "Apple released it in June 2007.", "tech"]
   ];
+  var CATS = {
+    space: ["Space", "#8ab4ff", "planet"], animals: ["Animals", "#34d399", "paw"], history: ["History", "#f5b971", "column"],
+    body: ["Body", "#ff7a9a", "heart"], science: ["Science", "#67e8f9", "flask"], earth: ["Earth", "#7bd88f", "leaf"],
+    tech: ["Tech", "#a78bfa", "tech"], food: ["Food", "#fbbf24", "fork"], money: ["Money", "#4ade80", "coin"], sports: ["Sports", "#fb923c", "ball"],
+    misc: ["Trivia", "#c3b8fe", "spark"]
+  };
+  function catOf(c) { return CATS[c] ? c : "misc"; }
+
   var WORDS = [
     ["Sanguine", "adjective", "Optimistic, especially in a bad or difficult situation.", "Despite the red open, he stayed sanguine about the week."],
     ["Laconic", "adjective", "Using very few words.", "His laconic reply was just 'Sold.'"],
@@ -207,7 +235,7 @@
     };
     var t = d.trending || {};
     b.trending = { stocks: items(t.stocks, 4, 120, 240), tech: items(t.tech, 4, 120, 240), world: items(t.world, 4, 120, 240) };
-    if (d.fact && str(d.fact.claim, 280) && typeof d.fact.is_true === "boolean") b.fact = { claim: str(d.fact.claim, 280), truth: d.fact.is_true, explain: str(d.fact.explain, 400) };
+    if (d.fact && str(d.fact.claim, 280) && typeof d.fact.is_true === "boolean") b.fact = { claim: str(d.fact.claim, 280), truth: d.fact.is_true, explain: str(d.fact.explain, 400), cat: catOf(str(d.fact.category, 12).toLowerCase()), hard: str(d.fact.difficulty, 8).toLowerCase() === "hard" };
     if (d.word && str(d.word.word, 40) && str(d.word.definition, 300)) b.word = { word: str(d.word.word, 40), pos: str(d.word.part_of_speech, 20), def: str(d.word.definition, 300), ex: str(d.word.example, 240) };
     var g = d.gbot || {};
     b.gbot = { items: items(g.items, 4, 120, 300), sports: items(g.sports, 4, 120, 300), say: str(g.say, 160), mood: str(g.mood, 12).toLowerCase(), name: str(g.name, 14).toUpperCase(), link: /^https:\/\/([a-z0-9-]+\.)*(grok\.com|x\.com)\//i.test(g.link || "") ? safeUrl(g.link) : null };
@@ -222,7 +250,7 @@
     if (!dc) {
       var h = hashStr(today);
       var f = FF[h % FF.length], w = WORDS[(h >>> 8) % WORDS.length];
-      dc = { fact: { claim: f[0], truth: f[1], explain: f[2] }, word: { word: w[0], pos: w[1], def: w[2], ex: w[3] }, fromBot: false };
+      dc = { fact: { claim: f[0], truth: f[1], explain: f[2], cat: f[3] }, word: { word: w[0], pos: w[1], def: w[2], ex: w[3] }, fromBot: false };
     }
     if (brief && brief.date === today && !dc.fromBot && (brief.fact || brief.word)) {
       if (!C.ff[today]) { if (brief.fact) dc.fact = brief.fact; }
@@ -544,7 +572,7 @@
     player.addEventListener("touchstart", function (e) {
       e.stopPropagation();
       tracking = false;
-      if (busy || player.classList.contains("finale") || e.touches.length !== 1 || e.target.closest("input, textarea, button, a, .ib-tabs")) return;
+      if (busy || player.classList.contains("finale") || e.touches.length !== 1 || e.target.closest("input, textarea, button, a, .ib-tabs, .ib-swipe")) return;
       card = stage.querySelector(".ib-card.cur");
       tracking = true; axis = null; pulling = false; dx = dy = 0;
       sx = e.touches[0].clientX; sy = e.touches[0].clientY; st = Date.now();
@@ -815,7 +843,18 @@
       spark: '<path d="M12 3l2.2 6.8L21 12l-6.8 2.2L12 21l-2.2-6.8L3 12l6.8-2.2z"/>',
       bell: '<path d="M6 16V11a6 6 0 0 1 12 0v5l2 2H4z"/><path d="M10 20a2 2 0 0 0 4 0"/>',
       fire: '<path d="M12 3c1 4 5 5.5 5 10a5 5 0 0 1-10 0c0-2.5 1.5-3.5 2-5 .8 1.5 1.5 2 2.5 2C11 7.5 11 5 12 3z"/>',
-      x: '<path d="M4 4l16 16M20 4L4 20"/>'
+      x: '<path d="M4 4l16 16M20 4L4 20"/>',
+      planet: '<circle cx="12" cy="12" r="5.5"/><ellipse cx="12" cy="12" rx="10" ry="3.2" transform="rotate(-20 12 12)"/>',
+      paw: '<circle cx="7" cy="9" r="1.8"/><circle cx="11" cy="6" r="1.8"/><circle cx="15.5" cy="6.5" r="1.8"/><circle cx="18.5" cy="10.5" r="1.8"/><path d="M8 17c0-3 2.5-5.5 5-5.5s4.5 2.5 4.5 5c0 2-1.8 3-3.5 2.5-1.2-.3-1.8-.3-3 0C9.5 19.5 8 19 8 17z"/>',
+      column: '<path d="M4 7l8-4 8 4M5 7h14M6 10v8M10 10v8M14 10v8M18 10v8M4 21h16M5 18h14"/>',
+      heart: '<path d="M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10z"/><path d="M5.5 12h3l1.5-2.5 2 5 1.5-2.5h5"/>',
+      flask: '<path d="M9 3h6M10 3v6l-5 9a2 2 0 0 0 1.8 3h10.4a2 2 0 0 0 1.8-3l-5-9V3"/><path d="M7.5 15h9"/>',
+      leaf: '<path d="M5 19c0-8 5-14 15-14 0 10-6 15-14 15"/><path d="M5 19l8-8"/>',
+      fork: '<path d="M7 3v7a2 2 0 0 0 4 0V3M9 10v11M16 3c-2 1-3 4-3 7h3v11"/>',
+      coin: '<circle cx="12" cy="12" r="9"/><path d="M14.5 9c-.4-1-1.4-1.5-2.5-1.5-1.5 0-2.5.8-2.5 2s1 1.6 2.5 2 2.5.9 2.5 2.2-1.1 2-2.5 2c-1.2 0-2.2-.6-2.6-1.6M12 6v1.5M12 16.5V18"/>',
+      share: '<path d="M12 15V3M8 7l4-4 4 4"/><path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-7"/>',
+      book: '<path d="M4 5a2 2 0 0 1 2-2h13v16H6a2 2 0 0 0-2 2z"/><path d="M4 19V5M8 7h7"/>',
+      skull: '<path d="M12 3a8 8 0 0 0-5 14.2V20h10v-2.8A8 8 0 0 0 12 3z"/><circle cx="9" cy="12" r="1.6"/><circle cx="15" cy="12" r="1.6"/><path d="M10 20v-2M14 20v-2"/>'
     };
     return '<svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">' + (P[name] || P.spark) + "</svg>";
   }
@@ -960,14 +999,9 @@
     } else if (kind === "mind") {
       c = cardShell("mind", "Fact or Fiction", "04 · Sharpen up");
       var dc = dayContent(today); save();
+      c.appendChild(rankStrip());
       c.appendChild(factPanel(today, dc.fact));
-      var wsx = sect(c, "Word of the day");
-      var wd = el("div", "ib-word");
-      wd.appendChild(el("span", "w", dc.word.word));
-      if (dc.word.pos) wd.appendChild(el("span", "pos", dc.word.pos));
-      wsx.appendChild(wd);
-      wsx.appendChild(el("p", "ib-p", dc.word.def));
-      if (dc.word.ex) wsx.appendChild(el("p", "ib-p dim it", "“" + dc.word.ex + "”"));
+      c.appendChild(wordPanel(today, dc.word));
       var rq = recallQuiz(today);
       if (rq) c.appendChild(recallPanel(today, rq));
     } else if (kind === "gbot") {
@@ -1084,54 +1118,245 @@
     return p;
   }
 
+  /* ---------------- Fact or Fiction: rank, swipe, stamp, themes ---------------- */
+  var RANKS = [["E", 0, "#9ca3af"], ["D", 50, "#7dd3fc"], ["C", 150, "#34d399"], ["B", 300, "#fbbf24"], ["A", 500, "#fb923c"], ["S", 800, "#f472b6"]];
+  var QUICK_S = 10;
+  function mindPoints() {
+    var pts = 0;
+    Object.keys(C.ff).forEach(function (k) { var a = C.ff[k]; if (a && a.right) pts += 10 + (a.quick ? 5 : 0); });
+    Object.keys(C.recall).forEach(function (k) { if (C.recall[k] && C.recall[k].right) pts += 5; });
+    return pts;
+  }
+  function rankFor(pts) { var r = RANKS[0], nx = null; for (var i = 0; i < RANKS.length; i++) { if (pts >= RANKS[i][1]) { r = RANKS[i]; nx = RANKS[i + 1] || null; } } return { r: r, next: nx }; }
+  function ffStats() {
+    var ks = Object.keys(C.ff).sort(), tot = 0, ok = 0, streak = 0, best = 0, run = 0;
+    ks.forEach(function (k) { var a = C.ff[k]; if (!a) return; tot++; if (a.right) { ok++; run++; best = Math.max(best, run); } else run = 0; });
+    for (var i = ks.length - 1; i >= 0; i--) { if (C.ff[ks[i]] && C.ff[ks[i]].right) streak++; else break; }
+    return { tot: tot, ok: ok, streak: streak, best: best };
+  }
+  function rankStrip() {
+    var pts = mindPoints(), rk = rankFor(pts), st = ffStats();
+    var w = el("div", "ib-rank");
+    w.style.setProperty("--rk", rk.r[2]);
+    var badge = el("span", "badge"); badge.appendChild(el("b", null, rk.r[0])); w.appendChild(badge);
+    var mid = el("div", "mid");
+    mid.appendChild(el("span", "k", "Fact Hunter · " + rk.r[0] + "-Rank"));
+    var bar = el("span", "bar"), fill = el("i");
+    var pct = rk.next ? Math.min(100, (pts - rk.r[1]) / (rk.next[1] - rk.r[1]) * 100) : 100;
+    fill.style.width = pct.toFixed(1) + "%"; bar.appendChild(fill); mid.appendChild(bar);
+    mid.appendChild(el("span", "sub", rk.next ? pts + " / " + rk.next[1] + " to " + rk.next[0] : pts + " pts · max rank"));
+    w.appendChild(mid);
+    var fl = el("span", "flame" + (st.streak >= 3 ? " hot" : st.streak ? "" : " cold"));
+    fl.appendChild(iconEl("fire")); fl.appendChild(el("b", null, String(st.streak)));
+    w.appendChild(fl);
+    return w;
+  }
+  var ffStart = {}, justAnswered = null;
+  function rankUp(letter, color) {
+    var o = el("div", "ib-rankup"); o.style.setProperty("--rk", color);
+    o.appendChild(el("span", "k", "Rank up"));
+    o.appendChild(el("b", null, letter));
+    o.appendChild(el("span", "s", "Fact Hunter"));
+    (player || document.body).appendChild(o);
+    buzz([20, 60, 20, 60, 40]);
+    setTimeout(function () { burst(window.innerWidth / 2, window.innerHeight / 2, color, 40); }, 250);
+    setTimeout(function () { o.classList.add("out"); }, 1900);
+    setTimeout(function () { o.remove(); }, 2400);
+  }
+  function shareFact(fact, btn) {
+    var txt = "Fact or fiction? " + fact.claim;
+    function done(msg) { var t = el("span", "ib-toast", msg); btn.appendChild(t); setTimeout(function () { t.remove(); }, 1400); }
+    try {
+      if (navigator.share) { navigator.share({ text: txt }).catch(function () {}); return; }
+      navigator.clipboard.writeText(txt).then(function () { done("Copied"); }, function () { done("Couldn't copy"); });
+    } catch (e) { done("Couldn't copy"); }
+  }
   function factPanel(today, fact) {
-    var p = el("div", "ib-ff");
+    var cat = catOf(fact.cat), cd = CATS[cat];
+    var p = el("div", "ib-ff cat-" + cat);
+    p.style.setProperty("--cat", cd[1]);
     var ans = C.ff[today];
-    var cardEl = el("div", "ib-flip" + (ans ? " flipped" : ""));
-    var front = el("div", "f front"); front.appendChild(el("span", "claim", fact.claim));
+    var reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    var head = el("div", "ib-ffhead");
+    var tag = el("span", "ib-cattag"); tag.appendChild(iconEl(cd[2])); tag.appendChild(el("span", null, cd[0])); head.appendChild(tag);
+    if (fact.hard) head.appendChild(el("span", "ib-hard", "Hard"));
+    var timer = el("span", "ib-timer");
+    timer.innerHTML = '<svg viewBox="0 0 36 36" aria-hidden="true"><circle cx="18" cy="18" r="15" class="tr"/><circle cx="18" cy="18" r="15" class="pg"/></svg>';
+    var tn = el("b"); timer.appendChild(tn);
+    head.appendChild(timer);
+    p.appendChild(head);
+
+    var flip = el("div", "ib-flip" + (ans && justAnswered !== today ? " flipped" : "") + (ans ? "" : " ib-swipe"));
+    var front = el("div", "f front");
+    var fx = el("div", "fx"); for (var i = 0; i < 7; i++) { var g = iconEl(cd[2], "fl"); g.style.setProperty("--i", i); fx.appendChild(g); } front.appendChild(fx);
+    front.appendChild(el("span", "claim", fact.claim));
+    var sL = el("span", "stamp fic", "Fiction"), sR = el("span", "stamp fact", "Fact");
+    front.appendChild(sL); front.appendChild(sR);
+    if (!ans) front.appendChild(el("span", "swipehint", "‹ Fiction · swipe · Fact ›"));
     var back = el("div", "f back");
     if (ans) {
       back.classList.add(ans.right ? "ok" : "no");
-      back.appendChild(el("span", "verdict", (fact.truth ? "Fact" : "Fiction") + (ans.right ? " · you got it" : " · not this time")));
+      var vd = el("span", "verdict"); vd.appendChild(el("b", null, fact.truth ? "Fact" : "Fiction")); vd.appendChild(el("span", null, ans.right ? (ans.quick ? "Quick draw · +15" : "You got it · +10") : "Not this time")); back.appendChild(vd);
       back.appendChild(el("span", "was", fact.claim));
       if (fact.explain) back.appendChild(el("span", "why", fact.explain));
+      var picked = ans.pick ? sR : sL; picked.classList.add("show");
     }
-    cardEl.appendChild(front); cardEl.appendChild(back);
-    p.appendChild(cardEl);
+    flip.appendChild(front); flip.appendChild(back);
+    p.appendChild(flip);
+    if (ans && justAnswered === today) { justAnswered = null; requestAnimationFrame(function () { requestAnimationFrame(function () { flip.classList.add("flipped"); }); }); }
+
+    /* timer */
+    if (ans) { timer.classList.add("off"); tn.textContent = ans.quick ? "⚡" : "✓"; }
+    else {
+      if (!ffStart[today]) ffStart[today] = Date.now();
+      var el0 = (Date.now() - ffStart[today]) / 1000;
+      var pg = timer.querySelector(".pg");
+      pg.style.animationDelay = (-el0).toFixed(2) + "s";
+      if (el0 >= QUICK_S) timer.classList.add("off");
+      (function tick() {
+        if (!timer.isConnected && el0 > 0.5) return;
+        var left = QUICK_S - (Date.now() - ffStart[today]) / 1000;
+        if (C.ff[today]) return;
+        if (left <= 0) { tn.textContent = "0"; timer.classList.add("off"); return; }
+        tn.textContent = String(Math.ceil(left)); timer.classList.toggle("low", left <= 3);
+        setTimeout(tick, 200);
+      })();
+    }
+
+    function answer(pick) {
+      if (C.ff[today]) return;
+      var before = rankFor(mindPoints()).r;
+      var right = pick === fact.truth, quick = right && (Date.now() - (ffStart[today] || Date.now())) / 1000 <= QUICK_S;
+      C.ff[today] = { pick: pick, right: right, quick: quick, cat: cat };
+      var ks = Object.keys(C.ff).sort(); while (ks.length > 365) delete C.ff[ks.shift()];
+      save();
+      flip.classList.remove("ib-swipe");
+      front.style.transition = "transform 0.25s ease"; front.style.transform = "";
+      (pick ? sR : sL).classList.add("slam");
+      buzz(right ? [10, 40, 10] : 40);
+      var r = flip.getBoundingClientRect();
+      setTimeout(function () { burst(r.left + r.width / 2, r.top + r.height / 2, right ? "#34d399" : "#ff5a6e", right ? (quick ? 30 : 20) : 10); }, 220);
+      justAnswered = today;
+      setTimeout(function () {
+        refreshCard();
+        var after = rankFor(mindPoints()).r;
+        if (after[0] !== before[0]) setTimeout(function () { rankUp(after[0], after[2]); }, 700);
+      }, 650);
+    }
     if (!ans) {
+      /* drag to answer */
+      var sx = 0, dx = 0, drag = false;
+      flip.addEventListener("pointerdown", function (e) { if (C.ff[today]) return; drag = true; sx = e.clientX; dx = 0; front.style.transition = "none"; try { flip.setPointerCapture(e.pointerId); } catch (x) {} });
+      flip.addEventListener("pointermove", function (e) {
+        if (!drag) return;
+        dx = e.clientX - sx;
+        front.style.transform = "translateX(" + dx + "px) rotate(" + (dx / 18) + "deg)";
+        sR.style.opacity = Math.max(0, Math.min(1, dx / 90)); sL.style.opacity = Math.max(0, Math.min(1, -dx / 90));
+      });
+      function up() {
+        if (!drag) return; drag = false;
+        sR.style.opacity = ""; sL.style.opacity = "";
+        if (Math.abs(dx) > 90) answer(dx > 0);
+        else { front.style.transition = "transform 0.35s cubic-bezier(0.3, 1.4, 0.5, 1)"; front.style.transform = ""; }
+      }
+      flip.addEventListener("pointerup", up); flip.addEventListener("pointercancel", up);
       var row = el("div", "ib-gr");
-      [[true, "Fact"], [false, "Fiction"]].forEach(function (o) {
-        var b = el("button", "ib-pick " + (o[0] ? "fact" : "fic"), o[1]); b.type = "button";
-        b.addEventListener("click", function () {
-          var right = o[0] === fact.truth;
-          C.ff[today] = { pick: o[0], right: right };
-          var ks = Object.keys(C.ff).sort(); while (ks.length > 120) delete C.ff[ks.shift()];
-          save(); buzz(right ? [10, 40, 10] : 30);
-          var r = b.getBoundingClientRect(); if (right) burst(r.left + r.width / 2, r.top + r.height / 2, "#fbbf24", 18);
-          refreshCard();
-        });
+      [[false, "‹ Fiction", "fic"], [true, "Fact ›", "fact"]].forEach(function (o) {
+        var b = el("button", "ib-pick " + o[2], o[1]); b.type = "button";
+        b.addEventListener("click", function () { front.style.transition = "transform 0.3s ease"; front.style.transform = "translateX(" + (o[0] ? 40 : -40) + "px) rotate(" + (o[0] ? 3 : -3) + "deg)"; answer(o[0]); });
         row.appendChild(b);
       });
       p.appendChild(row);
     }
-    var tot = 0, ok = 0; Object.keys(C.ff).forEach(function (k) { tot++; if (C.ff[k].right) ok++; });
-    if (tot) p.appendChild(el("div", "ib-mini", "Fact or Fiction record: " + ok + " / " + tot));
+    /* footer: category record + share */
+    var ft = el("div", "ib-fffoot");
+    var ct = 0, co = 0; Object.keys(C.ff).forEach(function (k) { var a = C.ff[k]; if (a && a.cat === cat) { ct++; if (a.right) co++; } });
+    var st = ffStats();
+    ft.appendChild(el("span", "rec", (ct ? cd[0] + " " + co + "/" + ct + " · " : "") + "All-time " + st.ok + "/" + st.tot + (st.best ? " · best streak " + st.best : "")));
+    var sh = el("button", "ib-share"); sh.type = "button"; sh.appendChild(iconEl("share")); sh.appendChild(el("span", null, "Share"));
+    sh.addEventListener("click", function () { shareFact(fact, sh); });
+    ft.appendChild(sh);
+    p.appendChild(ft);
     return p;
   }
+
+  /* ---------------- Word of the Day: decode + Lexicon ---------------- */
+  var lastDecode = 0, lexOpen = false;
+  var GLYPHS = "ΔΣΛΞΨΩ#%&*<>/\\|▓▒░01";
+  function decode(node, word) {
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches || Date.now() - lastDecode < 8000) { node.textContent = word; return; }
+    lastDecode = Date.now();
+    var t0 = performance.now(), n = word.length;
+    node.classList.add("decoding");
+    (function f() {
+      if (!node.isConnected && performance.now() - t0 > 100) return;
+      var e = performance.now() - t0, out = "";
+      for (var i = 0; i < n; i++) {
+        if (e > 250 + i * 70 || word[i] === " ") out += word[i];
+        else out += GLYPHS[Math.floor(Math.random() * GLYPHS.length)];
+      }
+      node.textContent = out;
+      if (e < 250 + n * 70 + 40) requestAnimationFrame(f); else { node.textContent = word; node.classList.remove("decoding"); node.classList.add("decoded"); }
+    })();
+  }
+  function wordPanel(today, word) {
+    var s = el("div", "ib-sec ib-wordsec");
+    var hd = el("div", "ib-wordhead");
+    hd.appendChild(el("span", "ib-sl", "Word of the day"));
+    var lx = el("button", "ib-lexbtn"); lx.type = "button"; lx.appendChild(iconEl("book")); lx.appendChild(el("span", null, "Lexicon")); lx.appendChild(el("b", null, String(C.words.length)));
+    hd.appendChild(lx);
+    s.appendChild(hd);
+    var wd = el("div", "ib-word");
+    var w = el("span", "w"); wd.appendChild(w);
+    if (word.pos) wd.appendChild(el("span", "pos", word.pos));
+    s.appendChild(wd);
+    decode(w, word.word);
+    if (!C.lex) C.lex = {};
+    if (!C.lex[today]) {
+      C.lex[today] = 1; var lk = Object.keys(C.lex).sort(); while (lk.length > 60) delete C.lex[lk.shift()]; save();
+      var fl = el("span", "ib-extract", "+1 word extracted"); wd.appendChild(fl);
+    }
+    s.appendChild(el("p", "ib-p", word.def));
+    if (word.ex) s.appendChild(el("p", "ib-p dim it", "“" + word.ex + "”"));
+    var list = el("div", "ib-lex" + (lexOpen ? " open" : ""));
+    C.words.slice().reverse().forEach(function (x) {
+      var r = el("div", "lx" + (x.date === today ? " today" : ""));
+      var top = el("div", "lt"); top.appendChild(el("b", null, x.word)); top.appendChild(el("i", null, shortDate(parseDay(x.date)))); r.appendChild(top);
+      r.appendChild(el("span", "ld", x.def));
+      list.appendChild(r);
+    });
+    s.appendChild(list);
+    lx.classList.toggle("on", lexOpen);
+    lx.addEventListener("click", function () { lexOpen = !lexOpen; list.classList.toggle("open", lexOpen); lx.classList.toggle("on", lexOpen); buzz(6); });
+    return s;
+  }
+
+  /* ---------------- Recall: boss question ---------------- */
   function recallPanel(today, rq) {
-    var s = el("div", "ib-sec ib-recall");
-    s.appendChild(el("div", "ib-sl", "Recall · from " + shortDate(parseDay(rq.from))));
-    s.appendChild(el("div", "ib-word"));
-    s.lastChild.appendChild(el("span", "w", rq.word));
-    s.appendChild(el("span", "ib-mini", "What does it mean?"));
     var ans = C.recall[today];
+    var s = el("div", "ib-boss" + (ans ? (ans.right ? " won" : " lost") : ""));
+    var hd = el("div", "bh"); hd.appendChild(iconEl("skull")); hd.appendChild(el("span", "lbl", "Boss question")); hd.appendChild(el("span", "from", "from " + shortDate(parseDay(rq.from))));
+    s.appendChild(hd);
+    var hp = el("div", "hp"), hpf = el("i"); hp.appendChild(hpf); s.appendChild(hp);
+    hpf.style.width = ans && ans.right ? "0%" : "100%";
+    var wd = el("div", "ib-word"); wd.appendChild(el("span", "w", rq.word)); s.appendChild(wd);
+    s.appendChild(el("span", "ib-mini", ans ? (ans.right ? "Defeated · +5 pts" : "It got away — this one comes back around") : "Land the right meaning to defeat it"));
     rq.opts.forEach(function (o, i) {
       var b = el("button", "ib-opt", o.d); b.type = "button";
       if (ans) { b.disabled = true; if (o.ok) b.classList.add("right"); else if (ans.i === i) b.classList.add("wrong"); }
       b.addEventListener("click", function () {
+        if (C.recall[today]) return;
+        var before = rankFor(mindPoints()).r;
         C.recall[today] = { i: i, right: o.ok };
-        var ks = Object.keys(C.recall).sort(); while (ks.length > 120) delete C.recall[ks.shift()];
-        save(); buzz(o.ok ? [10, 40, 10] : 30); refreshCard();
+        var ks = Object.keys(C.recall).sort(); while (ks.length > 365) delete C.recall[ks.shift()];
+        save(); buzz(o.ok ? [10, 40, 10, 40, 30] : 40);
+        if (o.ok) { hpf.style.width = "0%"; s.classList.add("hit"); var r = s.getBoundingClientRect(); setTimeout(function () { burst(r.left + r.width / 2, r.top + 40, "#f472b6", 26); }, 450); }
+        else s.classList.add("miss");
+        setTimeout(function () {
+          refreshCard();
+          var after = rankFor(mindPoints()).r;
+          if (after[0] !== before[0]) setTimeout(function () { rankUp(after[0], after[2]); }, 500);
+        }, 900);
       });
       s.appendChild(b);
     });

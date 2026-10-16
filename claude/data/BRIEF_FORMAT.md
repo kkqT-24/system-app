@@ -93,7 +93,9 @@ Replace the whole file each time. Commit message: `Daily Briefing: <edition> YYY
   "fact": {
     "claim": "A statement that is either TRUE or FALSE. Max 280 chars.",
     "is_true": false,
-    "explain": "Why it's true / the real story. Max 400 chars."
+    "explain": "Why it's true / the real story. Max 400 chars.",
+    "category": "space",
+    "difficulty": "medium"
   },
 
   "word": {
@@ -130,7 +132,7 @@ Replace the whole file each time. Commit message: `Daily Briefing: <edition> YYY
 | `catalyst.today` | when there's data | Only scheduled releases/events for today. `time` is 24h Eastern `HH:MM`. Leave `actual` empty until it's released |
 | `catalyst.week` | yes | Rest of the next 7 days: big data, Fed speakers, earnings Kent's watchlist cares about |
 | `trending` | yes | Up to 4 per bucket. What's genuinely trending on X today, not evergreen topics |
-| `fact` | 8 AM | **Mix true and false roughly 50/50.** No repeats within 60 days. Later updates may repeat the 8 AM one |
+| `fact` | 8 AM | **Mix true and false roughly 50/50.** No repeats within 60 days. Later updates may repeat the 8 AM one. Optional `category`: one of `space`, `animals`, `history`, `body`, `science`, `earth`, `tech`, `food`, `money`, `sports` (sets the card's theme). Optional `difficulty`: `easy`, `medium` or `hard` (hard shows a tag) |
 | `word` | 8 AM | Useful, not obscure. No repeats within 90 days. Later updates may repeat the 8 AM one |
 | `gbot.say` | yes | Your line on the home screen. The holographic core "speaks" it (it decodes onto the screen) and it rotates with the trending headlines. One or two sentences, max 120 chars, new every update. Personal and specific beats generic |
 | `gbot.mood` | yes | `hype`, `chill`, `alert` or `thinking` — tints the core (amber, cyan, red, lavender) |
