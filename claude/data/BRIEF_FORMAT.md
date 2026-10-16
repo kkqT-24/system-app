@@ -69,7 +69,7 @@ Replace the whole file each time. Commit message: `Daily Briefing: <edition> YYY
     "headline": "One-line read of the day. Max 140 chars.",
     "note": "2-4 sentences: what matters today and why. Max 600 chars.",
     "portfolio": { "day_pct": -0.84, "week_pct": 1.92, "note": "What drove it, % only. Max 200 chars." },
-    "watchlist": [ { "symbol": "TSLA", "price": 373.58, "pct": -1.6, "note": "Short reason, max 80 chars (optional)" } ],
+    "watchlist": [ { "symbol": "TSLA", "price": 373.58, "prev_close": 362.43, "pct": -1.6, "note": "Short reason, max 80 chars (optional)" } ],
     "spy_day_pct": 0.42
   },
 

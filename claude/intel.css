@@ -543,3 +543,23 @@ body.ib-open { overflow: hidden; }
 .ib-av .eyes i { width: 3.3px; height: 8px; border-radius: 999px; background: #14103a; animation: ibBlinkEye 4.2s ease-in-out infinite; }
 @keyframes ibBlinkEye { 0%, 92%, 100% { transform: scaleY(1); } 96% { transform: scaleY(0.1); } }
 @keyframes ibLook { 0%, 38%, 54%, 100% { transform: translate(-32%, -62%); } 42%, 50% { transform: translate(-72%, -48%); } 72%, 76% { transform: translate(-55%, -38%); } 80% { transform: translate(-32%, -62%); } }
+
+/* the gap */
+.ib-gap { margin-top: 14px; padding: 11px 13px 6px; border: 1px solid rgba(103, 232, 249, 0.3); background: linear-gradient(135deg, rgba(103, 232, 249, 0.07), transparent 60%); }
+.ib-gap .gh { display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px; }
+.ib-gap .lbl { font-family: "Orbitron", sans-serif; font-weight: 700; font-size: 12px; letter-spacing: 0.2em; text-transform: uppercase; color: #67e8f9; }
+.ib-gap .tag { font-family: "Share Tech Mono", monospace; font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--ink-faint); }
+.ib-gap .tag.ind { color: #fbbf24; }
+.ib-gap .gr { display: flex; gap: 12px; padding: 9px 0; border-top: 1px solid rgba(203, 213, 225, 0.08); }
+.ib-gap .gh + .gr { border-top: none; }
+.ib-gap .ga { flex: none; width: 92px; display: flex; flex-direction: column; gap: 1px; }
+.ib-gap .ga b { font-family: "Share Tech Mono", monospace; font-weight: 400; font-size: 13px; letter-spacing: 0.14em; color: var(--ink-dim); }
+.ib-gap .gp { font-family: "Orbitron", sans-serif; font-size: 16px; }
+.ib-gap .gl { font-family: "Share Tech Mono", monospace; font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--ink-faint); }
+.ib-gap .up .gp { color: var(--ib-up); } .ib-gap .dn .gp { color: var(--ib-dn); }
+.ib-gap .gb { flex: 1; min-width: 0; display: flex; flex-direction: column; justify-content: center; gap: 5px; }
+.ib-gap .lv { font-family: "Share Tech Mono", monospace; font-size: 12.5px; color: var(--ink); white-space: pre; }
+.ib-gap .fb { height: 5px; background: rgba(203, 213, 225, 0.12); overflow: hidden; }
+.ib-gap .fb i { display: block; height: 100%; background: #67e8f9; box-shadow: 0 0 6px #67e8f9; transition: width 0.8s ease; }
+.ib-gap .fs { font-family: "Share Tech Mono", monospace; font-size: 10.5px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--ink-faint); }
+.ib-gap .fs.done { color: var(--ib-up); }

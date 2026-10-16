@@ -4,6 +4,13 @@ Standard library only. Each source is tried in turn; a ticker that no
 source answers is left out rather than failing the whole run."""
 import csv, io, json, os, sys, time, urllib.request
 from datetime import datetime, timedelta, timezone
+from zoneinfo import ZoneInfo
+
+NY = ZoneInfo("America/New_York")
+
+
+def ny_day(ts):
+    return datetime.fromtimestamp(ts, timezone.utc).astimezone(NY).strftime("%Y-%m-%d")
 
 # symbol shown in the app -> (yahoo symbol, stooq symbol, finnhub symbol)
 WATCHLIST = [
@@ -35,7 +42,16 @@ def yahoo(sym):
     if len(closes) >= 2 and abs(closes[-1] - price) < 1e-6:
         prev = closes[-2]
     t = m.get("regularMarketTime")
-    return price, float(prev), (datetime.fromtimestamp(t, timezone.utc).isoformat() if t else None)
+    out = {"price": price, "prev": float(prev), "time": datetime.fromtimestamp(t, timezone.utc).isoformat() if t else None}
+    # today's session bar (open / high / low) for the gap read
+    try:
+        res = d["chart"]["result"][0]; q = res["indicators"]["quote"][0]; ts = res["timestamp"]
+        i = len(ts) - 1
+        if t and ny_day(ts[i]) == ny_day(t) and None not in (q["open"][i], q["high"][i], q["low"][i]):
+            out.update({"open": float(q["open"][i]), "high": float(q["high"][i]), "low": float(q["low"][i]), "session": ny_day(ts[i])})
+    except Exception:  # noqa: BLE001
+        pass
+    return out
 
 
 def stooq(sym):
@@ -44,7 +60,13 @@ def stooq(sym):
     price, prev = float(r["Close"]), float(r["Prev"]) if r.get("Prev") not in (None, "", "N/D") else None
     if prev is None:
         raise ValueError("no prev close")
-    return price, prev, None
+    out = {"price": price, "prev": prev, "time": None}
+    try:
+        if r.get("Open") not in (None, "", "N/D"):
+            out.update({"open": float(r["Open"]), "high": float(r["High"]), "low": float(r["Low"]), "session": r["Date"]})
+    except Exception:  # noqa: BLE001
+        pass
+    return out
 
 
 def finnhub(sym):
@@ -53,19 +75,26 @@ def finnhub(sym):
     d = json.loads(get("https://finnhub.io/api/v1/quote?symbol=%s&token=%s" % (sym, FINNHUB)))
     if not d.get("c"):
         raise ValueError("empty")
-    return float(d["c"]), float(d["pc"]), datetime.fromtimestamp(d["t"], timezone.utc).isoformat() if d.get("t") else None
+    out = {"price": float(d["c"]), "prev": float(d["pc"]), "time": datetime.fromtimestamp(d["t"], timezone.utc).isoformat() if d.get("t") else None}
+    if d.get("o") and d.get("t"):
+        out.update({"open": float(d["o"]), "high": float(d["h"]), "low": float(d["l"]), "session": ny_day(d["t"])})
+    return out
 
 
 def quote(row):
     label, ysym, ssym, fsym = row
     for name, fn, s in (("yahoo", yahoo, ysym), ("finnhub", finnhub, fsym), ("stooq", stooq, ssym)):
         try:
-            price, prev, t = fn(s)
+            r = fn(s)
+            price, prev = r["price"], r["prev"]
             if price <= 0 or prev <= 0:
                 continue
             ch = price - prev
-            return {"symbol": label, "price": round(price, 2), "change": round(ch, 2),
-                    "change_pct": round(ch / prev * 100, 2), "prev_close": round(prev, 2), "time": t, "source": name}
+            out = {"symbol": label, "price": round(price, 2), "change": round(ch, 2),
+                   "change_pct": round(ch / prev * 100, 2), "prev_close": round(prev, 2), "time": r["time"], "source": name}
+            if r.get("open") and r.get("session"):
+                out.update({"open": round(r["open"], 2), "high": round(r["high"], 2), "low": round(r["low"], 2), "session": r["session"]})
+            return out
         except Exception as e:  # noqa: BLE001 - any failure falls through to the next source
             print("  %s via %s failed: %s" % (label, name, e), file=sys.stderr)
     return None

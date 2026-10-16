@@ -200,7 +200,8 @@
   function cleanMarket(d) {
     if (!d || !Array.isArray(d.quotes)) return null;
     var q = d.quotes.filter(function (x) { return x && typeof x.symbol === "string" && num(x.price) != null && num(x.change_pct) != null; }).slice(0, 12)
-      .map(function (x) { return { symbol: str(x.symbol, 8), price: +x.price, pct: +x.change_pct, time: str(x.time, 40) }; });
+      .map(function (x) { return { symbol: str(x.symbol, 8), price: +x.price, pct: +x.change_pct, time: str(x.time, 40), prev: num(x.prev_close),
+        open: num(x.open), high: num(x.high), low: num(x.low), session: /^\d{4}-\d{2}-\d{2}$/.test(x.session || "") ? x.session : "" }; });
     return { updated: str(d.updated, 40), quotes: q };
   }
   function items(arr, max, tmax, dmax) {
@@ -220,7 +221,7 @@
       headline: str(m.headline, 140), note: str(m.note, 600),
       portfolio: m.portfolio && num(m.portfolio.day_pct) != null ? { day: +m.portfolio.day_pct, week: num(m.portfolio.week_pct), note: str(m.portfolio.note, 200) } : null,
       watch: (Array.isArray(m.watchlist) ? m.watchlist : []).filter(function (w) { return w && str(w.symbol, 8) && num(w.pct) != null; }).slice(0, 12)
-        .map(function (w) { return { symbol: str(w.symbol, 8).toUpperCase(), pct: +w.pct, price: num(w.price), note: str(w.note, 80) }; }),
+        .map(function (w) { return { symbol: str(w.symbol, 8).toUpperCase(), pct: +w.pct, price: num(w.price), prev: num(w.prev_close), note: str(w.note, 80) }; }),
       spy: num(m.spy_day_pct)
     };
     var c = d.catalyst || {};
@@ -911,6 +912,65 @@
     return a;
   }
 
+
+  /* ---------------- the gap (SPY / QQQ / TSLA) ----------------
+     After the open: today's open vs the prior close from the market job,
+     with how much of it has filled (the day's low/high reaching the prior
+     close). Before the open: the indicated gap from the bot's premarket
+     watchlist numbers. */
+  var GAP_SYMS = ["SPY", "QQQ", "TSLA"];
+  function gapRows(now) {
+    var p = ny(now), out = [];
+    var afterOpen = isSession(p.key) && p.min >= 570;
+    GAP_SYMS.forEach(function (sym) {
+      var q = market && market.quotes.filter(function (x) { return x.symbol === sym; })[0];
+      if (afterOpen && q && q.session === p.key && q.open != null && q.prev) {
+        var g = q.open - q.prev, gp = g / q.prev * 100, fill = 0;
+        if (g > 0 && q.low != null) fill = Math.min(1, Math.max(0, (q.open - q.low) / g));
+        else if (g < 0 && q.high != null) fill = Math.min(1, Math.max(0, (q.high - q.open) / -g));
+        out.push({ sym: sym, live: true, gp: gp, prev: q.prev, open: q.open, fill: g === 0 ? 1 : fill, price: q.price });
+        return;
+      }
+      if (!afterOpen && isFresh() && isSession(p.key)) {
+        var wt = ny(new Date(Date.parse(brief.fullWritten || brief.written) || 0));
+        var w = brief.market.watch.filter(function (x) { return x.symbol === sym; })[0];
+        if (w && wt.key === p.key && wt.min < 570 && w.price) {
+          var prev = w.prev || w.price / (1 + w.pct / 100);
+          out.push({ sym: sym, live: false, gp: w.pct, prev: prev, open: w.price, fill: null });
+        }
+      }
+    });
+    return out;
+  }
+  function money(v) { return v.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 }); }
+  function gapPanel(now) {
+    var rows = gapRows(now);
+    if (!rows.length) return null;
+    var live = rows[0].live;
+    var s = el("div", "ib-gap");
+    var hd = el("div", "gh"); hd.appendChild(el("span", "lbl", "The gap")); hd.appendChild(el("span", "tag" + (live ? "" : " ind"), live ? "At the open" : "Indicated · premarket"));
+    s.appendChild(hd);
+    rows.forEach(function (r) {
+      var up = r.gp > 0.005, dn = r.gp < -0.005, dir = up ? "up" : dn ? "dn" : "flat";
+      var row = el("div", "gr " + dir);
+      var a = el("div", "ga");
+      a.appendChild(el("b", null, r.sym));
+      a.appendChild(el("span", "gp", (up ? "▲ " : dn ? "▼ " : "") + pctTxt(r.gp)));
+      a.appendChild(el("span", "gl", up ? "Gap up" : dn ? "Gap down" : "Flat open"));
+      row.appendChild(a);
+      var b = el("div", "gb");
+      b.appendChild(el("span", "lv", money(r.prev) + "  →  " + money(r.open)));
+      if (r.fill != null) {
+        var bar = el("span", "fb"), fi = el("i"); fi.style.width = Math.round(r.fill * 100) + "%"; bar.appendChild(fi); b.appendChild(bar);
+        var left = Math.abs(r.open - r.prev) * (1 - r.fill);
+        b.appendChild(el("span", "fs" + (r.fill >= 1 ? " done" : ""), r.fill >= 1 ? "✓ Gap filled" : Math.round(r.fill * 100) + "% filled · $" + money(left) + " to go"));
+      } else b.appendChild(el("span", "fs", "Fill target " + money(r.prev) + " · opens 9:30"));
+      row.appendChild(b);
+      s.appendChild(row);
+    });
+    return s;
+  }
+
   function renderCard(kind) {
     var now = new Date(), today = dayKey(now), fresh = isFresh();
     var c;
@@ -940,6 +1000,7 @@
         if (olk) cb.appendChild(el("p", "ib-p dim", olk));
         c.appendChild(cb);
       }
+      var gpn = gapPanel(now); if (gpn) c.appendChild(gpn);
       var port = fresh && brief.market.portfolio;
       if (port) {
         var pr = el("div", "ib-port");
