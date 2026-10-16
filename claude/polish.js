@@ -212,46 +212,6 @@
   }).observe(wx, { attributes: true, attributeFilter: ["class"], attributeOldValue: true });
 })();
 
-/* Sports Desk: the bar above the embedded desk is its own drag handle.
-   Touches inside the desk belong to the desk, so swipe-to-close lives
-   on the bar: drag it down and let go to return to the modules. */
-(function () {
-  "use strict";
-  var sec = document.getElementById("sec-sports");
-  var bar = sec ? sec.querySelector(".mx-embed-bar") : null;
-  var handle = document.getElementById("tabsHandle");
-  if (!bar || !handle) return;
-  var y0 = null, pid = null, dy = 0;
-  bar.addEventListener("touchstart", function (e) { e.stopPropagation(); }, { passive: true });
-  bar.addEventListener("pointerdown", function (e) {
-    if (e.target.closest("a")) return;
-    y0 = e.clientY; pid = e.pointerId; dy = 0;
-    try { bar.setPointerCapture(pid); } catch (err) {}
-    sec.style.transition = "none";
-  });
-  bar.addEventListener("pointermove", function (e) {
-    if (y0 === null || e.pointerId !== pid) return;
-    dy = Math.max(0, e.clientY - y0);
-    sec.style.transform = dy ? "translateY(" + Math.round(dy * 0.85) + "px)" : "";
-  });
-  function end() {
-    if (y0 === null) return;
-    y0 = null; pid = null;
-    if (dy > 110) {
-      sec.style.transition = "transform 0.28s ease-in";
-      sec.style.transform = "translateY(110vh)";
-      setTimeout(function () { sec.style.transition = ""; sec.style.transform = ""; handle.click(); }, 260);
-    } else {
-      sec.style.transition = "transform 0.32s cubic-bezier(0.22, 1, 0.36, 1)";
-      sec.style.transform = "";
-      setTimeout(function () { sec.style.transition = ""; }, 340);
-    }
-    dy = 0;
-  }
-  bar.addEventListener("pointerup", end);
-  bar.addEventListener("pointercancel", end);
-})();
-
 /* Inside a module the bottom REBOOT becomes a back bar (same as the
    handle up top); REBOOT stays on the module screen. */
 (function () {
@@ -409,25 +369,118 @@
   } catch (e) {}
 })();
 
-/* Sports Desk sheet: flag the body while it's open (the CSS pins the
-   sheet and locks the page), and a plain tap on its bar closes it. */
+/* Sports Desk: behaves like the other modules.
+   • flags the body while open (CSS locks the page) and fits the desk's
+     height so handle + desk + back tab exactly fill the screen
+   • swipe down to close: from the bar, or from inside the desk when
+     it's scrolled to the top (the desk is on the same site, so its
+     touches can be read here)
+   • refresh button reloads the desk */
 (function () {
   "use strict";
   var sec = document.getElementById("sec-sports");
-  var bar = sec ? sec.querySelector(".mx-embed-bar") : null;
-  var handle = document.getElementById("tabsHandle");
   if (!sec) return;
-  function sync() { document.body.classList.toggle("sports-open", !sec.classList.contains("is-hidden")); }
+  var frame = sec.querySelector("iframe"), box = sec.querySelector(".mx-embed-frame");
+  var bar = sec.querySelector(".mx-embed-bar"), handle = document.getElementById("tabsHandle");
+  var thBar = handle && handle.querySelector(".th-bar");
+  function isOpen() { return !sec.classList.contains("is-hidden"); }
+  function fit() {
+    if (!isOpen() || !box) return;
+    /* grow or shrink the desk until the back tab sits at the bottom */
+    var ctr = document.querySelector(".main-controls"), main = document.getElementById("main");
+    if (!ctr || !main) return;
+    var pad = parseFloat(getComputedStyle(main).paddingBottom) || 20;
+    var cur = box.getBoundingClientRect().height;
+    var h = Math.max(240, Math.round(cur + window.innerHeight - pad - ctr.getBoundingClientRect().bottom));
+    box.style.setProperty("height", h + "px", "important");
+  }
+  function sync() {
+    document.body.classList.toggle("sports-open", isOpen());
+    if (isOpen()) { window.scrollTo(0, 0); requestAnimationFrame(fit); setTimeout(fit, 500); }
+  }
   new MutationObserver(sync).observe(sec, { attributes: true, attributeFilter: ["class"] });
+  window.addEventListener("resize", function () { setTimeout(fit, 60); });
   sync();
-  if (!bar || !handle) return;
-  var tx = 0, ty = 0, t0 = 0;
-  bar.addEventListener("pointerdown", function (e) { tx = e.clientX; ty = e.clientY; t0 = Date.now(); });
-  bar.addEventListener("click", function (e) {
-    if (e.target.closest("a")) return;
-    if (Date.now() - t0 > 500 || Math.abs(e.clientX - tx) > 8 || Math.abs(e.clientY - ty) > 8) return;
-    handle.click();
+
+  /* refresh */
+  var rl = sec.querySelector(".mx-embed-reload");
+  if (rl && frame) rl.addEventListener("click", function (e) {
+    e.stopPropagation();
+    rl.classList.remove("spin"); void rl.offsetWidth; rl.classList.add("spin");
+    try { frame.contentWindow.location.reload(); }
+    catch (err) { var u = frame.getAttribute("src") || frame.getAttribute("data-src"); frame.setAttribute("src", "about:blank"); setTimeout(function () { frame.setAttribute("src", u); }, 30); }
   });
-  /* nothing behind the sheet should scroll from a touch on the bar */
-  bar.addEventListener("touchmove", function (e) { e.preventDefault(); }, { passive: false });
+
+  /* swipe down to close (same feel as the other modules) */
+  if (!handle) return;
+  var y0 = null, dy = 0;
+  function ring(p) {
+    if (!thBar) return;
+    if (p <= 0) { ["animation", "width", "height", "background", "border", "borderRadius", "boxShadow"].forEach(function (k) { thBar.style[k] = ""; }); return; }
+    thBar.style.animation = "none";
+    thBar.style.width = Math.round(40 - 16 * p) + "px"; thBar.style.height = Math.round(6 + 18 * p) + "px";
+    thBar.style.background = "transparent"; thBar.style.border = "3px solid var(--violet)"; thBar.style.borderRadius = "50%"; thBar.style.boxShadow = "0 0 14px var(--glow)";
+  }
+  function start(y) { y0 = y; dy = 0; sec.style.transition = "none"; }
+  function move(y, e) {
+    if (y0 === null) return;
+    dy = y - y0;
+    if (dy <= 0) { sec.style.transform = ""; ring(0); return; }
+    if (e && e.cancelable) e.preventDefault();
+    sec.style.transform = "translateY(" + Math.round(dy * 0.85) + "px)";
+    ring(Math.min(dy / 160, 1));
+  }
+  function end() {
+    if (y0 === null) return;
+    y0 = null; ring(0);
+    if (dy > 110) {
+      sec.style.transition = "transform 0.28s ease-in, opacity 0.28s ease-in";
+      sec.style.transform = "translateY(110vh)";
+      setTimeout(function () { sec.style.transition = ""; sec.style.transform = ""; handle.click(); }, 260);
+    } else {
+      sec.style.transition = "transform 0.32s cubic-bezier(0.22, 1, 0.36, 1)";
+      sec.style.transform = "";
+      setTimeout(function () { sec.style.transition = ""; }, 340);
+    }
+    dy = 0;
+  }
+  /* the bar */
+  if (bar) {
+    bar.addEventListener("touchstart", function (e) { if (e.target.closest("a, button") || e.touches.length !== 1) return; e.stopPropagation(); start(e.touches[0].clientY); }, { passive: true });
+    bar.addEventListener("touchmove", function (e) { e.stopPropagation(); if (y0 === null) { if (e.cancelable) e.preventDefault(); return; } move(e.touches[0].clientY, e); }, { passive: false });
+    bar.addEventListener("touchend", function (e) { e.stopPropagation(); end(); });
+    bar.addEventListener("touchcancel", function (e) { e.stopPropagation(); end(); });
+  }
+  /* inside the desk, only when it's scrolled all the way up */
+  function atTop(t, doc) {
+    for (var n = t; n && n.nodeType === 1; n = n.parentElement) {
+      if (n.scrollTop > 2) return false;
+    }
+    var se = doc.scrollingElement || doc.documentElement;
+    return !se || se.scrollTop <= 2;
+  }
+  function hook() {
+    var doc; try { doc = frame.contentWindow.document; } catch (err) { return; }
+    if (!doc || doc.__mxSwipe) return;
+    doc.__mxSwipe = true;
+    var cand = false, sx = 0, sy = 0;
+    doc.addEventListener("touchstart", function (e) {
+      cand = false; y0 = null;
+      if (e.touches.length !== 1 || !isOpen()) return;
+      if (!atTop(e.target, doc)) return;
+      cand = true; sx = e.touches[0].clientX; sy = e.touches[0].clientY;
+    }, { passive: true });
+    doc.addEventListener("touchmove", function (e) {
+      if (!cand) return;
+      var t = e.touches[0], ddy = t.clientY - sy, ddx = t.clientX - sx;
+      if (y0 === null) {
+        if (Math.abs(ddx) > Math.abs(ddy) || ddy < 8) { if (ddy < -4 || Math.abs(ddx) > 10) cand = false; return; }
+        start(sy + 8);
+      }
+      move(t.clientY, e);
+    }, { passive: false });
+    doc.addEventListener("touchend", function () { cand = false; end(); });
+    doc.addEventListener("touchcancel", function () { cand = false; end(); });
+  }
+  if (frame) { frame.addEventListener("load", hook); hook(); }
 })();

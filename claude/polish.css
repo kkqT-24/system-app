@@ -529,14 +529,17 @@ body:not(.tab-open) .main-center { flex: 0 0 auto; justify-content: flex-start; 
 body:not(.tab-open) .main-inner > .main-top:last-child { position: relative; top: 20px; }
 body:not(.tab-open) .main-controls { position: relative; top: -14px; }
 
-/* ---------- Sports Desk: pinned full-screen sheet ----------
-   While it's open the page underneath is locked, so a fast swipe in
-   the desk can't drag the whole app. The sheet sits right under the
-   status bar; its own bar is the handle (drag down or tap to close). */
+/* ---------- Sports Desk: sits like every other module ----------
+   Edge to edge, with the top handle and bottom back tab. The desk's
+   height is fitted by polish.js so the page exactly fills the screen,
+   and the page is locked while it's open, so a fast swipe in the desk
+   can't drag the app. */
 html:has(body.sports-open), body.sports-open { overflow: hidden !important; height: 100% !important; overscroll-behavior: none; }
-body.sports-open #sec-sports.section.mx-embed {
-  position: fixed !important; z-index: 60; left: 0; right: 0; top: calc(env(safe-area-inset-top) + 4px); bottom: 0;
-  margin: 0 !important; display: flex; flex-direction: column; border-radius: 16px 16px 0 0;
+.mx-embed-bar .mx-embed-acts { display: flex; gap: 8px; align-items: center; }
+.mx-embed-reload {
+  appearance: none; background: none; cursor: pointer; display: inline-flex; align-items: center; justify-content: center;
+  width: 30px; height: 28px; padding: 0; border: 1px solid var(--line-soft); color: var(--lav);
 }
-body.sports-open #sec-sports .mx-embed-frame { flex: 1 1 auto; height: auto !important; min-height: 0; }
-body.sports-open #tabsHandle, body.sports-open .mx-back-bar { visibility: hidden; }
+.mx-embed-reload svg { width: 14px; height: 14px; }
+.mx-embed-reload.spin svg { animation: mxReloadSpin 0.7s cubic-bezier(0.4, 0, 0.2, 1); }
+@keyframes mxReloadSpin { to { transform: rotate(360deg); } }
