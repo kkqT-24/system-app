@@ -386,17 +386,15 @@
   function isOpen() { return !sec.classList.contains("is-hidden"); }
   function fit() {
     if (!isOpen() || !box) return;
-    /* grow or shrink the desk until the back tab sits at the bottom */
-    var ctr = document.querySelector(".main-controls"), main = document.getElementById("main");
-    if (!ctr || !main) return;
-    var pad = parseFloat(getComputedStyle(main).paddingBottom) || 20;
-    var cur = box.getBoundingClientRect().height;
-    var h = Math.max(240, Math.round(cur + window.innerHeight - pad - ctr.getBoundingClientRect().bottom));
-    box.style.setProperty("height", h + "px", "important");
+    /* the desk runs from its spot under the bar to the bottom of the screen */
+    /* layout position (offsetTop ignores the open/drag transforms) */
+    var top = 0; for (var n = box; n; n = n.offsetParent) top += n.offsetTop;
+    var h = Math.max(240, Math.round(window.innerHeight - top));
+    if (Math.abs(h - (fit.last || 0)) > 1) { box.style.setProperty("height", h + "px", "important"); fit.last = h; }
   }
   function sync() {
     document.body.classList.toggle("sports-open", isOpen());
-    if (isOpen()) { window.scrollTo(0, 0); requestAnimationFrame(fit); setTimeout(fit, 500); }
+    if (isOpen()) { window.scrollTo(0, 0); fit(); requestAnimationFrame(fit); }
   }
   new MutationObserver(sync).observe(sec, { attributes: true, attributeFilter: ["class"] });
   window.addEventListener("resize", function () { setTimeout(fit, 60); });

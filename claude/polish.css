@@ -535,6 +535,18 @@ body:not(.tab-open) .main-controls { position: relative; top: -14px; }
    and the page is locked while it's open, so a fast swipe in the desk
    can't drag the app. */
 html:has(body.sports-open), body.sports-open { overflow: hidden !important; height: 100% !important; overscroll-behavior: none; }
+/* no grip pill on the bar, no bottom back tab: the desk runs to the
+   bottom of the screen; open with one light slide instead of the
+   per-part effects (filters on a live page stutter) */
+.section.mx-embed .mx-embed-bar::before { display: none !important; }
+body.sports-open .main-controls { display: none !important; }
+body.sports-open #main { padding-bottom: 0 !important; }
+body.sports-open #sec-sports.section.mx-embed { margin-bottom: 0 !important; border-bottom: 0 !important; }
+body.sports-open #sec-sports .mx-embed-frame { border-bottom: 0 !important; min-height: 0 !important; }
+#sec-sports.section.assembling, #sec-sports.section.assembling > * { animation: none !important; }
+#sec-sports.section.assembling::before, #sec-sports.section.assembling::after { display: none !important; }
+#sec-sports.section.assembling { animation: mxSportsIn 0.34s cubic-bezier(0.22, 1, 0.36, 1) both !important; }
+@keyframes mxSportsIn { from { opacity: 0; transform: translateY(26px); } to { opacity: 1; transform: none; } }
 .mx-embed-bar .mx-embed-acts { display: flex; gap: 8px; align-items: center; }
 .mx-embed-reload {
   appearance: none; background: none; cursor: pointer; display: inline-flex; align-items: center; justify-content: center;
