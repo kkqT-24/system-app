@@ -300,7 +300,7 @@
   }
 
   /* ---------------- preview box ---------------- */
-  var CARDS = ["market", "trending", "mind", "gbot"];
+  var CARDS = ["market", "trending", "gbot", "mind"];
   var GROK_URL = "https://grok.com";
   /* fresh = written within the last 14 hours (a 12 AM trending update
      still counts for the day it belongs to) */
