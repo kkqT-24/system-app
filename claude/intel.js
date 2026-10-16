@@ -9,7 +9,7 @@
      3 Trending   stocks / tech / world
      4 Fact or Fiction + Word of the Day (+ recall quiz on a
                   word from last week)
-     5 Grok Bot   what it can help with + Sports Desk
+     (From the Bot leads: what it can help with + Sports Desk)
      6 Wrap-up    today's focus, +5 EXP once a day
    Sources:
    • data/brief.json  — the Grok bot, 7 AM / 4:15 PM / 7 PM ET
@@ -329,8 +329,27 @@
   }
 
   /* ---------------- preview box ---------------- */
-  var CARDS = ["week", "market", "trending", "gbot", "mind"];
+  var CARDS = ["gbot", "week", "market", "trending", "mind"];
   var GROK_URL = "https://grok.com";
+  /* Opening Grok from the home-screen app: iOS shows the link in an
+     in-app browser sheet, then hands it to the Grok app, which leaves
+     that sheet blank behind it. Keep a handle on the sheet and close
+     it as soon as the app comes back into view. */
+  var outWin = null;
+  function openGrok(u) {
+    var w = null; try { w = window.open(u, "_blank"); } catch (err) {}
+    if (!w) { window.location.href = u; return; }
+    try { w.opener = null; } catch (err) {}
+    outWin = w;
+  }
+  function closeOut() {
+    if (!outWin) return;
+    var w = outWin; outWin = null;
+    try { w.close(); } catch (err) {}
+  }
+  document.addEventListener("visibilitychange", function () { if (!document.hidden) closeOut(); });
+  window.addEventListener("focus", closeOut);
+  window.addEventListener("pageshow", closeOut);
   /* fresh = written within the last 14 hours (a 12 AM trending update
      still counts for the day it belongs to) */
   function isFresh() {
@@ -1243,6 +1262,7 @@
         c.appendChild(sd);
       }
       var rp = el("a", "ib-reply"); rp.href = g.link || GROK_URL; rp.target = "_blank"; rp.rel = "noopener noreferrer";
+      rp.addEventListener("click", function (e) { e.preventDefault(); openGrok(rp.href); });
       rp.appendChild(el("span", null, "Reply to " + (g.name ? g.name.charAt(0) + g.name.slice(1).toLowerCase() : "Grok"))); rp.appendChild(el("b", null, "›"));
       c.appendChild(rp);
     }
@@ -1889,8 +1909,7 @@
       if (e.target.closest(".jv")) {
         e.stopPropagation();
         var u = (brief && brief.gbot.link) || GROK_URL;
-        var w = null; try { w = window.open(u, "_blank", "noopener"); } catch (err) {}
-        if (!w) window.location.href = u;
+        openGrok(u);
         return;
       }
       open(); load(false);
