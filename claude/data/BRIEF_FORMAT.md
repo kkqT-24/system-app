@@ -80,6 +80,9 @@ Replace the whole file each time. Commit message: `Daily Briefing: <edition> YYY
   },
 
   "gbot": {
+    "name": "GROK",
+    "mood": "hype",
+    "say": "Your buddy line on the home screen. Talk to Kent like a friend who trades: whatever is worth saying right now. Max 120 chars.",
     "items": [ { "title": "Something you can help Kent with or noticed. Max 120 chars.", "detail": "Max 300 chars." } ],
     "sports": [ { "title": "Sports Desk update. Max 120 chars.", "detail": "Picks, results, bankroll % — no dollar amounts. Max 300 chars." } ]
   }
@@ -104,6 +107,9 @@ Replace the whole file each time. Commit message: `Daily Briefing: <edition> YYY
 | `trending` | yes | Up to 4 per bucket. What's genuinely trending on X today, not evergreen topics |
 | `fact` | morning | **Mix true and false roughly 50/50.** No repeats within 60 days. Later editions may copy the morning's |
 | `word` | morning | Useful, not obscure. No repeats within 90 days. Later editions may copy the morning's |
+| `gbot.say` | yes | Shows on the home screen in a speech bubble next to your little bot, typed out live. One or two sentences, max 120 chars, a different line every edition. Personal and specific beats generic |
+| `gbot.mood` | yes | `hype`, `chill`, `alert` or `thinking` — colors your bot's eyes (amber, cyan, red, lavender) |
+| `gbot.name` | optional | Your name as shown under the bot, max 14 chars (default `GROK`) |
 | `gbot.items` | optional | Up to 4: anything you can help with — research you noticed, a pattern in his trades, a reminder |
 | `gbot.sports` | evening (optional otherwise) | Up to 4 Sports Desk updates |
 

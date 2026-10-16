@@ -210,7 +210,7 @@
     if (d.fact && str(d.fact.claim, 280) && typeof d.fact.is_true === "boolean") b.fact = { claim: str(d.fact.claim, 280), truth: d.fact.is_true, explain: str(d.fact.explain, 400) };
     if (d.word && str(d.word.word, 40) && str(d.word.definition, 300)) b.word = { word: str(d.word.word, 40), pos: str(d.word.part_of_speech, 20), def: str(d.word.definition, 300), ex: str(d.word.example, 240) };
     var g = d.gbot || {};
-    b.gbot = { items: items(g.items, 4, 120, 300), sports: items(g.sports, 4, 120, 300) };
+    b.gbot = { items: items(g.items, 4, 120, 300), sports: items(g.sports, 4, 120, 300), say: str(g.say, 160), mood: str(g.mood, 12).toLowerCase(), name: str(g.name, 14).toUpperCase() };
     return b;
   }
 
@@ -297,7 +297,7 @@
   }
 
   /* ---------------- preview box ---------------- */
-  var CARDS = ["market", "catalyst", "trending", "mind", "gbot", "wrap"];
+  var CARDS = ["market", "catalyst", "trending", "mind", "gbot"];
   function editionKey() { var t = dayKey(new Date()); return brief && brief.date === t ? t + ":" + brief.edition : t + ":base"; }
   function edLabel() {
     if (!brief || brief.date !== dayKey(new Date())) return brief ? "Last brief · " + shortDate(parseDay(brief.date)) : "Waiting on the bot";
@@ -318,106 +318,204 @@
     list.sort(function (a, b) { return (a.date + (a.time || "99")).localeCompare(b.date + (b.time || "99")); });
     return list[0] || null;
   }
+  function quote(sym) { return market ? market.quotes.filter(function (q) { return q.symbol === sym; })[0] || null : null; }
+
+  /* the buddy: an original little bot drawn in code (not anyone's logo) */
+  var BOT_SVG = '<svg viewBox="0 0 64 64" aria-hidden="true">' +
+    '<line class="ant" x1="32" y1="13" x2="32" y2="5"/><circle class="tip" cx="32" cy="4.5" r="3"/>' +
+    '<path class="head" d="M14 18 Q14 13 19 13 H45 Q50 13 50 18 V40 Q50 46 44 46 H20 Q14 46 14 40 Z"/>' +
+    '<rect class="visor" x="18" y="21" width="28" height="13" rx="6.5"/>' +
+    '<g class="eyes"><rect class="eye" x="23" y="24.5" width="6" height="6" rx="3"/><rect class="eye" x="35" y="24.5" width="6" height="6" rx="3"/></g>' +
+    '<rect class="mouth" x="27" y="38.5" width="10" height="2.4" rx="1.2"/>' +
+    '<rect class="ear" x="9" y="24" width="5" height="11" rx="2"/><rect class="ear" x="50" y="24" width="5" height="11" rx="2"/>' +
+    '<path class="body" d="M22 49 H42 L39 60 H25 Z"/></svg>';
+  var QUIPS = {
+    pre: ["Pre-market's warming up. Lock your call before the bell.", "Futures are moving. Got a read yet?", "Bell's coming. Coffee, then the Setup."],
+    open: ["Market's live. Stick to the plan.", "Session's running. No chasing.", "Tape's moving. Breathe, then decide."],
+    after: ["Bell rang. How'd your call do?", "Session's done. Good time to log the day.", "Closed for the day. Review, then rest."],
+    closed: ["Markets are closed. Good time to get ahead on tomorrow.", "Quiet tape. Workouts don't skip themselves.", "Off hours. I'll have a fresh brief at 7."]
+  };
+  function buddyLine(now) {
+    var today = dayKey(now);
+    if (brief && brief.date === today && brief.gbot.say) return { text: brief.gbot.say, mood: brief.gbot.mood };
+    var s = marketLine(now).s, k = s === "pre" ? "pre" : s === "open" ? "open" : (isSession(today) && ny(now).min >= 960 && ny(now).min < 1260 ? "after" : "closed");
+    var arr = QUIPS[k];
+    return { text: arr[hashStr(today + k) % arr.length], mood: k === "open" ? "alert" : k === "pre" ? "hype" : "chill" };
+  }
+  var typed = "", typeTimer = null;
+  function typeInto(node, text, bot) {
+    if (typed === text && node.textContent === text) return;
+    typed = text;
+    if (typeTimer) clearInterval(typeTimer);
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) { node.textContent = text; return; }
+    var i = 0; node.textContent = "";
+    bot.classList.add("talking");
+    typeTimer = setInterval(function () {
+      i += 1 + (Math.random() < 0.3 ? 1 : 0);
+      node.textContent = text.slice(0, i);
+      if (i >= text.length) { clearInterval(typeTimer); typeTimer = null; bot.classList.remove("talking"); }
+    }, 34);
+  }
+  var lastTsla = null, tapeSig = "", countFrom = {};
+  function countUp(node, to, fmt) {
+    var from = countFrom[node.className] == null ? 0 : countFrom[node.className];
+    countFrom[node.className] = to;
+    if (from === to || window.matchMedia("(prefers-reduced-motion: reduce)").matches) { node.textContent = fmt(to); return; }
+    var t0 = performance.now();
+    (function step(t) {
+      var p = Math.min(1, (t - t0) / 700), e = 1 - Math.pow(1 - p, 3);
+      node.textContent = fmt(from + (to - from) * e);
+      if (p < 1) requestAnimationFrame(step);
+    })(t0);
+  }
   function renderBox() {
     if (!box) return;
     var now = new Date(), today = dayKey(now), ek = editionKey();
     var cards = activeCards(), seen = Math.min(C.seen[ek] || 0, cards.length);
-    var done = !!C.wrap[today];
     box.classList.toggle("fresh", seen === 0);
-    box.classList.toggle("done", done);
-    var L = box.querySelector(".ib-left"), R = box.querySelector(".ib-right"), F = box.querySelector(".ib-foot");
-    /* left: portfolio + the call */
-    L.textContent = "";
-    L.appendChild(el("span", "ib-k", "Market"));
-    var port = brief && brief.date === today && brief.market.portfolio;
-    var spy = market && market.quotes.filter(function (q) { return q.symbol === "SPY"; })[0];
-    var big = el("span", "ib-big");
-    if (port) { big.textContent = pctTxt(port.day); big.classList.add(port.day >= 0 ? "up" : "dn"); L.appendChild(big); L.appendChild(el("span", "ib-sub", "Your portfolio")); }
-    else if (spy) { big.textContent = pctTxt(spy.pct); big.classList.add(spy.pct >= 0 ? "up" : "dn"); L.appendChild(big); L.appendChild(el("span", "ib-sub", "SPY")); }
-    else { big.textContent = "—"; L.appendChild(big); L.appendChild(el("span", "ib-sub", marketLine(now).t)); }
-    var tgt = callTarget(now), c = C.calls[tgt], last = null;
-    Object.keys(C.calls).sort().forEach(function (k) { if (C.calls[k].result && k <= today) last = { k: k, c: C.calls[k] }; });
-    var callTxt;
-    if (last && last.k === today) callTxt = last.c.result === "win" ? "✓ Called it" : last.c.result === "loss" ? "✗ Missed the call" : "Call pushed";
-    else if (c) callTxt = "Called " + c.call.toUpperCase() + (tgt === today ? " · locked" : " · " + DOW[parseDay(tgt).getDay()]);
-    else callTxt = "Make your SPY call ›";
-    L.appendChild(el("span", "ib-callln" + (c || (last && last.k === today) ? "" : " ask"), callTxt));
-    /* right: next catalyst */
-    R.textContent = "";
-    R.appendChild(el("span", "ib-k", "Catalyst"));
-    var ne = nextEvent(today);
-    if (ne) {
-      R.appendChild(el("span", "ib-ev", ne.name));
-      R.appendChild(el("span", "ib-sub", (ne.date === today ? "Today" : shortDate(parseDay(ne.date))) + (ne.time ? " · " + clock24(ne.time) : "")));
-    } else R.appendChild(el("span", "ib-ev", "Quiet week"));
-    var bl = brief && brief.date === today && brief.market.headline;
-    if (bl) R.appendChild(el("span", "ib-line", bl));
-    /* foot: edition + progress pips */
-    F.textContent = "";
-    F.appendChild(el("span", "ib-ed", done && seen >= cards.length ? "Briefing complete" : edLabel()));
-    var pips = el("span", "ib-pips");
-    for (var i = 0; i < cards.length; i++) pips.appendChild(el("i", i < seen ? "on" : ""));
-    F.appendChild(pips);
+    box.classList.toggle("done", !!C.wrap[today] && seen >= cards.length);
+    box.querySelector(".ib-ed").textContent = C.wrap[today] && seen >= cards.length ? "Complete" : edLabel();
+    /* left: portfolio (or TSLA) big, TSLA price line, market clock */
+    var L = box.querySelector(".ib-left");
+    if (!L.firstChild) {
+      L.innerHTML = '<span class="ib-k"></span><span class="ib-big"></span><span class="ib-tsla"><b class="sym">TSLA</b> <span class="px"></span> <span class="ch"></span></span><span class="ib-sub"></span>';
+    }
+    var port = brief && brief.date === today && brief.market.portfolio, ts = quote("TSLA");
+    var big = L.querySelector(".ib-big");
+    var bigVal = port ? port.day : ts ? ts.pct : null;
+    L.querySelector(".ib-k").textContent = port ? "Portfolio" : "Tesla";
+    big.classList.remove("up", "dn");
+    if (bigVal != null) { big.classList.add(bigVal >= 0 ? "up" : "dn"); countUp(big, bigVal, function (v) { return pctTxt(v); }); }
+    else big.textContent = "—";
+    var tl = L.querySelector(".ib-tsla");
+    tl.style.display = ts ? "" : "none";
+    if (ts) {
+      tl.querySelector(".px").textContent = "$" + ts.price.toFixed(2);
+      var ch = tl.querySelector(".ch"); ch.textContent = (ts.pct >= 0 ? "▲" : "▼") + Math.abs(ts.pct).toFixed(2) + "%"; ch.className = "ch " + (ts.pct >= 0 ? "up" : "dn");
+      if (lastTsla != null && lastTsla !== ts.price) { tl.classList.remove("tick-up", "tick-dn"); void tl.offsetWidth; tl.classList.add(ts.price > lastTsla ? "tick-up" : "tick-dn"); }
+      lastTsla = ts.price;
+    }
+    var ml = marketLine(now);
+    var sub = L.querySelector(".ib-sub"); sub.textContent = ml.t.replace("Market ", "").replace(" · opens ", " · ").replace(" · closes in ", " · ") ; sub.className = "ib-sub " + ml.s;
+    /* right: the buddy */
+    var R = box.querySelector(".ib-right");
+    if (!R.firstChild) {
+      R.innerHTML = '<div class="bud"><div class="bud-bot">' + BOT_SVG + '</div><span class="bud-name"></span></div><div class="bud-bubble"><span class="bud-text"></span></div>';
+    }
+    var bl = buddyLine(now);
+    var bot = R.querySelector(".bud-bot");
+    bot.setAttribute("data-mood", ["hype", "chill", "alert", "thinking"].indexOf(bl.mood) >= 0 ? bl.mood : "thinking");
+    R.querySelector(".bud-name").textContent = (brief && brief.gbot.name) || "GROK";
+    typeInto(R.querySelector(".bud-text"), bl.text, bot);
+    /* foot: a scrolling tape of the watchlist + progress pips */
+    var watch = brief && brief.date === today && brief.market.watch.length ? brief.market.watch : (market ? market.quotes.map(function (q) { return { symbol: q.symbol, pct: q.pct }; }) : []);
+    var sig = watch.map(function (w) { return w.symbol + w.pct; }).join("|");
+    var tape = box.querySelector(".ib-tape-in");
+    if (sig !== tapeSig) {
+      tapeSig = sig; tape.textContent = "";
+      if (watch.length) {
+        for (var r = 0; r < 2; r++) watch.forEach(function (w) {
+          var s = el("span", "tk " + (w.pct >= 0 ? "up" : "dn"));
+          s.appendChild(el("b", null, w.symbol)); s.appendChild(document.createTextNode(" " + pctTxt(w.pct)));
+          tape.appendChild(s);
+        });
+        tape.style.animationDuration = Math.max(14, watch.length * 4) + "s";
+      } else tape.appendChild(el("span", "tk", "Watchlist appears with the first brief"));
+      tape.classList.toggle("roll", watch.length > 0);
+    }
+    var pips = box.querySelector(".ib-pips"); pips.textContent = "";
+    for (var i = 0; i < cards.length; i++) pips.appendChild(el("i", i < seen ? "on" : i === seen ? "next" : ""));
   }
 
   /* ---------------- card player ---------------- */
-  var player = null, idx = 0, list = [];
+  var player = null, idx = 0, list = [], busy = false;
   function buildPlayer() {
     player = el("div", "ib-player");
     player.setAttribute("role", "dialog"); player.setAttribute("aria-label", "Daily Briefing");
     player.innerHTML = '<div class="ibp-glow"></div><div class="ibp-top"><div class="ibp-bars"></div><div class="ibp-head"><span class="ibp-ed"></span><button type="button" class="ibp-x" aria-label="Close">&times;</button></div></div><div class="ibp-stage"></div>' +
-      '<div class="ibp-nav"><button type="button" class="ibp-prev" aria-label="Previous card">&#8249;</button><span class="ibp-count mono"></span><button type="button" class="ibp-next" aria-label="Next card">&#8250;</button></div>';
+      '<div class="ibp-nav"><button type="button" class="ibp-prev" aria-label="Previous card">&#8249;</button><span class="ibp-count mono"></span><button type="button" class="ibp-next" aria-label="Next card">&#8250;</button></div><div class="ibp-fin"></div>';
     document.body.appendChild(player);
-    player.querySelector(".ibp-x").addEventListener("click", close);
+    player.querySelector(".ibp-x").addEventListener("click", function () { close(); });
     player.querySelector(".ibp-prev").addEventListener("click", function () { go(idx - 1); });
-    player.querySelector(".ibp-next").addEventListener("click", function () { if (idx >= list.length - 1) close(); else go(idx + 1); });
-    /* swipe: left / right between cards, down to close */
-    var sx = 0, sy = 0, st = 0, tracking = false, dx = 0, dy = 0, axis = null;
+    player.querySelector(".ibp-next").addEventListener("click", function () { if (idx >= list.length - 1) finale(); else go(idx + 1); });
+    /* gestures: left / right between cards, pull down (from the top
+       of a card) to close. Native scrolling is blocked only while a
+       pull is actually in progress, so long cards still scroll. */
     var stage = player.querySelector(".ibp-stage");
+    var sx = 0, sy = 0, st = 0, tracking = false, dx = 0, dy = 0, axis = null, pulling = false, card = null;
     player.addEventListener("touchstart", function (e) {
       e.stopPropagation();
-      if (e.touches.length !== 1 || e.target.closest("input, textarea, .ib-tabs")) { tracking = false; return; }
-      tracking = true; axis = null; dx = dy = 0; sx = e.touches[0].clientX; sy = e.touches[0].clientY; st = Date.now();
+      tracking = false;
+      if (busy || player.classList.contains("finale") || e.touches.length !== 1 || e.target.closest("input, textarea, button, a, .ib-tabs")) return;
+      card = stage.querySelector(".ib-card.cur");
+      tracking = true; axis = null; pulling = false; dx = dy = 0;
+      sx = e.touches[0].clientX; sy = e.touches[0].clientY; st = Date.now();
     }, { passive: true });
     player.addEventListener("touchmove", function (e) {
       e.stopPropagation();
       if (!tracking) return;
       dx = e.touches[0].clientX - sx; dy = e.touches[0].clientY - sy;
-      if (!axis) { if (Math.abs(dx) < 10 && Math.abs(dy) < 10) return; axis = Math.abs(dx) > Math.abs(dy) ? "x" : "y"; }
-      var card = stage.querySelector(".ib-card.cur"); if (!card) return;
-      if (axis === "x") { card.style.transition = "none"; card.style.transform = "translateX(" + dx * 0.6 + "px)"; }
-      else if (dy > 0 && card.scrollTop <= 0) { player.style.transition = "none"; player.style.transform = "translateY(" + dy * 0.8 + "px)"; player.style.opacity = String(Math.max(0.3, 1 - dy / 500)); if (e.cancelable) e.preventDefault(); }
+      if (!axis) {
+        if (Math.abs(dx) < 8 && Math.abs(dy) < 8) return;
+        axis = Math.abs(dx) > Math.abs(dy) * 1.2 ? "x" : "y";
+        if (axis === "y") pulling = dy > 0 && (!card || card.scrollTop <= 0);
+        if (axis === "y" && !pulling) { tracking = false; return; }
+        player.style.transition = "none";
+        if (card) { card.style.transition = "none"; card.classList.remove("in-right", "in-left", "in-up"); }
+      }
+      if (e.cancelable) e.preventDefault();
+      if (axis === "x" && card) { card.style.transform = "translateX(" + (dx * 0.55).toFixed(1) + "px)"; card.style.opacity = String(1 - Math.min(0.5, Math.abs(dx) / 600)); }
+      else if (pulling) { var py = Math.max(0, dy); player.style.transform = "translateY(" + (py * 0.85).toFixed(1) + "px)"; player.style.opacity = String(Math.max(0.35, 1 - py / 520)); }
     }, { passive: false });
     function end() {
       if (!tracking) return; tracking = false;
-      var card = stage.querySelector(".ib-card.cur");
-      if (card) { card.style.transition = ""; card.style.transform = ""; }
+      var fast = Date.now() - st < 260;
+      if (card) { card.style.transition = ""; card.style.transform = ""; card.style.opacity = ""; }
+      if (pulling) {
+        if (dy > 120 || (fast && dy > 50)) { dropAway(); return; }
+        player.style.transition = ""; player.style.transform = ""; player.style.opacity = "";
+        return;
+      }
       player.style.transition = "";
-      var fast = Date.now() - st < 250;
-      if (axis === "y" && (dy > 110 || (fast && dy > 50))) { close(); return; }
-      player.style.transform = ""; player.style.opacity = "";
-      if (axis === "x" && (Math.abs(dx) > 70 || (fast && Math.abs(dx) > 35))) { if (dx < 0) { if (idx < list.length - 1) go(idx + 1); } else go(idx - 1); }
+      if (axis === "x" && (Math.abs(dx) > 70 || (fast && Math.abs(dx) > 35))) {
+        if (dx < 0) { if (idx < list.length - 1) go(idx + 1); else finale(); } else go(idx - 1);
+      }
     }
     player.addEventListener("touchend", end); player.addEventListener("touchcancel", end);
   }
+  /* the pulled-down sheet keeps falling instead of snapping */
+  function dropAway() {
+    busy = true;
+    player.style.transition = "transform 0.3s cubic-bezier(0.4, 0, 1, 1), opacity 0.3s ease";
+    player.style.transform = "translateY(100%)"; player.style.opacity = "0";
+    setTimeout(function () { busy = false; close(true); }, 310);
+  }
   function open(at) {
     if (!player) buildPlayer();
+    if (busy) return;
     scoreCalls();
     list = activeCards();
-    player.style.transform = ""; player.style.opacity = "";
+    player.classList.remove("finale", "collapse");
+    player.querySelector(".ibp-fin").textContent = "";
+    player.style.transition = ""; player.style.transform = ""; player.style.opacity = ""; player.style.clipPath = "";
+    player.querySelector(".ibp-stage").textContent = "";
+    void player.offsetWidth;
     player.classList.add("show");
     document.body.classList.add("ib-open");
     var ek = editionKey(), seen = C.seen[ek] || 0;
+    idx = 0;
     go(at != null ? at : (seen > 0 && seen < list.length ? seen : 0), true);
   }
-  function close() {
+  function close(instant) {
     if (!player) return;
-    player.classList.remove("show");
+    if (instant) { player.style.transition = "none"; }
+    player.classList.remove("show", "finale", "collapse");
     document.body.classList.remove("ib-open");
+    setTimeout(function () { player.style.transition = ""; player.style.transform = ""; player.style.opacity = ""; player.style.clipPath = ""; }, 60);
     save(); renderBox();
   }
   function go(i, first) {
-    if (i < 0 || i >= list.length) return;
+    if (busy || i < 0 || i >= list.length) return;
     var dir = i >= idx ? 1 : -1;
     idx = i;
     var ek = editionKey(); C.seen[ek] = Math.max(C.seen[ek] || 0, i + 1);
@@ -428,22 +526,88 @@
     player.querySelector(".ibp-ed").textContent = edLabel();
     player.querySelector(".ibp-count").textContent = (i + 1) + " / " + list.length;
     player.querySelector(".ibp-prev").disabled = i === 0;
-    player.querySelector(".ibp-next").textContent = i === list.length - 1 ? "Done" : "›";
-    player.querySelector(".ibp-next").classList.toggle("last", i === list.length - 1);
+    var nx = player.querySelector(".ibp-next");
+    nx.textContent = i === list.length - 1 ? "Finish" : "›";
+    nx.classList.toggle("last", i === list.length - 1);
     var stage = player.querySelector(".ibp-stage");
-    var old = stage.querySelector(".ib-card.cur");
+    var olds = stage.querySelectorAll(".ib-card.cur");
     var card = renderCard(list[i]);
     card.classList.add("cur", first ? "in-up" : dir > 0 ? "in-right" : "in-left");
+    card.addEventListener("animationend", function () { card.classList.remove("in-right", "in-left", "in-up"); }, { once: true });
     stage.appendChild(card);
-    if (old) { old.classList.remove("cur"); old.classList.add(dir > 0 ? "out-left" : "out-right"); setTimeout(function () { old.remove(); }, 380); }
+    Array.prototype.forEach.call(olds, function (old) {
+      old.classList.remove("cur"); old.classList.add(dir > 0 ? "out-left" : "out-right");
+      setTimeout(function () { old.remove(); }, 320);
+    });
     renderBox();
   }
   function refreshCard() {
-    if (!player || !player.classList.contains("show")) return;
+    if (!player || !player.classList.contains("show") || player.classList.contains("finale")) return;
     var stage = player.querySelector(".ibp-stage"), old = stage.querySelector(".ib-card.cur");
     if (!old) return;
     var st = old.scrollTop, card = renderCard(list[idx]);
     card.classList.add("cur"); stage.replaceChild(card, old); card.scrollTop = st;
+  }
+
+  /* ---------------- finale: the wrap-up has no card ----------------
+     The cards fold away, a lone prompt asks for today's focus, the
+     ring charges and pays +5 EXP, then the whole briefing shrinks
+     back into its box on the home screen. Once wrapped, Finish just
+     plays the fold-back. */
+  function finale() {
+    if (busy) return;
+    var today = dayKey(new Date());
+    var fin = player.querySelector(".ibp-fin");
+    fin.textContent = "";
+    player.classList.add("finale");
+    if (C.wrap[today]) { setTimeout(collapseToBox, 380); return; }
+    var ring = el("div", "fin-ring");
+    ring.innerHTML = '<svg viewBox="0 0 120 120" aria-hidden="true"><circle cx="60" cy="60" r="52" class="tr"/><circle cx="60" cy="60" r="52" class="pg"/><circle cx="60" cy="60" r="40" class="in"/></svg><span class="fin-exp">+' + WRAP_EXP + "</span><span class=\"fin-unit\">EXP</span>";
+    fin.appendChild(ring);
+    fin.appendChild(el("div", "fin-q", "One thing that wins today?"));
+    var f = el("form", "fin-form");
+    var inp = el("input", "fin-in"); inp.type = "text"; inp.maxLength = 80; inp.placeholder = "Type your focus"; inp.setAttribute("aria-label", "Today's focus"); inp.autocomplete = "off";
+    var btn = el("button", "fin-go", "Lock in"); btn.type = "submit";
+    f.appendChild(inp); f.appendChild(btn); fin.appendChild(f);
+    var skip = el("button", "fin-skip", "Skip"); skip.type = "button"; fin.appendChild(skip);
+    skip.addEventListener("click", function () { collapseToBox(); });
+    f.addEventListener("submit", function (e) {
+      e.preventDefault();
+      if (busy || C.wrap[today]) return;
+      busy = true;
+      C.wrap[today] = { focus: str(inp.value, 80), at: new Date().toISOString() };
+      var ks = Object.keys(C.wrap).sort(); while (ks.length > 60) delete C.wrap[ks.shift()];
+      save(); inp.blur();
+      fin.classList.add("locking");
+      buzz([12, 50, 12, 50, 30]);
+      ring.classList.add("charge");
+      setTimeout(function () {
+        var r = ring.getBoundingClientRect();
+        burst(r.left + r.width / 2, r.top + r.height / 2, "#c3b8fe", 40);
+        burst(r.left + r.width / 2, r.top + r.height / 2, "#fbbf24", 16);
+        ring.classList.add("done");
+        try { if (window.__ksGainExp) window.__ksGainExp(WRAP_EXP); } catch (err) {}
+      }, 950);
+      setTimeout(function () { busy = false; collapseToBox(); }, 2100);
+    });
+    setTimeout(function () { try { inp.focus({ preventScroll: true }); } catch (err) {} }, 500);
+  }
+  function collapseToBox() {
+    if (!box || !player) { close(); return; }
+    busy = true;
+    var r = box.getBoundingClientRect(), W = window.innerWidth, H = window.innerHeight;
+    var inset = "inset(" + Math.max(0, r.top).toFixed(0) + "px " + Math.max(0, W - r.right).toFixed(0) + "px " + Math.max(0, H - r.bottom).toFixed(0) + "px " + Math.max(0, r.left).toFixed(0) + "px round 14px)";
+    player.classList.add("collapse");
+    var done = function () {
+      busy = false; close(true);
+      box.classList.remove("landed"); void box.offsetWidth; box.classList.add("landed");
+      var bx = box.getBoundingClientRect();
+      burst(bx.left + bx.width / 2, bx.top + bx.height / 2, "#cbd5e1", 18);
+    };
+    try {
+      var an = player.animate([{ clipPath: "inset(0px 0px 0px 0px round 0px)", opacity: 1 }, { clipPath: inset, opacity: 0.15 }], { duration: 560, easing: "cubic-bezier(0.6, 0, 0.2, 1)", fill: "forwards" });
+      an.onfinish = function () { an.cancel(); done(); };
+    } catch (e) { done(); }
   }
 
   function cardShell(kind, title, kicker) {
@@ -568,8 +732,6 @@
       c = cardShell("gbot", "From the Bot", "05 · Grok bot");
       if (brief.gbot.items.length) { var gs = sect(c, "Can help with"); itemList(gs, brief.gbot.items); }
       if (brief.gbot.sports.length) { var ss = sect(c, "Sports Desk"); itemList(ss, brief.gbot.sports); }
-    } else {
-      c = wrapCard(today);
     }
     return c;
   }
@@ -676,41 +838,6 @@
     return s;
   }
 
-  function wrapCard(today) {
-    var c = cardShell("wrap", "Wrap-up", "06 · Lock in");
-    var w = C.wrap[today];
-    var ring = el("div", "ib-ring" + (w ? " done" : ""));
-    ring.innerHTML = '<svg viewBox="0 0 120 120" aria-hidden="true"><circle cx="60" cy="60" r="52" class="tr"/><circle cx="60" cy="60" r="52" class="pg"/><g class="tk"></g></svg><span class="ib-exp">+' + WRAP_EXP + ' EXP</span>';
-    c.appendChild(ring);
-    if (w) {
-      c.appendChild(el("div", "ib-sl center", "Today's focus"));
-      c.appendChild(el("div", "ib-focus", w.focus || "—"));
-      c.appendChild(el("p", "ib-p dim center", "Briefing complete. It refreshes at 4:15 PM and 7 PM."));
-      return c;
-    }
-    c.appendChild(el("p", "ib-p center", "One thing that would make today a win?"));
-    var f = el("form", "ib-wform");
-    var inp = el("input", "t-input"); inp.type = "text"; inp.maxLength = 80; inp.placeholder = "Today's focus"; inp.setAttribute("aria-label", "Today's focus");
-    var go2 = el("button", "t-confirm", "Lock it in"); go2.type = "submit";
-    f.appendChild(inp); f.appendChild(go2); c.appendChild(f);
-    f.addEventListener("submit", function (e) {
-      e.preventDefault();
-      if (C.wrap[today]) return;
-      var focus = str(inp.value, 80);
-      C.wrap[today] = { focus: focus, at: new Date().toISOString() };
-      var ks = Object.keys(C.wrap).sort(); while (ks.length > 60) delete C.wrap[ks.shift()];
-      save();
-      inp.blur();
-      try { if (window.__ksGainExp) window.__ksGainExp(WRAP_EXP); } catch (err) {}
-      buzz([12, 50, 12, 50, 30]);
-      ring.classList.add("charge");
-      var r = ring.getBoundingClientRect();
-      setTimeout(function () { burst(r.left + r.width / 2, r.top + r.height / 2, "#c3b8fe", 36); ring.classList.add("done"); }, 900);
-      setTimeout(function () { refreshCard(); renderBox(); }, 1700);
-    });
-    return c;
-  }
-
   /* particle burst (canvas-free: a few absolutely-placed sparks) */
   function burst(x, y, color, n) {
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
@@ -774,4 +901,76 @@
   setTimeout(function () { load(true); }, 1200);
   setInterval(function () { if (!document.hidden) { renderBox(); renderSky(); if (Date.now() - lastLoad > 600000) load(true); } }, 60000);
   document.addEventListener("visibilitychange", function () { if (!document.hidden) { load(false); renderBox(); renderSky(); } });
+})();
+
+/* ==========================================================
+   X RINGS SWIRL (Claude build) — while the rings are held for a
+   reboot, motes spiral in from all around and get pulled into the
+   core, faster and denser the longer the hold. Let go early and
+   they scatter back out; on a full charge they collapse into a
+   flash as the reboot starts.
+   ========================================================== */
+(function () {
+  "use strict";
+  var cvs = null, ctx = null, parts = [], raf = null, src = null, t0 = 0, dur = 1400, state = "off", cx = 0, cy = 0, dpr = 1;
+  var COLS = ["#8f5ef8", "#a78bfa", "#c3b8fe", "#6f63f6", "#e9e3ff", "#da78f5"];
+  function size() {
+    dpr = Math.min(2, window.devicePixelRatio || 1);
+    cvs.width = innerWidth * dpr; cvs.height = innerHeight * dpr;
+    cvs.style.width = innerWidth + "px"; cvs.style.height = innerHeight + "px";
+  }
+  function spawn(p) {
+    var a = Math.random() * Math.PI * 2, r = 120 + Math.random() * 140;
+    parts.push({ a: a, r: r, w: (0.9 + Math.random() * 1.3) * (Math.random() < 0.5 ? 1 : 1), s: 0.6 + Math.random() * 1.8, c: COLS[(Math.random() * COLS.length) | 0], life: 1, out: 0 });
+  }
+  function frame(ts) {
+    var b = src.getBoundingClientRect(); cx = b.left + b.width / 2; cy = b.top + b.height / 2;
+    var p = Math.min(1, (ts - t0) / dur);
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    ctx.globalCompositeOperation = "destination-out";
+    ctx.fillStyle = "rgba(0,0,0,0.28)"; ctx.fillRect(0, 0, innerWidth, innerHeight);
+    ctx.globalCompositeOperation = "lighter";
+    if (state === "in") { var n = 1 + Math.floor(p * 6); for (var k = 0; k < n; k++) spawn(p); }
+    for (var i = parts.length - 1; i >= 0; i--) {
+      var q = parts[i];
+      if (state === "in") { q.a += q.w * (0.03 + p * 0.09) * (1 + 60 / Math.max(20, q.r)); q.r -= (1.2 + p * 5.5) * (0.6 + q.s * 0.3); }
+      else if (state === "out") { q.r += 6 + q.out; q.out += 0.6; q.a += q.w * 0.02; q.life -= 0.035; }
+      else if (state === "flash") { q.r *= 0.82; q.life -= 0.05; }
+      if (q.r < 14 && state === "in") { parts.splice(i, 1); continue; }
+      if (q.life <= 0) { parts.splice(i, 1); continue; }
+      var x = cx + Math.cos(q.a) * q.r, y = cy + Math.sin(q.a) * q.r;
+      ctx.globalAlpha = Math.max(0, Math.min(1, q.life * (state === "in" ? Math.min(1, (260 - q.r) / 80 + 0.2) : 1)));
+      ctx.fillStyle = q.c; ctx.beginPath(); ctx.arc(x, y, q.s, 0, Math.PI * 2); ctx.fill();
+    }
+    /* the core glow grows with the charge */
+    if (state === "in" || state === "flash") {
+      var g = ctx.createRadialGradient(cx, cy, 0, cx, cy, 30 + p * 50);
+      g.addColorStop(0, "rgba(233,227,255," + (0.12 + p * 0.45) + ")"); g.addColorStop(1, "rgba(143,94,248,0)");
+      ctx.globalAlpha = 1; ctx.fillStyle = g; ctx.beginPath(); ctx.arc(cx, cy, 30 + p * 50, 0, Math.PI * 2); ctx.fill();
+    }
+    if (state !== "in" && !parts.length) { stopNow(); return; }
+    raf = requestAnimationFrame(frame);
+  }
+  function stopNow() {
+    if (raf) cancelAnimationFrame(raf); raf = null; parts = []; state = "off";
+    if (cvs) { ctx.setTransform(1, 0, 0, 1, 0, 0); ctx.clearRect(0, 0, cvs.width, cvs.height); cvs.style.display = "none"; }
+  }
+  window.__mxSwirl = {
+    start: function (el, ms) {
+      if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+      if (!cvs) {
+        cvs = document.createElement("canvas"); cvs.className = "mx-swirl"; cvs.setAttribute("aria-hidden", "true");
+        document.body.appendChild(cvs); ctx = cvs.getContext("2d");
+        addEventListener("resize", function () { if (state !== "off") size(); });
+      }
+      size(); cvs.style.display = "block";
+      src = el; dur = ms || 1400; t0 = performance.now(); state = "in"; parts = [];
+      if (!raf) raf = requestAnimationFrame(frame);
+    },
+    stop: function (fired) {
+      if (state === "off") return;
+      state = fired ? "flash" : "out";
+      parts.forEach(function (q) { q.out = Math.random() * 4; });
+    }
+  };
 })();

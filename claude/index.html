@@ -2360,9 +2360,9 @@
           <div class="showcase" id="showcase">
             <div class="intel-box" id="intelBox" role="button" tabindex="0" aria-label="Open Daily Briefing">
               <span class="ib-scan" aria-hidden="true"></span>
-              <div class="ib-top"><span class="ib-name">Daily Briefing</span><span class="ib-go">Open &rsaquo;</span></div>
+              <div class="ib-top"><span class="ib-name">Daily Briefing</span><span class="ib-ed"></span></div>
               <div class="ib-panes"><div class="ib-left"></div><div class="ib-right"></div></div>
-              <div class="ib-foot"></div>
+              <div class="ib-foot"><div class="ib-tape"><div class="ib-tape-in"></div></div><span class="ib-pips"></span></div>
             </div>
             <div class="showcase-label">Select a module</div>
             <div class="showcase-grid" role="group" aria-label="All tabs">
@@ -2626,7 +2626,7 @@
         </div>
 
         <div class="main-top">
-          <span id="appVersion">Core v2.7</span>
+          <span id="appVersion">Core v2.8</span>
           <span>Louisville, KY</span>
         </div>
       </div>
@@ -3515,6 +3515,8 @@
           /* v2: a CRT power-down plays first (polish.js), then the boot */
           if (window.__mxReboot && !RM) window.__mxReboot(rbGo); else setTimeout(rbGo, 180);
         }
+        /* Claude build: holding the X rings up top reboots too */
+        window.__ksReboot = function () { if (!rbFired) rbFire(); };
         replayBtn.addEventListener("pointerdown", rbBegin);
         replayBtn.addEventListener("pointerup", rbCancel);
         replayBtn.addEventListener("pointercancel", rbCancel);
@@ -5951,23 +5953,43 @@
         var ringsWrap = ringsBtn.parentElement;
         var ringsHolding = false;
         var ringsTimers = [];
+        /* Claude build: tap the rings = open X. Hold = the spin winds up,
+           the rings swell and particles swirl in; hold the full
+           RINGS_REBOOT_MS and the system reboots. Let go early and it
+           all spins back down — and a hold never opens X. */
+        var RINGS_REBOOT_MS = 1800, ringsDownAt = 0, ringsHeldFor = 0, ringsFired = false;
         function clearRingsSpin() {
+          if (ringsHolding) ringsHeldFor = Date.now() - ringsDownAt;
           ringsHolding = false;
           for (var ri = 0; ri < ringsTimers.length; ri++) clearTimeout(ringsTimers[ri]);
           ringsTimers = [];
-          ringsWrap.classList.remove("holding", "spinup1", "spinup2", "spinup3");
+          ringsWrap.classList.remove("holding", "spinup1", "spinup2", "spinup3", "charging");
+          if (window.__mxSwirl) window.__mxSwirl.stop(ringsFired);
         }
         ringsBtn.addEventListener("pointerdown", function (e) {
-          ringsHolding = true;
+          ringsHolding = true; ringsFired = false; ringsDownAt = Date.now(); ringsHeldFor = 0;
           try { ringsBtn.setPointerCapture(e.pointerId); } catch (err) {}
           ringsWrap.classList.add("holding", "spinup1");
           ringsTimers.push(setTimeout(function () { if (ringsHolding) ringsWrap.classList.add("spinup2"); }, 320));
+          ringsTimers.push(setTimeout(function () {
+            if (!ringsHolding) return;
+            ringsWrap.classList.add("charging");
+            if (window.__mxSwirl) window.__mxSwirl.start(ringsBtn, RINGS_REBOOT_MS - 380);
+          }, 380));
           ringsTimers.push(setTimeout(function () { if (ringsHolding) ringsWrap.classList.add("spinup3"); }, 800));
+          ringsTimers.push(setTimeout(function () {
+            if (!ringsHolding) return;
+            ringsFired = true;
+            try { if (navigator.vibrate) navigator.vibrate([20, 40, 60]); } catch (err) {}
+            clearRingsSpin();
+            if (window.__ksReboot) window.__ksReboot();
+          }, RINGS_REBOOT_MS));
         });
         ringsBtn.addEventListener("pointerup", clearRingsSpin);
         ringsBtn.addEventListener("pointercancel", clearRingsSpin);
         ringsBtn.addEventListener("contextmenu", function (e) { e.preventDefault(); });
         ringsBtn.addEventListener("click", function () {
+          if (ringsFired || ringsHeldFor > 380) return;
           var t = Date.now();
           window.location.href = "twitter://timeline";
           setTimeout(function () {
