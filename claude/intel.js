@@ -387,7 +387,7 @@
     var cv = null, cx2 = null, host = null, raf = null, S = 150, dpr = 1, t0 = performance.now();
     var shells = [], sparks = [], arcs = [], level = 0;
     /* eyes: blink every few seconds, glance around now and then */
-    var REST = [-2.6, -1.6];
+    var REST = [2.6, -1.6];
     var eye = { nextBlink: 0, blinkT: -1, lx: REST[0], ly: REST[1], tx: REST[0], ty: REST[1], nextLook: 0 };
     function init(h) {
       host = h; cv = h.querySelector("canvas"); cx2 = cv.getContext("2d");
@@ -474,11 +474,11 @@
         var r = Math.random();
         var away = !(eye.tx === REST[0] && eye.ty === REST[1]);
         if (away || r < 0.55) { eye.tx = REST[0]; eye.ty = REST[1]; eye.nextLook = t + 2.5 + Math.random() * 3.5; }
-        else { eye.tx = [3, 2.6, -1, 0.5][(Math.random() * 4) | 0]; eye.ty = [-1, 1.2, 1.4, -2][(Math.random() * 4) | 0]; eye.nextLook = t + 0.9 + Math.random() * 1.2; }
+        else { eye.tx = [-3, -2.6, 1, -0.5][(Math.random() * 4) | 0]; eye.ty = [-1, 1.2, 1.4, -2][(Math.random() * 4) | 0]; eye.nextLook = t + 0.9 + Math.random() * 1.2; }
       }
       eye.lx += (eye.tx - eye.lx) * 0.12; eye.ly += (eye.ty - eye.ly) * 0.12;
       /* rounded pill eyes */
-      var ew = 2.6 + level * 0.3, eh = (5.4 + level * 0.8) * open, ex = c + eye.lx, ey = c - 1 + eye.ly;
+      var ew = 2.1 + level * 0.25, eh = (5.4 + level * 0.8) * open, ex = c + eye.lx, ey = c - 1 + eye.ly;
       if (speaking) eh *= 1 + 0.08 * Math.sin(t * 9);
       g.fillStyle = "#14103a"; g.globalAlpha = 0.92;
       [ex - 4.4, ex + 4.4].forEach(function (x) {
