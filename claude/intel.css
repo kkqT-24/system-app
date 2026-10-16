@@ -24,8 +24,9 @@
   background: linear-gradient(90deg, transparent, rgba(203, 213, 225, 0.12), transparent);
   transform: translateX(-100%);
 }
-.intel-box.fresh .ib-scan { opacity: 1; animation: ibScan 3.2s ease-in-out infinite; }
-@keyframes ibScan { 0% { transform: translateX(-100%); } 60%, 100% { transform: translateX(100%); } }
+.intel-box.fresh .ib-scan { opacity: 1; animation: ibScan 16s ease-in-out infinite; }
+/* a slow drift across (~8s), then a long rest before the next pass */
+@keyframes ibScan { 0% { transform: translateX(-100%); } 50%, 100% { transform: translateX(100%); } }
 .intel-box.fresh { border-color: rgba(203, 213, 225, 0.55); }
 .intel-box.landed { animation: ibLand 0.7s cubic-bezier(0.2, 1.4, 0.4, 1); }
 @keyframes ibLand { 0% { transform: scale(0.94); filter: brightness(1.9); } 100% { transform: none; filter: none; } }
@@ -316,3 +317,4 @@ body.ib-open { overflow: hidden; }
 .ib-pullhint.ready .lbl { color: var(--lav); }
 @keyframes ibHintPulse { 50% { box-shadow: 0 0 20px rgba(195, 184, 254, 0.95); } }
 .ib-player.dismiss { pointer-events: none; }
+.intel-box { touch-action: pan-y; }

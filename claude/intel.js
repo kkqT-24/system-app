@@ -1020,7 +1020,38 @@
 
   hydrate(); scoreCalls(); renderBox(); renderSky();
   if (box) {
+    /* swipe the box left / right to step through the feed; a swipe
+       never opens the briefing */
+    var bx0 = 0, by0 = 0, bAxis = null, bDx = 0, swiped = false;
+    box.addEventListener("touchstart", function (e) {
+      if (e.touches.length !== 1) return;
+      bx0 = e.touches[0].clientX; by0 = e.touches[0].clientY; bAxis = null; bDx = 0;
+    }, { passive: true });
+    box.addEventListener("touchmove", function (e) {
+      var dx = e.touches[0].clientX - bx0, dy = e.touches[0].clientY - by0;
+      if (!bAxis) { if (Math.abs(dx) < 8 && Math.abs(dy) < 8) return; bAxis = Math.abs(dx) > Math.abs(dy) ? "x" : "y"; }
+      if (bAxis !== "x") return;
+      if (e.cancelable) e.preventDefault();
+      bDx = dx;
+      var fd = box.querySelector(".jv-feed");
+      fd.style.transition = "none"; fd.style.transform = "translateX(" + (dx * 0.35).toFixed(1) + "px)"; fd.style.opacity = String(1 - Math.min(0.6, Math.abs(dx) / 300));
+    }, { passive: false });
+    function boxEnd() {
+      if (bAxis !== "x") return;
+      var fd = box.querySelector(".jv-feed");
+      fd.style.transition = "transform 0.3s cubic-bezier(0.2, 0.9, 0.2, 1), opacity 0.3s ease"; fd.style.transform = ""; fd.style.opacity = "";
+      if (Math.abs(bDx) > 40 && feed.length > 1) {
+        swiped = true; setTimeout(function () { swiped = false; }, 400);
+        showFeed(feedIdx + (bDx < 0 ? 1 : -1));
+        if (feedTimer) clearInterval(feedTimer);
+        feedTimer = setInterval(feedTick, 10000);
+        buzz(6);
+      }
+      bAxis = null;
+    }
+    box.addEventListener("touchend", boxEnd); box.addEventListener("touchcancel", boxEnd);
     box.addEventListener("click", function (e) {
+      if (swiped) { e.stopPropagation(); return; }
       /* the core is its own button: it opens the Grok bot */
       if (e.target.closest(".jv")) {
         e.stopPropagation();
