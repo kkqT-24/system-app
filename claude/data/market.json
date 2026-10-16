@@ -1,27 +1,27 @@
 {
  "version": 1,
- "updated": "2026-10-16T16:28:35+00:00",
+ "updated": "2026-10-16T16:42:25+00:00",
  "quotes": [
   {
    "symbol": "SPY",
-   "price": 767.61,
-   "change": -4.18,
-   "change_pct": -0.54,
+   "price": 766.62,
+   "change": -5.17,
+   "change_pct": -0.67,
    "prev_close": 771.79,
-   "time": "2026-10-16T16:28:35+00:00",
+   "time": "2026-10-16T16:42:23+00:00",
    "source": "yahoo",
    "open": 773.24,
    "high": 773.23,
-   "low": 766.58,
+   "low": 766.28,
    "session": "2026-10-16"
   },
   {
    "symbol": "QQQ",
-   "price": 717.13,
-   "change": -10.87,
-   "change_pct": -1.49,
+   "price": 716.07,
+   "change": -11.93,
+   "change_pct": -1.64,
    "prev_close": 728.0,
-   "time": "2026-10-16T16:28:34+00:00",
+   "time": "2026-10-16T16:42:23+00:00",
    "source": "yahoo",
    "open": 725.48,
    "high": 725.94,
@@ -30,24 +30,24 @@
   },
   {
    "symbol": "TSLA",
-   "price": 357.16,
-   "change": -5.28,
-   "change_pct": -1.46,
+   "price": 356.62,
+   "change": -5.83,
+   "change_pct": -1.61,
    "prev_close": 362.44,
-   "time": "2026-10-16T16:28:35+00:00",
+   "time": "2026-10-16T16:42:23+00:00",
    "source": "yahoo",
    "open": 369.04,
    "high": 370.58,
-   "low": 356.88,
+   "low": 356.26,
    "session": "2026-10-16"
   },
   {
    "symbol": "QLD",
-   "price": 89.5,
-   "change": -2.86,
-   "change_pct": -3.1,
+   "price": 89.28,
+   "change": -3.09,
+   "change_pct": -3.34,
    "prev_close": 92.36,
-   "time": "2026-10-16T16:28:03+00:00",
+   "time": "2026-10-16T16:42:23+00:00",
    "source": "yahoo",
    "open": 91.66,
    "high": 91.78,
@@ -56,11 +56,11 @@
   },
   {
    "symbol": "VIX",
-   "price": 17.14,
-   "change": 0.68,
-   "change_pct": 4.13,
+   "price": 17.23,
+   "change": 0.77,
+   "change_pct": 4.68,
    "prev_close": 16.46,
-   "time": "2026-10-16T16:13:31+00:00",
+   "time": "2026-10-16T16:27:16+00:00",
    "source": "yahoo",
    "open": 16.02,
    "high": 17.34,
@@ -68,5 +68,32 @@
    "session": "2026-10-16"
   }
  ],
- "earnings": []
+ "earnings": [],
+ "lev200": {
+  "date": "2026-10-15",
+  "state": "ON",
+  "since": "2026-04-08",
+  "qqq_close": 728.0,
+  "sma200": 674.46,
+  "pct_vs_sma": 7.94,
+  "upper": 681.2,
+  "lower": 667.71,
+  "flips": [
+   {
+    "date": "2026-03-20",
+    "to": "OFF"
+   },
+   {
+    "date": "2026-04-08",
+    "to": "ON"
+   }
+  ],
+  "live": {
+   "price": 716.07,
+   "sma200": 674.94,
+   "pct_vs_sma": 6.09,
+   "state_if_closed": "ON",
+   "in_session": true
+  }
+ }
 }
