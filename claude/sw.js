@@ -1,8 +1,8 @@
 /* System v2 offline worker: the app shell is cached so it opens
    without a connection; the page itself is fetched fresh first
    (network-first) so updates show up on the next open. */
-var CACHE = "system-v2.6";
-var SHELL = ["./", "index.html", "motion.css", "quests.css", "v2.css", "polish.css", "motion.js", "bolts.js", "aura.js", "quests.js", "v2.js", "polish.js", "shadows3d.js",
+var CACHE = "system-v2.7";
+var SHELL = ["./", "index.html", "motion.css", "quests.css", "v2.css", "polish.css", "intel.css", "motion.js", "bolts.js", "aura.js", "quests.js", "v2.js", "polish.js", "intel.js", "data/econ.json", "shadows3d.js",
   "manifest.webmanifest", "icon-512.png", "apple-touch-icon.png", "../x-logo.png"];
 self.addEventListener("install", function (e) {
   e.waitUntil(caches.open(CACHE).then(function (c) { return c.addAll(SHELL); }).then(function () { return self.skipWaiting(); }));

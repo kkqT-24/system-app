@@ -2313,6 +2313,7 @@
     <link rel="stylesheet" href="quests.css" />
     <link rel="stylesheet" href="v2.css" />
     <link rel="stylesheet" href="polish.css" />
+    <link rel="stylesheet" href="intel.css" />
     <link rel="manifest" href="manifest.webmanifest" />
     <meta name="theme-color" content="#040410" />
     <meta name="mobile-web-app-capable" content="yes" />
@@ -2357,6 +2358,12 @@
                status bar beneath. No section panel opens until a tile is
                picked; picking one hides the showcase. -->
           <div class="showcase" id="showcase">
+            <div class="intel-box" id="intelBox" role="button" tabindex="0" aria-label="Open Daily Briefing">
+              <span class="ib-scan" aria-hidden="true"></span>
+              <div class="ib-top"><span class="ib-name">Daily Briefing</span><span class="ib-go">Open &rsaquo;</span></div>
+              <div class="ib-panes"><div class="ib-left"></div><div class="ib-right"></div></div>
+              <div class="ib-foot"></div>
+            </div>
             <div class="showcase-label">Select a module</div>
             <div class="showcase-grid" role="group" aria-label="All tabs">
               <button type="button" class="tab-tile" data-section="quests"><span class="t-name">Quests</span><span class="t-state"><span class="t-lv">Level 1 · Rank</span> <span class="t-letter" data-rank="e"><span class="t-glyph">E</span></span></span></button>
@@ -2597,7 +2604,7 @@
               <div class="s-row"><span class="k">High / Low</span><span class="v">89° / 70°</span></div>
               <div class="s-row"><span class="k">Wind</span><span class="v">SSW 10 MPH</span></div>
               <div class="s-row"><span class="k">Humidity</span><span class="v">48%</span></div>
-              <div class="s-row"><span class="k">Sunset</span><span class="v">7:07 PM</span></div>
+              <div class="wx-sky" id="wxSky" aria-label="Sun and moon"></div>
               <div class="wx-week">
                 <div class="wx-day"><span class="d">Wed · Oct 14</span><span class="weather-icon" data-icon="tstormsDay" aria-hidden="true"></span><span class="c">PM Thunderstorms</span><span class="t">83° / 67°</span></div>
                 <div class="wx-day"><span class="d">Thu · Oct 15</span><span class="weather-icon" data-icon="tstormsDay" aria-hidden="true"></span><span class="c">PM Thunderstorms</span><span class="t">80° / 64°</span></div>
@@ -2619,7 +2626,7 @@
         </div>
 
         <div class="main-top">
-          <span id="appVersion">Core v2.6</span>
+          <span id="appVersion">Core v2.7</span>
           <span>Louisville, KY</span>
         </div>
       </div>
@@ -6376,6 +6383,9 @@
         /* Claude build: System Console hooks — set level / EXP directly
            and preview the secret / prayer quest without touching its
            schedule or giving / taking EXP */
+        /* Claude build: the Daily Briefing's wrap-up pays EXP through
+           the same path as a quest */
+        window.__ksGainExp = function (n) { gainExp(n); if (window.__ksSaveState) window.__ksSaveState(); };
         window.__mxHunter = {
           get: function () { return { level: HUNTER.level, exp: HUNTER.exp, cap: HUNTER.cap, max: MAX_LEVEL, rank: rankFor(HUNTER.level) }; },
           set: function (level, exp) {
@@ -7284,6 +7294,7 @@
     <script src="aura.js"></script>
     <script src="quests.js"></script>
     <script src="v2.js"></script>
+    <script src="intel.js"></script>
     <script src="polish.js"></script>
     <script src="shadows3d.js"></script>
   </body>
