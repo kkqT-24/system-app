@@ -240,7 +240,9 @@
   "fact": {
     "claim": "October is historically the S&P 500's worst month on average.",
     "is_true": false,
-    "explain": "October has the scary reputation because of the 1929 and 1987 crashes, but its average return is positive. September is the month that has been weakest on average over the long run."
+    "explain": "October has the scary reputation because of the 1929 and 1987 crashes, but its average return is positive. September is the month that has been weakest on average over the long run.",
+    "category": "money",
+    "difficulty": "medium"
   },
   "word": {
     "word": "Equanimity",
