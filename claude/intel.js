@@ -336,7 +336,8 @@
      sphere inside tilted particle shells, throwing sparks and arcs of
      energy outward; everything intensifies while it speaks. Colors come
      from the bot's mood (an inner and an outer hue). */
-  var MOODS = { chill: ["#67e8f9", "#3b82f6"], hype: ["#fbbf24", "#fb7a2c"], alert: ["#ff7a8a", "#ff3b5c"], thinking: ["#c3b8fe", "#8f5ef8"] };
+  /* dual tone: the mood hue paired with the app's violet */
+  var MOODS = { chill: ["#67e8f9", "#8f5ef8"], hype: ["#fbbf24", "#a06bff"], alert: ["#ff7a8a", "#8f5ef8"], thinking: ["#c3b8fe", "#7c4dff"] };
   function rgba(hex, a) { var n = parseInt(hex.slice(1), 16); return "rgba(" + (n >> 16 & 255) + "," + (n >> 8 & 255) + "," + (n & 255) + "," + a + ")"; }
   var energy = (function () {
     var cv = null, cx2 = null, host = null, raf = null, S = 150, dpr = 1, t0 = performance.now();
@@ -349,7 +350,7 @@
       for (var k = 0; k < 3; k++) {
         var pts = [];
         for (var i = 0; i < 46; i++) pts.push({ a: i / 46 * Math.PI * 2 + Math.random() * 0.1, r: 0.9 + Math.random() * 0.2, s: 0.6 + Math.random() * 1.1, hot: Math.random() < 0.35 });
-        shells.push({ tilt: [0.25, 1.15, 2.1][k], squash: [0.38, 0.5, 0.3][k], speed: [0.55, -0.4, 0.8][k], R: [30, 34, 26][k], pts: pts });
+        shells.push({ tilt: [0.25, 1.15, 2.1][k], squash: [0.38, 0.5, 0.3][k], speed: [0.26, -0.19, 0.36][k], R: [30, 34, 26][k], pts: pts });
       }
     }
     function bolt(x0, y0, ang, len) {
@@ -366,12 +367,12 @@
       if (!host || !host.isConnected || document.hidden || (player && player.classList.contains("show"))) return;
       var t = (ts - t0) / 1000, c = S / 2;
       var speaking = host.classList.contains("speaking");
-      level += ((speaking ? 1 : 0.35) - level) * 0.06;
+      level += ((speaking ? 0.75 : 0.3) - level) * 0.025;
       var col = MOODS[host.getAttribute("data-mood")] || MOODS.chill, A = col[0], B = col[1];
       var g = cx2; g.setTransform(dpr, 0, 0, dpr, 0, 0); g.clearRect(0, 0, S, S);
       g.globalCompositeOperation = "lighter";
       /* outer haze */
-      var pulse = 0.5 + 0.5 * Math.sin(t * (2 + level * 4));
+      var pulse = 0.5 + 0.5 * Math.sin(t * (1.1 + level * 1.2));
       var hz = g.createRadialGradient(c, c, 4, c, c, 62);
       hz.addColorStop(0, rgba(A, 0.22 + level * 0.12)); hz.addColorStop(0.45, rgba(B, 0.10 + level * 0.08)); hz.addColorStop(1, rgba(B, 0));
       g.fillStyle = hz; g.beginPath(); g.arc(c, c, 62, 0, Math.PI * 2); g.fill();
@@ -387,12 +388,12 @@
         });
       });
       /* energy arcs: short-lived jagged bolts thrown off the sphere */
-      if (Math.random() < 0.05 + level * 0.28) {
+      if (Math.random() < 0.006 + level * 0.03) {
         var ang = Math.random() * Math.PI * 2, r0 = 12 + Math.random() * 6;
-        arcs.push({ pts: bolt(c + Math.cos(ang) * r0, c + Math.sin(ang) * r0, ang, 26 + Math.random() * (30 + level * 24)), life: 1, w: 0.7 + Math.random() * 0.9, hue: Math.random() < 0.5 ? A : B });
+        arcs.push({ pts: bolt(c + Math.cos(ang) * r0, c + Math.sin(ang) * r0, ang, 18 + Math.random() * (16 + level * 10)), life: 1, w: 0.7 + Math.random() * 0.9, hue: Math.random() < 0.5 ? A : B });
       }
       for (var i = arcs.length - 1; i >= 0; i--) {
-        var ar = arcs[i]; ar.life -= 0.09;
+        var ar = arcs[i]; ar.life -= 0.045;
         if (ar.life <= 0) { arcs.splice(i, 1); continue; }
         g.globalAlpha = ar.life;
         g.strokeStyle = ar.hue; g.lineWidth = ar.w * 2.6; g.shadowColor = ar.hue; g.shadowBlur = 8;
@@ -400,10 +401,10 @@
         g.strokeStyle = "#fff"; g.lineWidth = ar.w * 0.7; g.shadowBlur = 0; g.stroke();
       }
       /* sparks streaming outward */
-      var n = Math.random() < 0.6 + level ? 1 + (level > 0.7 ? 2 : 0) : 0;
-      for (var k2 = 0; k2 < n; k2++) { var sa = Math.random() * Math.PI * 2; sparks.push({ x: c + Math.cos(sa) * 14, y: c + Math.sin(sa) * 14, vx: Math.cos(sa) * (0.5 + Math.random() * 1.4), vy: Math.sin(sa) * (0.5 + Math.random() * 1.4), life: 1, hue: Math.random() < 0.6 ? A : "#ffffff" }); }
+      var n = Math.random() < 0.12 + level * 0.12 ? 1 : 0;
+      for (var k2 = 0; k2 < n; k2++) { var sa = Math.random() * Math.PI * 2; sparks.push({ x: c + Math.cos(sa) * 14, y: c + Math.sin(sa) * 14, vx: Math.cos(sa) * (0.25 + Math.random() * 0.6), vy: Math.sin(sa) * (0.25 + Math.random() * 0.6), life: 1, hue: Math.random() < 0.6 ? A : "#ffffff" }); }
       for (var q = sparks.length - 1; q >= 0; q--) {
-        var sp = sparks[q]; sp.x += sp.vx; sp.y += sp.vy; sp.vx *= 0.985; sp.vy *= 0.985; sp.life -= 0.022;
+        var sp = sparks[q]; sp.x += sp.vx; sp.y += sp.vy; sp.vx *= 0.985; sp.vy *= 0.985; sp.life -= 0.012;
         if (sp.life <= 0) { sparks.splice(q, 1); continue; }
         g.globalAlpha = sp.life; g.fillStyle = sp.hue; g.fillRect(sp.x - 0.8, sp.y - 0.8, 1.6, 1.6);
       }
@@ -414,7 +415,8 @@
       g.globalAlpha = 1; g.shadowBlur = 0; g.fillStyle = cg; g.beginPath(); g.arc(c, c, cr * 1.9, 0, Math.PI * 2); g.fill();
       /* a thin inner ring that flickers */
       g.globalAlpha = 0.35 + pulse * 0.3; g.strokeStyle = rgba(A, 0.9); g.lineWidth = 0.8;
-      g.beginPath(); g.arc(c, c, 19 + level * 2, t * 1.5, t * 1.5 + Math.PI * 1.4); g.stroke();
+      g.beginPath(); g.arc(c, c, 19 + level * 2, t * 0.6, t * 0.6 + Math.PI * 1.4); g.stroke();
+      g.strokeStyle = rgba(B, 0.8); g.beginPath(); g.arc(c, c, 22, -t * 0.4, -t * 0.4 + Math.PI * 0.9); g.stroke();
       g.globalAlpha = 1; g.globalCompositeOperation = "source-over";
       raf = requestAnimationFrame(frame);
     }
@@ -491,11 +493,10 @@
     box.classList.toggle("done", done);
     box.querySelector(".ib-ed").textContent = done ? "Complete" : edLabel();
     var core = box.querySelector(".jv");
-    if (!core.firstChild) { core.innerHTML = '<canvas class="jv-cv" aria-hidden="true"></canvas><span class="jv-name"></span>'; energy.mount(core); }
+    if (!core.firstChild) { core.innerHTML = '<canvas class="jv-cv" aria-hidden="true"></canvas>'; energy.mount(core); }
     energy.wake();
     var mood = isFresh() ? brief.gbot.mood : "";
     core.setAttribute("data-mood", ["hype", "chill", "alert", "thinking"].indexOf(mood) >= 0 ? mood : "chill");
-    core.querySelector(".jv-name").textContent = (isFresh() && brief.gbot.name) || "GROK";
     var items2 = feedItems(now), sig = items2.map(function (x) { return x.text; }).join("|");
     if (sig !== feedSig) {
       feedSig = sig; feed = items2;
@@ -552,6 +553,7 @@
         player.style.borderRadius = (k * 26).toFixed(1) + "px";
         player.style.filter = "brightness(" + (1 - k * 0.18).toFixed(3) + ")";
         player.style.setProperty("--pull", k.toFixed(3));
+        pullHint(k, py >= 120);
       }
     }, { passive: false });
     function end() {
@@ -561,6 +563,7 @@
       if (pulling) {
         if (dy > 120 || (fast && dy > 50)) { dropAway(); return; }
         player.style.transition = ""; player.style.transform = ""; player.style.opacity = ""; player.style.borderRadius = ""; player.style.filter = ""; player.style.removeProperty("--pull");
+        pullHint(0, false);
         return;
       }
       player.style.transition = "";
@@ -570,15 +573,41 @@
     }
     player.addEventListener("touchend", end); player.addEventListener("touchcancel", end);
   }
-  /* the pulled-down sheet keeps falling instead of snapping */
-  /* release past the threshold: the sheet settles down and fades out,
-     a soft glow line sweeping off the bottom edge */
+  /* pull hint: a pill above the sheet that stretches as you pull and
+     flips to "Release to close" (with a tick) past the threshold */
+  var hint = null, hintReady = false;
+  function pullHint(k, ready) {
+    if (!hint) {
+      hint = el("div", "ib-pullhint"); hint.setAttribute("aria-hidden", "true");
+      hint.innerHTML = '<i class="bar"></i><span class="lbl">Pull to close</span>';
+      document.body.appendChild(hint);
+    }
+    hint.style.setProperty("--k", k.toFixed(3));
+    hint.classList.toggle("on", k > 0.02);
+    if (ready !== hintReady) { hintReady = ready; hint.classList.toggle("ready", ready); hint.querySelector(".lbl").textContent = ready ? "Release to close" : "Pull to close"; if (ready) buzz(8); }
+  }
+  /* release past the threshold: the sheet shrinks and flies back into
+     the briefing box, which catches it with a flash */
   function dropAway() {
     busy = true;
+    pullHint(0, false);
     player.classList.add("dismiss");
-    player.style.transition = "transform 0.42s cubic-bezier(0.3, 0.7, 0.2, 1), opacity 0.36s ease, border-radius 0.42s ease";
-    player.style.transform = "translateY(70px) scale(0.9)"; player.style.opacity = "0"; player.style.borderRadius = "30px";
-    setTimeout(function () { busy = false; player.classList.remove("dismiss"); close(true); }, 430);
+    var r = box ? box.getBoundingClientRect() : null;
+    var W = innerWidth, H = innerHeight;
+    var tf = "translateY(80px) scale(0.86)";
+    if (r && r.width && r.bottom > 0 && r.top < H) {
+      var sx = r.width / W, sy = r.height / H, tx = r.left + r.width / 2 - W / 2, ty = r.top + r.height / 2 - H / 2;
+      tf = "translate(" + tx.toFixed(1) + "px," + ty.toFixed(1) + "px) scale(" + sx.toFixed(4) + "," + sy.toFixed(4) + ")";
+    }
+    player.style.transition = "transform 0.55s cubic-bezier(0.55, 0, 0.2, 1), opacity 0.5s ease-in 0.08s, border-radius 0.5s ease, filter 0.5s ease";
+    player.style.transform = tf; player.style.opacity = "0"; player.style.borderRadius = "60px"; player.style.filter = "brightness(1.6)";
+    setTimeout(function () {
+      busy = false; player.classList.remove("dismiss"); close(true);
+      if (box) {
+        box.classList.remove("landed"); void box.offsetWidth; box.classList.add("landed");
+        var bx = box.getBoundingClientRect(); burst(bx.left + bx.width / 2, bx.top + bx.height / 2, "#c3b8fe", 14);
+      }
+    }, 560);
   }
   function open(at) {
     if (!player) buildPlayer();
