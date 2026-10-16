@@ -1,0 +1,79 @@
+{
+  "version": 2,
+  "date": "2026-10-15",
+  "edition": "trending",
+  "written_at": "2026-10-16T00:06:06-04:00",
+  "trending": {
+    "stocks": [
+      {
+        "title": "SPY closes green near highs after hot PPI scare",
+        "detail": "Thursday opened with a gap lower on hot producer prices, then buyers stepped in. SPY closed up about 0.3% near records while the Dow led with a 1.1% gain.",
+        "url": "https://x.com/i/trending/2110459846206115990"
+      },
+      {
+        "title": "Tesla Roadster thruster demo dominates trader chat",
+        "detail": "Next-gen Roadster unveiled at a SpaceX site with midair flips and cold-gas thrusters. TSLA still finished Thursday down about 1.3% despite the hype.",
+        "url": "https://x.com/i/trending/2110429725088698594"
+      },
+      {
+        "title": "Cboe extends options hours for SPY and QQQ Oct 19",
+        "detail": "Early morning and late curb sessions start Monday for 24 stocks and 5 ETFs including SPY and QQQ. Liquidity and wider spreads are the main trader concerns.",
+        "url": "https://x.com/i/trending/2110741232624243117"
+      },
+      {
+        "title": "SoFi snaps back hard after 52-week lows",
+        "detail": "SOFI bounced sharply Thursday after probing yearly lows, with traders calling out a bullish engulfing candle ahead of Oct 27 earnings.",
+        "url": "https://x.com/i/trending/2110747061973115275"
+      }
+    ],
+    "tech": [
+      {
+        "title": "Grok Bot usage surge draws Musk and Huang praise",
+        "detail": "Musk said he has never seen anything accelerate this fast; Jensen Huang called the SpaceXAI setup cool as weekly users climb past 400k.",
+        "url": "https://x.com/i/trending/2110940829275525431"
+      },
+      {
+        "title": "AI startups take 83% of US venture cash this year",
+        "detail": "PitchBook-NVCA data through September shows AI grabbing most of a record VC haul. Chamath flagged circular AI-to-AI revenue as a risk to watch.",
+        "url": "https://x.com/i/trending/2110938595716472946"
+      },
+      {
+        "title": "Germany tees up Nvidia industrial AI partnership",
+        "detail": "Berlin plans a major Nvidia collaboration for factories, robotics, and automation. Jensen Huang visits Monday with formal details expected next week.",
+        "url": "https://x.com/i/trending/2110763155831828519"
+      },
+      {
+        "title": "Users lobby OpenAI to preserve GPT-4o weights",
+        "detail": "An open letter asks OpenAI to release retiring GPT-4o weights for independent use before API snapshots shut down in January 2027.",
+        "url": "https://x.com/i/trending/2110778183050236169"
+      }
+    ],
+    "world": [
+      {
+        "title": "NLCS buzz: Dodgers and Brewers own the night",
+        "detail": "Baseball Twitter is locked on the National League Championship Series as low-payroll Brewers keep challenging big-market Dodgers.",
+        "url": "https://x.com/search?q=%23NLCS"
+      },
+      {
+        "title": "Chiefs 4-0 host 0-5 Chargers this Sunday",
+        "detail": "Arrowhead awaits Sunday as undefeated Kansas City is a heavy favorite over winless LA. Expert scoreboard graphics are everywhere on X.",
+        "url": "https://x.com/i/trending/2110566629281046733"
+      },
+      {
+        "title": "TNF spotlight: Seahawks at Broncos trending hard",
+        "detail": "Sam Darnold, Drew Lock, and Sean Payton topped US trends as Seattle hits Denver on a short week after a heartbreaker vs the 49ers.",
+        "url": "https://x.com/search?q=%23SEAvsDEN"
+      },
+      {
+        "title": "Lakers roster crunch puts Bronny under the microscope",
+        "detail": "JJ Redick said Bronny has not played well in preseason as LA must trim to 15 by Oct 19. Final tune-up is the last chance to stick.",
+        "url": "https://x.com/i/trending/2110296127971225628"
+      }
+    ]
+  },
+  "gbot": {
+    "name": "GROK",
+    "mood": "chill",
+    "say": "Thursday stuck the landing: SPY green after the PPI scare. Roadster stole the night. Chiefs host Sunday."
+  }
+}
