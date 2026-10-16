@@ -2358,9 +2358,14 @@
                status bar beneath. No section panel opens until a tile is
                picked; picking one hides the showcase. -->
           <div class="showcase" id="showcase">
+            <div class="intel-box" id="intelBox" role="button" tabindex="0" aria-label="Open Daily Briefing">
+              <span class="ib-scan" aria-hidden="true"></span>
+              <div class="ib-top"><span class="ib-name">Daily Briefing</span><span class="ib-go">Open &rsaquo;</span></div>
+              <div class="ib-panes"><div class="ib-left"></div><div class="ib-right"></div></div>
+              <div class="ib-foot"></div>
+            </div>
             <div class="showcase-label">Select a module</div>
             <div class="showcase-grid" role="group" aria-label="All tabs">
-              <button type="button" class="tab-tile" data-section="intel"><span class="t-name">Daily Intel</span><span class="t-state" id="intelTileState">Markets · Brief · Facts</span></button>
               <button type="button" class="tab-tile" data-section="quests"><span class="t-name">Quests</span><span class="t-state"><span class="t-lv">Level 1 · Rank</span> <span class="t-letter" data-rank="e"><span class="t-glyph">E</span></span></span></button>
               <button type="button" class="tab-tile" data-section="workouts"><span class="t-name">Workouts</span><span class="t-bar-shell" aria-hidden="true"><span class="t-bar-track"><span class="t-bar-fill" id="wtBarFill"></span></span></span></button>
               <button type="button" class="tab-tile" data-section="status"><span class="t-name">Status</span><span class="t-state" id="mxStatusTile">Stats · Log</span></button>
@@ -2599,7 +2604,7 @@
               <div class="s-row"><span class="k">High / Low</span><span class="v">89° / 70°</span></div>
               <div class="s-row"><span class="k">Wind</span><span class="v">SSW 10 MPH</span></div>
               <div class="s-row"><span class="k">Humidity</span><span class="v">48%</span></div>
-              <div class="s-row"><span class="k">Sunset</span><span class="v">7:07 PM</span></div>
+              <div class="wx-sky" id="wxSky" aria-label="Sun and moon"></div>
               <div class="wx-week">
                 <div class="wx-day"><span class="d">Wed · Oct 14</span><span class="weather-icon" data-icon="tstormsDay" aria-hidden="true"></span><span class="c">PM Thunderstorms</span><span class="t">83° / 67°</span></div>
                 <div class="wx-day"><span class="d">Thu · Oct 15</span><span class="weather-icon" data-icon="tstormsDay" aria-hidden="true"></span><span class="c">PM Thunderstorms</span><span class="t">80° / 64°</span></div>
@@ -2612,9 +2617,6 @@
                 <button type="button" class="wx-gallery-tab" id="wxGalleryTab" aria-expanded="false" aria-controls="wxGalleryGrid"><span class="wx-tab-caret" aria-hidden="true">&#9654;</span><span>All condition glyphs</span></button>
                 <div class="wx-gallery-grid" id="wxGalleryGrid"></div>
               </div>
-            </section>
-            <section class="section is-hidden" id="sec-intel" aria-label="Daily Intel">
-              <div id="intelBody"><div class="s-name">Daily Intel</div><div class="s-state">Loading</div></div>
             </section>
           </div>
 
@@ -6381,6 +6383,9 @@
         /* Claude build: System Console hooks — set level / EXP directly
            and preview the secret / prayer quest without touching its
            schedule or giving / taking EXP */
+        /* Claude build: the Daily Briefing's wrap-up pays EXP through
+           the same path as a quest */
+        window.__ksGainExp = function (n) { gainExp(n); if (window.__ksSaveState) window.__ksSaveState(); };
         window.__mxHunter = {
           get: function () { return { level: HUNTER.level, exp: HUNTER.exp, cap: HUNTER.cap, max: MAX_LEVEL, rank: rankFor(HUNTER.level) }; },
           set: function (level, exp) {
