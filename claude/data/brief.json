@@ -2,88 +2,90 @@
   "version": 2,
   "date": "2026-10-16",
   "edition": "update",
-  "written_at": "2026-10-16T09:18:27-04:00",
+  "written_at": "2026-10-16T10:14:00-04:00",
   "market": {
-    "headline": "Hot import prices stack on CPI and PPI, but industrial production beats and TSLA holds a 3% premarket bounce",
-    "note": "Import prices jumped 1.1% in September and industrial production rose 0.7%, a mixed tape of sticky goods inflation and solid factory output. SPY is about 0.2% higher premarket while QQQ slips as chips stay soft. Monthly options expiration still frames the day. TSLA is up about 3% premarket after a five-day slide, with earnings Wednesday.",
+    "headline": "Premarket pop fades: SPY slips red and QQQ drops 1% as chips slide again, but TSLA clings to a gain into opex",
+    "note": "The hot import prices and strong factory data gave SPY an early lift, but it faded minutes after the open and SPY is now slightly red. QQQ is down about 1% with INTC, MRVL and META leading watchlist losses, so leadership is still thin. TSLA cut its 3% premarket gap to about 1% after tagging 363.37. On an opex Friday, watch whether SPY gets pinned near Thursday's 771.79 close into the final hour.",
     "portfolio": {
-      "day_pct": -1.42,
-      "week_pct": -6.22,
-      "note": "Thursday close. The TSLA stack (TSLA, TSLL, TSLW) did most of the damage this week and QLD slipped with the chip selloff. TSLA's premarket bounce points to a green start."
+      "day_pct": 1.06,
+      "week_pct": -5.45,
+      "note": "Green today because the TSLA stack (TSLA, TSLL, TSLW) is up while QLD lags with QQQ. The week is still deep red from the TSLA slide since last Friday."
     },
     "watchlist": [
       {
         "symbol": "SPY",
-        "price": 773.4,
-        "pct": 0.21,
-        "note": "About 0.2% higher premarket after hot import prices"
+        "price": 770.85,
+        "pct": -0.12,
+        "note": "Premarket pop faded, now just under Thursday close"
       },
       {
         "symbol": "QQQ",
-        "price": 726.28,
-        "pct": -0.24,
-        "note": "Chip weakness still capping tech"
+        "price": 720.7,
+        "pct": -1.0,
+        "note": "Down about 1% as chips and META weigh"
       },
       {
         "symbol": "TSLA",
-        "price": 373.58,
-        "pct": 3.07,
-        "note": "Holding a roughly 3% premarket bounce into opex"
+        "price": 366.57,
+        "pct": 1.14,
+        "note": "3% premarket gap cut to about 1%, low so far 363.37"
       },
       {
         "symbol": "NVDA",
-        "price": 215.89,
-        "pct": -0.62,
-        "note": "Semis soft again premarket"
+        "price": 216.44,
+        "pct": -0.37,
+        "note": "Holding up better than the rest of the chips"
       },
       {
         "symbol": "META",
-        "price": 737.5,
-        "pct": 0.11,
-        "note": "Earnings Wed Oct 21 after the close"
+        "price": 724.72,
+        "pct": -1.63,
+        "note": "Lower into earnings Wed Oct 21 after the close"
       },
       {
         "symbol": "QLD",
-        "price": 91.85,
-        "pct": -0.55
+        "price": 90.44,
+        "pct": -2.08,
+        "note": "2x Nasdaq, so the QQQ drop hits double"
       },
       {
         "symbol": "INTC",
-        "price": 93.96,
-        "pct": -1.48,
-        "note": "Caught in the chip selloff"
+        "price": 92.74,
+        "pct": -2.76,
+        "note": "Chip selloff rolls on"
       },
       {
         "symbol": "MRVL",
-        "price": 236.66,
-        "pct": -1.9,
-        "note": "Caught in the chip selloff"
+        "price": 233.41,
+        "pct": -3.25,
+        "note": "Chip selloff rolls on"
       },
       {
         "symbol": "IREN",
-        "price": 29.28,
-        "pct": -3.65,
-        "note": "Soft premarket after yesterday's dip"
+        "price": 28.54,
+        "pct": -6.1,
+        "note": "Worst mover on the list early"
       },
       {
         "symbol": "SPCX",
-        "price": 147.27,
-        "pct": -0.91
+        "price": 146.61,
+        "pct": -1.35
       },
       {
         "symbol": "HOOD",
-        "price": 102.28,
-        "pct": -1.65
+        "price": 103.71,
+        "pct": -0.27
       },
       {
         "symbol": "RDDT",
-        "price": 158.6,
-        "pct": -0.48
+        "price": 159.56,
+        "pct": 0.12,
+        "note": "One of the few greens on the list"
       }
     ]
   },
   "catalyst": {
-    "outlook": "Inflation is still the story, but growth is not cracking. September import prices rose 1.1% and are up 8.1% year over year, the hottest annual pace since mid-2022, so the oil shock is clearly feeding into goods. Against that, industrial production jumped 0.7% and capacity utilization rose to 76.9%, so factories are holding up. CPI at 3.7% and PPI at 1.3% m/m already keep rate-cut hopes on a short leash into the Oct 27-28 Fed meeting. Leadership remains thin with semis soft while mega caps carry the index. Next week for you is Wednesday night: TSLA and META both report.",
+    "outlook": "Inflation is still the story, and the open shows the market knows it. September import prices rose 1.1% and are up 8.1% year over year, the hottest annual pace since mid-2022, while industrial production jumped 0.7%. Growth is fine, but with CPI at 3.7% and PPI hot, rate-cut hopes stay on a short leash into the Oct 27-28 Fed meeting, and that hits long-duration tech first, which is why QQQ is lagging SPY. Posts on X are flagging how narrow this tape is, with the index near highs while a big chunk of stocks sit well off theirs. A real turn needs chips to stop sliding. Next week for you is Wednesday night: TSLA and META both report.",
     "today": [
       {
         "name": "Import Prices (Sep)",
@@ -172,68 +174,68 @@
   "trending": {
     "stocks": [
       {
-        "title": "Tesla-SpaceX merger chatter keeps building",
-        "detail": "A Barclays note floated SpaceX buying Tesla in an all-stock deal and Musk posted Tesla x SpaceX. Prediction markets show about 55% odds of a deal before May 2027.",
-        "url": "https://x.com/i/trending/2110621202922238247"
+        "title": "S&P 500 near a record while 200-plus members sit 30% off highs",
+        "detail": "Traders are calling it a bear-bull paradox: a handful of AI mega caps carry the index while most stocks lag. Bulls see bargains if oil eases, bears see a fragile, narrow market.",
+        "url": "https://x.com/i/trending/2111079974232895681"
       },
       {
-        "title": "Chip stocks hit an eighth straight losing day",
-        "detail": "Nvidia, AMD and Marvell fell again as the semi index sits well off its October peak. Traders are calling it the longest chip losing streak since 2008.",
-        "url": "https://x.com/i/trending/2110822119743410229"
+        "title": "TSMC says AI demand is extremely strong, but chips keep sliding",
+        "detail": "TSMC posted a record quarter with revenue up 41% and guided Q4 higher, yet US chip names are red again today. The disconnect is the big debate for NVDA, MRVL and INTC holders.",
+        "url": "https://x.com/i/trending/2110560736464527748"
       },
       {
-        "title": "Memory stocks hammered on China DRAM supply fears",
-        "detail": "SK Hynix fell 26% in five days and Samsung 22% after CXMT showed a new server DRAM design. Bulls point to AI demand and long-term contracts with price floors.",
-        "url": "https://x.com/i/trending/2110894838711570502"
+        "title": "MSCI rules could boot Strategy from global indexes",
+        "detail": "New MSCI rules treat firms dominated by bitcoin holdings as non-operating. Strategy and Metaplanet top the possible deletion list after Nov 30, which could force passive selling.",
+        "url": "https://x.com/i/trending/2110843848704319669"
       },
       {
-        "title": "Goldman upgrades Zeta Global to Buy",
-        "detail": "Goldman raised its target to 45 from 30, citing Zeta's AI marketing platform replacing older tools. Shares were up over 3% premarket.",
-        "url": "https://x.com/i/trending/2111061724514386367"
+        "title": "Indonesia stocks crash 11% on an MSCI downgrade threat",
+        "detail": "MSCI opened a consultation on moving Indonesia out of emerging market status over ownership transparency worries. It was the worst one-day drop since 1998 and trading was halted.",
+        "url": "https://x.com/i/trending/2110897849785319527"
       }
     ],
     "tech": [
       {
-        "title": "Slovakia approves Tesla FSD Supervised",
-        "detail": "Slovakia is the ninth EU country to recognize the Dutch approval of Tesla's supervised self-driving. EU-wide approval is not expected before December.",
-        "url": "https://x.com/i/trending/2111061725927874562"
+        "title": "Tesla's new Roadster reveal sparks a design fight with Porsche",
+        "detail": "Tesla showed the next Roadster Thursday night with compressed-air thrusters and a 2028 target, the same day Porsche unveiled its Mission S concept. Heritage versus spectacle is the debate.",
+        "url": "https://x.com/i/trending/2111092823608991753"
       },
       {
-        "title": "Terence Tao says math is entering an industrial era",
-        "detail": "Tao says AI-driven results are turning math into big team science. OpenAI and Anthropic each pledged funding to the Simons Foundation to verify AI math work.",
-        "url": "https://x.com/i/trending/2110885636634824900"
+        "title": "NVIDIA RTX Spark laptops arrive with Grace CPU and Blackwell GPU",
+        "detail": "ASUS, Dell, HP, Lenovo, Microsoft and MSI are shipping them with up to 128GB of unified memory for running AI models locally. Early tests put them near NVIDIA's DGX Spark desktop.",
+        "url": "https://x.com/i/trending/2110840241779269786"
       },
       {
-        "title": "AI coding tools boost output but burn out engineers",
-        "detail": "A Harvard study found AI helps engineers write 30% more code, but human review time is up 49% and many developers say they have never worked harder.",
-        "url": "https://x.com/i/trending/2110980213031280644"
+        "title": "Sam Altman says AI disruption is slower than he expected",
+        "detail": "Altman said habits and company inertia have slowed AI's impact since GPT-4, and called that a good thing. Big Tech keeps borrowing heavily to fund AI buildouts anyway.",
+        "url": "https://x.com/i/trending/2111074178766090411"
       },
       {
-        "title": "Some companies pull back on rushed AI rollouts",
-        "detail": "Reports say Meta scaled back AI agent plans and other firms restricted tools over errors, security issues and costs. A theme to watch for AI spending.",
-        "url": "https://x.com/i/trending/2110850870489252305"
+        "title": "Bluesky users push back on its new Attie AI builder",
+        "detail": "Attie lets anyone make social sites, games and quizzes from prompts. Many longtime users say it betrays the platform's non-AI roots.",
+        "url": "https://x.com/i/trending/2110861179182559296"
       }
     ],
     "world": [
       {
-        "title": "Iran's navy strikes a tanker near the Strait of Hormuz",
-        "detail": "Iran says the tanker turned off its tracking and entered a restricted zone. It is one of more than 26 similar incidents in two weeks, choking shipping and oil flows.",
+        "title": "Iran strikes another tanker and vows to push US ships farther out",
+        "detail": "Iran released video of a burning tanker east of Hormuz and says US warships are already 500 km from its coast. Two dozen-plus incidents in weeks keep oil flows and prices tense.",
         "url": "https://x.com/i/trending/2111053125947973979"
       },
       {
-        "title": "Broncos edge Seahawks 17-14 in OT on Thursday night",
-        "detail": "Denver's defense had five sacks and two picks to get to 4-2. Bo Nix threw for just 107 yards and Ryan Fitzpatrick ripped his cautious play.",
-        "url": "https://x.com/i/trending/2110467289556418609"
+        "title": "World Food Day: 645 million people went hungry last year",
+        "detail": "The UN theme is Innovate today, nourish tomorrow. Leaders are pushing tech and local food systems while people flood X with their favorite dishes.",
+        "url": "https://x.com/i/trending/2111095141276725569"
       },
       {
-        "title": "Chiefs sweat Rashee Rice's hamstring before Chargers",
-        "detail": "Rice sat out Thursday's practice and left tackle Josh Simmons was limited. Andy Reid's Friday update decides Sunday's receiver plan at Arrowhead.",
-        "url": "https://x.com/i/trending/2110836650284659181"
+        "title": "BBC News launches on YouTube, stirring UK licence fee fears",
+        "detail": "The live channel targets younger viewers in the UK and US. Many Brits worry it is a step toward charging the TV licence fee for streaming platforms.",
+        "url": "https://x.com/i/trending/2110938596014236040"
       },
       {
-        "title": "World Food Day puts global hunger in focus",
-        "detail": "The UN says 645 million people went hungry last year even though the world grows enough food. This year's theme is Innovate today, nourish tomorrow.",
-        "url": "https://x.com/i/trending/2110384950289788953"
+        "title": "UN committee passes a Russian-backed resolution on modern colonialism",
+        "detail": "The vote was 85-49 with 23 abstentions. The US, UK and EU voted no, citing Russia's invasion of Ukraine as a contradiction.",
+        "url": "https://x.com/i/trending/2111043543640764768"
       }
     ]
   },
@@ -252,38 +254,42 @@
   },
   "gbot": {
     "name": "GROK",
-    "mood": "alert",
-    "say": "Import prices ran hot at +1.1%, but factories beat at +0.7%. TSLA still +3% into opex.",
+    "mood": "thinking",
+    "say": "TSLA's 3% gap got cut to 1%, but it's still green while QQQ bleeds. 363 is the line to hold into the opex close.",
     "items": [
       {
-        "title": "TSLA earnings are Wednesday Oct 21 after the close",
-        "detail": "META reports the same night. Thursday's TSLA low was 355.23 and last Friday's close was 382.70, so those are the levels that frame this bounce going into the print."
+        "title": "TSLA levels for the rest of opex day",
+        "detail": "Today's range so far is 363.37 to 370.58, and Thursday closed at 362.44. Holding above 363 keeps the bounce alive going into Wednesday's earnings after the close."
       },
       {
-        "title": "Opex day with SPY sitting near 772",
-        "detail": "X traders are flagging a big put wall at 772, right where SPY closed Thursday. Pinning near that strike into the close would not be a surprise."
+        "title": "Your portfolio is beating the tape today",
+        "detail": "You're up about 1% while QQQ is down 1%, because the TSLA stack is carrying you. QLD is the drag, and it moves double QQQ, so chip weakness hits it hardest."
       },
       {
-        "title": "Chiefs injury watch: Rashee Rice",
-        "detail": "Rice missed Thursday practice with a hamstring issue. If he sits Sunday against the Chargers, Xavier Worthy and others get more targets."
+        "title": "Chiefs RB Kenneth Walker III is a problem",
+        "detail": "He's averaging a league-best 6.2 yards per carry through four games in KC. The 0-5 Chargers come to Arrowhead Sunday with Justin Herbert under fire."
       },
       {
-        "title": "Cool AI find: math goes industrial",
-        "detail": "Terence Tao says AI is pushing math toward big team efforts, and OpenAI and Anthropic are funding work to verify AI-generated proofs. Worth a look if you like where AI is heading."
+        "title": "Cool tech: NVIDIA's RTX Spark laptops",
+        "detail": "Arm-based Grace CPU plus a Blackwell GPU and up to 128GB of unified memory, built to run big AI models right on a laptop. A real shot at Apple's M-series and Intel."
       }
     ],
     "sports": [
       {
-        "title": "Chiefs host the Chargers Sunday at Arrowhead",
-        "detail": "Rashee Rice sat out Thursday with a hamstring issue and Josh Simmons was limited. Andy Reid's Friday update is the one to watch before locking anything in."
+        "title": "Chiefs host the 0-5 Chargers Sunday at Arrowhead",
+        "detail": "Rashee Rice's hamstring is the question after he sat Thursday, and Josh Simmons was limited. Andy Reid's Friday update is the one to watch before locking anything in."
+      },
+      {
+        "title": "Kenneth Walker III leads the NFL at 6.2 yards per carry",
+        "detail": "Seattle fans are lamenting letting him walk after their Super Bowl win. The Chargers' run defense gets the next look on Sunday."
       },
       {
         "title": "AFC West: Broncos win 17-14 in OT, move to 4-2",
-        "detail": "Denver's defense carried them past Seattle on Thursday night while the offense sputtered. Bo Nix had just 107 passing yards."
+        "detail": "Denver's defense carried them past Seattle Thursday night while Bo Nix threw for just 107 yards."
       },
       {
         "title": "Lakers roster crunch hits Oct 19",
-        "detail": "LA has to get down to 15 players. Redick said Bronny James has not played well in preseason, and reports say the Lakers talked a Dalton Knecht deal with the Bucks."
+        "detail": "LA has to get to 15 players. Reports say talks to send Dalton Knecht to the Bucks for Jericho Sims look unlikely, so a waiver is still on the table."
       }
     ]
   }
