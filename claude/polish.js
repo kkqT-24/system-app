@@ -408,3 +408,26 @@
     if (b && m) b.textContent = "Build " + m[1] + " — Boot Sequence";
   } catch (e) {}
 })();
+
+/* Sports Desk sheet: flag the body while it's open (the CSS pins the
+   sheet and locks the page), and a plain tap on its bar closes it. */
+(function () {
+  "use strict";
+  var sec = document.getElementById("sec-sports");
+  var bar = sec ? sec.querySelector(".mx-embed-bar") : null;
+  var handle = document.getElementById("tabsHandle");
+  if (!sec) return;
+  function sync() { document.body.classList.toggle("sports-open", !sec.classList.contains("is-hidden")); }
+  new MutationObserver(sync).observe(sec, { attributes: true, attributeFilter: ["class"] });
+  sync();
+  if (!bar || !handle) return;
+  var tx = 0, ty = 0, t0 = 0;
+  bar.addEventListener("pointerdown", function (e) { tx = e.clientX; ty = e.clientY; t0 = Date.now(); });
+  bar.addEventListener("click", function (e) {
+    if (e.target.closest("a")) return;
+    if (Date.now() - t0 > 500 || Math.abs(e.clientX - tx) > 8 || Math.abs(e.clientY - ty) > 8) return;
+    handle.click();
+  });
+  /* nothing behind the sheet should scroll from a touch on the bar */
+  bar.addEventListener("touchmove", function (e) { e.preventDefault(); }, { passive: false });
+})();

@@ -528,3 +528,15 @@ body:not(.tab-open) .main-center { flex: 0 0 auto; justify-content: flex-start; 
    edge, REBOOT centred in the gap between the verse and the version row */
 body:not(.tab-open) .main-inner > .main-top:last-child { position: relative; top: 20px; }
 body:not(.tab-open) .main-controls { position: relative; top: -14px; }
+
+/* ---------- Sports Desk: pinned full-screen sheet ----------
+   While it's open the page underneath is locked, so a fast swipe in
+   the desk can't drag the whole app. The sheet sits right under the
+   status bar; its own bar is the handle (drag down or tap to close). */
+html:has(body.sports-open), body.sports-open { overflow: hidden !important; height: 100% !important; overscroll-behavior: none; }
+body.sports-open #sec-sports.section.mx-embed {
+  position: fixed !important; z-index: 60; left: 0; right: 0; top: calc(env(safe-area-inset-top) + 4px); bottom: 0;
+  margin: 0 !important; display: flex; flex-direction: column; border-radius: 16px 16px 0 0;
+}
+body.sports-open #sec-sports .mx-embed-frame { flex: 1 1 auto; height: auto !important; min-height: 0; }
+body.sports-open #tabsHandle, body.sports-open .mx-back-bar { visibility: hidden; }
