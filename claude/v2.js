@@ -812,6 +812,7 @@
         var o = JSON.parse(decodeURIComponent(escape(atob(code.trim().replace(/^SYSTEM-SAVE:/, "")))));
         if (o.v1) localStorage.setItem("systemApp.v1", o.v1);
         if (o.v2) localStorage.setItem(KEY, o.v2);
+        if (o.intel) localStorage.setItem("systemApp.intel", o.intel);
         alert("Save loaded. Reloading.");
         location.reload();
       } catch (err) { alert("That code didn't work — copy it again and paste the whole thing."); }
@@ -932,7 +933,7 @@
      into Notes. "Later" snoozes it a day. */
   var WEEK = 7 * 864e5;
   function saveCode() {
-    return "SYSTEM-SAVE:" + btoa(unescape(encodeURIComponent(JSON.stringify({ v1: localStorage.getItem("systemApp.v1"), v2: localStorage.getItem(KEY) }))));
+    return "SYSTEM-SAVE:" + btoa(unescape(encodeURIComponent(JSON.stringify({ v1: localStorage.getItem("systemApp.v1"), v2: localStorage.getItem(KEY), intel: localStorage.getItem("systemApp.intel") }))));
   }
   function copySave(msg) {
     D.lastBackup = Date.now(); save();

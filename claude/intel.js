@@ -388,7 +388,7 @@
         });
       });
       /* energy arcs: short-lived jagged bolts thrown off the sphere */
-      if (Math.random() < 0.006 + level * 0.03) {
+      if (Math.random() < 0.0025 + level * 0.012) {
         var ang = Math.random() * Math.PI * 2, r0 = 12 + Math.random() * 6;
         arcs.push({ pts: bolt(c + Math.cos(ang) * r0, c + Math.sin(ang) * r0, ang, 18 + Math.random() * (16 + level * 10)), life: 1, w: 0.7 + Math.random() * 0.9, hue: Math.random() < 0.5 ? A : B });
       }
@@ -987,18 +987,19 @@
   function hydrate() {
     market = cleanMarket(C.market);
     brief = cleanBrief(C.brief);
-    /* a trending-only update (8 PM / 10 PM / 12 AM) carries just trending
-       + Grok's line; everything else comes from the last full update */
+    /* a trending-only update (nights, and all weekend) carries just
+       trending + Grok's line; everything else comes from the last full
+       update, up to 72 hours back so Friday 6 PM carries the weekend */
     if (brief && brief.edition === "trending") {
       var full = cleanBrief(C.full), tw = Date.parse(brief.written), fw = full ? Date.parse(full.written) : NaN;
-      if (full && isFinite(tw) && isFinite(fw) && tw - fw < 30 * 3600000 && tw >= fw) {
+      if (full && isFinite(tw) && isFinite(fw) && tw - fw < 72 * 3600000 && tw >= fw) {
         full.trending = brief.trending;
         if (brief.gbot.say) { full.gbot.say = brief.gbot.say; full.gbot.mood = brief.gbot.mood || full.gbot.mood; }
         full.fullWritten = full.written; full.written = brief.written; full.edition = "trending";
         brief = full;
       }
     }
-    if (brief && Math.round((parseDay(dayKey(new Date())) - parseDay(brief.date)) / 864e5) > 2) brief = null;
+    if (brief && Math.round((parseDay(dayKey(new Date())) - parseDay(brief.date)) / 864e5) > 3) brief = null;
     econ = (C.econ && Array.isArray(C.econ.events) ? C.econ.events : []).filter(function (e) { return e && /^\d{4}-\d{2}-\d{2}$/.test(e.date) && str(e.name, 80); })
       .map(function (e) { return { date: e.date, time: /^\d{1,2}:\d{2}$/.test(e.time || "") ? e.time : "", name: str(e.name, 80) }; });
   }
