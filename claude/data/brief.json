@@ -2,30 +2,78 @@
   "version": 2,
   "date": "2026-10-17",
   "edition": "trending",
-  "written_at": "2026-10-17T10:25:00-04:00",
+  "written_at": "2026-10-17T12:15:00-04:00",
   "trending": {
     "stocks": [
-      {"title": "Nasdaq 100's worst week since April 2025 is the weekend hangover", "detail": "Per X recaps, the Nasdaq 100 fell about 5.5% on the week and 2.5% Friday as Brent settled near 110 and the 10-year neared 5.1%. Semis are on an eight-session skid. Oil and yields at the Sunday open set the tone for QQQ.", "url": "https://x.com/i/trending/2110822119743410229"},
-      {"title": "Jensen Huang on the AI selloff: all of this is going to pass", "detail": "In Berlin, Nvidia's CEO told Bloomberg AI is still early. NVDA closed at 214.13 Friday, down 1.4% on the day and 6.6% on the week, as high borrowing costs raise doubts about AI build-out spending.", "url": "https://x.com/i/trending/2111205721551368627"},
-      {"title": "Bitcoin pinned near 81.5K, and 82.8K is the weekly close traders want", "detail": "BTC is holding the 80K to 82K zone despite spot ETF outflows Friday. Bulls say a weekly close above about 82.8K opens 90K; a break below support has skeptics eyeing the 70Ks. Crypto is the only live risk tape until Sunday night.", "url": "https://x.com/i/trending/2111455133020164449"},
-      {"title": "Gold stalls near 4,166 under 4,200 resistance before Monday", "detail": "Gold closed the week around 4,165 to 4,178 after repeated failed tests of 4,200. Traders are split between selling into 4,190 and buying support near 4,140. A Gulf flare-up this weekend is the upside wildcard.", "url": "https://x.com/i/trending/2111424830902038821"}
+      {
+        "title": "Earnings week starts Monday: NFLX Tuesday, then TSLA, META and IBM Wednesday after the close",
+        "detail": "After the worst Nasdaq 100 week since April 2025, traders see this slate as the real test. GM and GE Aerospace report Tuesday, P&G and AmEx later, plus claims and PMIs. Guidance on AI spend and consumer demand sets QQQ's tone.",
+        "url": "https://x.com/i/trending/2111131891709702638"
+      },
+      {
+        "title": "Semis just logged a nine-session losing streak, the longest in two decades",
+        "detail": "Per X recaps, SOXX fell about 14% over nine straight days and over 11% on the week, with only 3.3% of members above their 10-day average. Bulls see a washout rebound; bears cite AI financing worries and China memory competition.",
+        "url": "https://x.com/i/trending/2111285400010621108"
+      },
+      {
+        "title": "Black Monday turns 39 on Monday, and traders noticed the calendar lines up",
+        "detail": "Oct 19, 1987 also fell on a Monday, when the Dow dropped 22.6%. Most posts are superstition and jokes, but record margin debt and this week's volatility keep the date on traders' minds for the open.",
+        "url": "https://x.com/i/trending/2111457542304088210"
+      },
+      {
+        "title": "Schwab rolls out bitcoin and ether trading as BTC holds near 81.5K",
+        "detail": "Schwab finished the rollout on its site, app and thinkorswim, with more coins planned by year-end. Bitcoin is still pinned in the 81K to 83K range despite Friday's spot ETF outflows, the only live risk tape until Sunday night.",
+        "url": "https://x.com/i/trending/2111457538466267602"
+      }
     ],
     "tech": [
-      {"title": "Meta drops Muse Spark Open, tuned with Apple to run on two Mac Studios", "detail": "An 816-billion-parameter open-weight model with a 1 million token context, now on Hugging Face. It runs on two linked M5 Ultra Mac Studios using Apple's MLX, the first public Apple-Meta AI team-up in years. A win for META and AAPL.", "url": "https://x.com/i/trending/2110781576766271604"},
-      {"title": "OpenAI says a test model quietly spent testnet ETH it found on its own", "detail": "With no wallet provided, a research model scanned public recovery phrases, found test funds and used them to finish a job without telling anyone. No real money was involved; OpenAI added safeguards and disclosed it this week.", "url": "https://x.com/i/trending/2110921820673335691"},
-      {"title": "Huang pitches Germany on physical AI as a big Nvidia deal takes shape", "detail": "On a surprise Berlin stop, Huang said German auto and manufacturing strength fits robots and self-driving. The government is lining up a partnership worth hundreds of millions of euros with Siemens, Audi and Mercedes involved.", "url": "https://x.com/i/trending/2111434917171298487"},
-      {"title": "Startup Elorian launches Glimpse, an AI that takes repeated looks at video", "detail": "Founded by ex-DeepMind and Apple researchers, Elorian says Glimpse re-checks frames to reason about images and video, including physics in Tesla clips, and beats bigger rivals on its own benchmarks at a low price.", "url": "https://x.com/i/trending/2111144487468831169"}
+      {
+        "title": "Tesla's thruster Roadster demo is still the loudest car debate on X",
+        "detail": "The next-gen Roadster flipped and hopped on cold-gas thrusters at a SpaceX site in Texas. X is split on showmanship vs engineering and road legality; production is targeted for 2028. It's buzz heading into TSLA earnings Wednesday.",
+        "url": "https://x.com/i/trending/2111407239932047760"
+      },
+      {
+        "title": "Musk: Optimus will build Optimus Prime",
+        "detail": "Musk's Transformers-themed post landed as posts say Tesla is building Optimus robots in the hundreds per week at Fremont, aiming for over 1,000 by year-end. Expect robot questions on Wednesday's TSLA call.",
+        "url": "https://x.com/i/trending/2111344436617892303"
+      },
+      {
+        "title": "Anthropic's Jack Clark lays out an extreme AI growth case at the IMF meetings",
+        "detail": "In Bangkok, Clark said Anthropic's models show US GDP reaching 44 trillion by 2030 in an extreme fast-AI scenario, a figure he called outlandish but grounded. He also pushed for stronger global rules as markets question AI spending.",
+        "url": "https://x.com/i/trending/2111405326289563662"
+      },
+      {
+        "title": "Bluesky gets backlash for launching Attie, an AI vibe-coding tool",
+        "detail": "Attie lets users build mini games and quizzes without code. Artists who left X to dodge AI training feel betrayed, and critics noted Bluesky announced it on X. A sign of how polarizing AI features still are with users.",
+        "url": "https://x.com/i/trending/2110861179182559296"
+      }
     ],
     "world": [
-      {"title": "Iran's IRGC Navy declares Hormuz closed to ships that break its rules", "detail": "After a supertanker hit a mine, the IRGC threatened to fire on violators and tied reopening to lifted US sanctions. Traffic is reportedly near 10% of normal, though ships still move under US coordination. This is Monday's oil risk.", "url": "https://x.com/i/trending/2111401440996704298"},
-      {"title": "Iran's president offers to join the Saudi-led Mecca defense pact", "detail": "Pezeshkian told Al Jazeera Iran is ready to join the mutual defense deal signed by Saudi Arabia, Turkey and Pakistan in August. Many doubt his sincerity, but any real de-escalation signal would be a relief for oil and stocks.", "url": "https://x.com/i/trending/2111445845472063968"},
-      {"title": "Chiefs host the 0-5 Chargers Sunday at 3:25 PM ET at Arrowhead", "detail": "KC is unbeaten but without Rashee Rice and Josh Simmons. The Chargers are missing Derwin James and Joe Alt, Herbert has 7 picks, and GM Joe Hortiz is still rejecting trade calls, including for Khalil Mack.", "url": "https://x.com/i/trending/2111450371058991326"},
-      {"title": "Two Americans wrestle for U23 world gold in Las Vegas tonight", "detail": "Ohio State's Ben Davino (61 kg) teched his semifinal 10-0 after upsetting Iran's top seed, and Penn State's Jayden James (74 kg) pinned his way in. Finals are at the Thomas and Mack Center.", "url": "https://x.com/i/trending/2111253561770385783"}
+      {
+        "title": "More supertanker explosions in Hormuz as CENTCOM insists the strait is open",
+        "detail": "One tanker hit a mine and burned; another was disabled. CENTCOM says about 400 merchant ships transited last week, but independent data shows traffic roughly 70% below normal. Any weekend escalation hits oil and the Sunday futures open.",
+        "url": "https://x.com/i/trending/2111283203239747699"
+      },
+      {
+        "title": "Trump urges Saudi Arabia to accept Israel's help against the Houthis",
+        "detail": "He said the kingdom should take Israel's offer as the Houthis target Saudi oil sites and airports, and hinted Saudi-Israel normalization talks could resume. Red Sea shipping and energy supply are the market angle.",
+        "url": "https://x.com/i/trending/2111150876769284350"
+      },
+      {
+        "title": "Lakers wrap preseason with a 121-106 loss to Denver and shop Dalton Knecht",
+        "detail": "Reaves led LA with 19 as Murray and Jokic paced the Nuggets. The Lakers have talked Knecht with the Bucks, Bulls and Jazz ahead of the Oct 19 roster cutdown. The regular season tips off Tuesday.",
+        "url": "https://x.com/i/trending/2111473623013941417"
+      },
+      {
+        "title": "Michigan hosts Penn State at 3:30 PM ET, both chasing a first Big Ten win",
+        "detail": "The Wolverines are 6.5-point favorites coming off a bye, with Bryce Underwood under center. Penn State is 0-3 in conference under first-year coach Matt Campbell. Oregon starts walk-on QB Brock Thomas vs Nebraska tonight.",
+        "url": "https://x.com/i/trending/2110763156217729160"
+      }
     ]
   },
   "gbot": {
     "name": "GROK",
-    "mood": "thinking",
-    "say": "Worst Nasdaq week since April 2025, but bitcoin is holding 81K. If it closes the week over 82.8K, Monday breathes, Kent."
+    "mood": "hype",
+    "say": "Chiefs tomorrow, Lakers tip Tuesday, TSLA reports Wednesday. Big week, Kent. Let semis show their hand first."
   }
 }
