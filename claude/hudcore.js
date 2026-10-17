@@ -3,7 +3,7 @@
    Replaces the boot core's old rings with a thin, precise HUD:
    a degree-tick scale with cardinal markers, a progress arc that
    fills with the load, rotating segmented arcs, a radar sweep over
-   a faint hex grid, and corner brackets with small readouts.
+   a faint hex grid, and small readouts in the corners.
    The percentage and its label stay as DOM text (the boot script
    drives and glitches them); this only draws around them. It reads
    the boot's own state classes (armed, spinup, holdspin*) so the
@@ -28,9 +28,7 @@
     var c = 150, armed = hud.classList.contains("armed"), br = 0.5 + 0.5 * Math.sin(t * 1.6);
     var n = parseInt(pctEl && pctEl.textContent, 10); if (!isNaN(n)) pct = Math.max(0, Math.min(100, n));
     g.setTransform(dpr, 0, 0, dpr, 0, 0); g.clearRect(0, 0, S, S);
-    /* corner brackets + readouts */
-    g.strokeStyle = rgba("#c3b8fe", 0.35); g.lineWidth = 1;
-    [[8, 8, 1, 1], [292, 8, -1, 1], [8, 292, 1, -1], [292, 292, -1, -1]].forEach(function (b) { g.beginPath(); g.moveTo(b[0], b[1] + 14 * b[3]); g.lineTo(b[0], b[1]); g.lineTo(b[0] + 14 * b[2], b[1]); g.stroke(); });
+    /* corner readouts */
     txt(((verEl && verEl.textContent) || "Core").toUpperCase(), 14, 24, rgba("#aca9e8", 0.7), "left");
     txt("SYNC " + String(Math.round(pct)).padStart(3, "0"), 286, 24, rgba("#aca9e8", 0.7), "right");
     txt("38.25N 85.76W", 14, 276, rgba("#7673b8", 0.8), "left");
