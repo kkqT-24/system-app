@@ -2,30 +2,30 @@
   "version": 2,
   "date": "2026-10-16",
   "edition": "trending",
-  "written_at": "2026-10-16T22:17:00-04:00",
+  "written_at": "2026-10-17T00:20:00-04:00",
   "trending": {
     "stocks": [
-      {"title": "VIX spikes as Wall Street slides into extreme fear", "detail": "The VIX jumped over 30% intraday Friday and Fear and Greed readings sat around 18 to 25. CoreWeave fell over 12% on debt worries. Traders are split on whether this is a washout bottom or just the start.", "url": "https://x.com/i/trending/2111157201968472107"},
-      {"title": "Bank stocks log six straight down weeks, longest since 2008", "detail": "The KBW Bank Index is about 13% off its August peak, with BofA, Wells, Goldman and Morgan Stanley each down over 20% from highs. High rates and deposit costs are the drag; earnings did not help.", "url": "https://x.com/i/trending/2111211203884097812"},
-      {"title": "SpaceX reports Monday, a day before Tesla, fueling merger talk", "detail": "SpaceX posts Q3 results after the close Oct 20. Barclays floated an all-stock SpaceX-Tesla merger idea and Kalshi shows about 60% odds of a deal before May 2027. Expect TSLA chatter all weekend.", "url": "https://x.com/i/trending/2111079976711721032"},
-      {"title": "Schwab opens Bitcoin and Ether trading to retail clients", "detail": "Schwab Crypto is now live for eligible US accounts with a 0.75% fee, Solana planned later. Bitcoin is holding near 81K after dipping under 80K; traders want a weekly close above 82K.", "url": "https://x.com/i/trending/2111264303999320522"}
+      {"title": "S&P 500 sits under 3% from its record while 206 members are down 30%+", "detail": "SPX closed Friday at 7,659 even as nearly 5,000 US stocks trade 20%+ below highs. With inflation at 3.7%, oil over 100 and the 10-year near 5.1%, X is calling it the bear-bull paradox: a few mega caps hiding the damage.", "url": "https://x.com/i/trending/2110879557532430720"},
+      {"title": "Semis log a nine-day losing streak, longest in two decades", "detail": "SOXX fell over 11% on the week, its worst since March 2025, with only 3.3% of members above their 10-day average. Bulls point to washout rebounds; bears point to AI financing stress. A big swing factor for QQQ Monday.", "url": "https://x.com/i/trending/2111285400010621108"},
+      {"title": "Black Monday turns 39 on Monday and traders are drawing parallels", "detail": "Oct 19, 1987 saw the S&P fall 20.47% in a day. Posts compare it to now: the Nasdaq 100's worst week since April 2025, Brent above 105 and 10-year yields over 5%. Mostly fear chatter, but it sets the mood into the open.", "url": "https://x.com/i/trending/2111309079863791699"},
+      {"title": "Bitcoin holds near 82K as the bull-or-crash debate heats up", "detail": "BTC dipped under 80K this week, then steadied after failing at 83K to 84K. Fidelity's Jurrien Timmer sees a new bull cycle starting; Bloomberg's Mike McGlone warns of much lower if stocks drop 20%. Weekend crypto is the first risk tell.", "url": "https://x.com/i/trending/2111269197992825004"}
     ],
     "tech": [
-      {"title": "Anthropic staff expect Nobel-level AI science by 2027", "detail": "Internal surveys shared by chief economist Peter McCrory show 91% of employees expect AI-driven Nobel-level breakthroughs by 2030, versus 39% of US adults. Staff see AI doing 75% of their work hours by 2030.", "url": "https://x.com/i/trending/2111264306767462683"},
-      {"title": "Linus Torvalds vibe-codes a tool with Google's Antigravity", "detail": "Torvalds merged an AI-generated Python visualizer into his AudioNoise hobby project, keeping the core C by hand. It reignited the debate over speed versus maintainability of AI-written code.", "url": "https://x.com/i/trending/2111196900020064564"},
-      {"title": "OpenAI dots are handling 3 AM on-call pages", "detail": "OpenAI's always-on agents triage incidents, draft pull requests and monitor channels. One engineer handled a page from bed through the ChatGPT app; teams cite over 1,400 merged PRs.", "url": "https://x.com/i/trending/2111266734019899600"},
-      {"title": "Nvidia's ASPIRE robot solves a Rubik's Cube with two arms", "detail": "Nvidia's GEAR lab open-sourced ASPIRE v1.0, a framework that lets robots learn, debug and improve from real-world feedback. Demos include the cube solve, screwing bottle caps and stacking cups.", "url": "https://x.com/i/trending/2111166917532684350"}
+      {"title": "Reflection AI drops Beam, a free 501B-parameter open-weight model", "detail": "Beam uses 23B active parameters per token and a 1M-token context, ranking second among US open-weight models on the Artificial Analysis index. It is built for coding and long agent tasks, with day-one Ollama and vLLM support.", "url": "https://x.com/i/trending/2111084244533489807"},
+      {"title": "Bank of America says AI capex looks like past boom-bust cycles", "detail": "BofA compares about 1 trillion in expected hyperscaler spending, roughly 3% of US GDP, to the 1990s tech boom and 1870s railroads. CoreWeave is down nearly 50% in six months with bond yields near 15%.", "url": "https://x.com/i/trending/2111163523803885953"},
+      {"title": "Ex-DeepMind and Apple team launches Glimpse for visual reasoning", "detail": "Elorian AI's Glimpse re-checks pixels mid-thought to track motion and read video, and claims to beat bigger rivals on benchmarks at 0.60 per million input tokens. Backed by 55 million, it targets robotics and factories.", "url": "https://x.com/i/trending/2111144487468831169"},
+      {"title": "Walter Isaacson says Steve Jobs would hate agentic AI", "detail": "On TBPN, Jobs' biographer argued AI that acts on its own breaks Jobs' idea of tech that amplifies people. Replies split, with some saying Jobs would have gone all in. A fun debate as Apple sits near a 5 trillion valuation.", "url": "https://x.com/i/trending/2111294296498286618"}
     ],
     "world": [
-      {"title": "Norte Fire hits 465 acres with zero containment", "detail": "Santa Ana winds pushed the San Clemente fire through neighborhoods, destroying homes. Evacuations cover San Clemente and San Juan Capistrano zones, with other fires burning at Camp Pendleton and Malibu.", "url": "https://x.com/i/trending/2110793878274277537"},
-      {"title": "Iran's president says Tehran wants no nuclear weapons", "detail": "Pezeshkian told Georgia's prime minister Iran is open to talks without pressure. Traders see possible oil relief but doubt the timing, with Iran's forces still on high alert near Hormuz.", "url": "https://x.com/i/trending/2111243976275828833"},
-      {"title": "Indonesia stocks crash 11% on an MSCI downgrade threat", "detail": "The Jakarta index had its worst day in nearly three decades after MSCI opened a review on moving Indonesia out of emerging markets over ownership transparency. The market is down nearly 40% this year.", "url": "https://x.com/i/trending/2110897849785319527"},
-      {"title": "FIFA reviews its Trump Peace Prize after one year", "detail": "FIFA's council asked its social responsibility committee to decide whether to keep, change or scrap the prize, with some members wanting politicians excluded. A report is due in Doha in December.", "url": "https://x.com/i/trending/2111107702168469663"}
+      {"title": "Washington Post photographer badly beaten by masked settlers", "detail": "Veteran photojournalist Heidi Levine, wearing a press vest, was attacked in the West Bank village of Abu Falah while covering the olive harvest, suffering broken vertebrae and a broken rib. The Post is demanding accountability.", "url": "https://x.com/i/trending/2110885635141648805"},
+      {"title": "Canada weighs more immigration after slowest growth since the 1940s", "detail": "Population grew just 0.5% year over year, the slowest since 1944-45. Immigration Minister Lena Diab hinted at higher levels in a November update, while many push back over housing costs and jobs.", "url": "https://x.com/i/trending/2111292139502027072"},
+      {"title": "Japan's three megabanks finish a joint yen stablecoin test", "detail": "Mizuho, MUFG and SMBC piloted issuing and redeeming a deposit-backed yen stablecoin for Mitsubishi Corp's cross-border payments. No live service yet; live transactions are eyed by March 2027.", "url": "https://x.com/i/trending/2111038995576881390"},
+      {"title": "UN marks the day to end poverty with a safe homes focus", "detail": "Oct 17 is the International Day for the Eradication of Poverty. Guterres called poverty an affront to human dignity, and the UN says more than 2.8 billion people live in inadequate housing.", "url": "https://x.com/i/trending/2111298557089092095"}
     ]
   },
   "gbot": {
     "name": "GROK",
-    "mood": "thinking",
-    "say": "Luka and a brand-new starting five vs Denver right now. Then SpaceX reports Monday, TSLA Wednesday. Buckle up, Kent."
+    "mood": "alert",
+    "say": "Semis down nine straight and the VIX near 20. Monday is Black Monday's anniversary. Rest up this weekend, Kent."
   }
 }
