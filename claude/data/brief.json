@@ -2,30 +2,30 @@
   "version": 2,
   "date": "2026-10-16",
   "edition": "trending",
-  "written_at": "2026-10-16T20:36:00-04:00",
+  "written_at": "2026-10-16T22:17:00-04:00",
   "trending": {
     "stocks": [
-      {"title": "Oil above 100 and a tech dump close out a brutal week", "detail": "Brent near 110 and WTI over 100 on Hormuz risk. Nasdaq 100 fell 5.5% on the week, its worst since April 2025, with the 10-year yield at 5.10% and semis down eight straight days.", "url": "https://x.com/i/trending/2110822119743410229"},
-      {"title": "Nvidia in correction, valuation at multiyear lows", "detail": "NVDA is down about 11.9% over eight sessions, with forward P/E at levels not seen since 2016. Traders debate buying the dip versus a deeper AI unwind, with 212 as the support level.", "url": "https://x.com/i/trending/2110833262075478078"},
-      {"title": "Huang tells investors the AI rout will pass", "detail": "Speaking to Bloomberg in Berlin, Jensen Huang said AI is just beginning and urged focus on long-term fundamentals as chip stocks slide on borrowing costs.", "url": "https://x.com/i/trending/2111205721551368627"},
-      {"title": "Monster earnings week next: Netflix, Tesla, Meta", "detail": "Over 200 companies report Oct 19-23. Netflix Tuesday, Tesla, Meta and IBM Wednesday, P&G Thursday. Traders are already lining up options plays on TSLA.", "url": "https://x.com/i/trending/2111131891709702638"}
+      {"title": "VIX spikes as Wall Street slides into extreme fear", "detail": "The VIX jumped over 30% intraday Friday and Fear and Greed readings sat around 18 to 25. CoreWeave fell over 12% on debt worries. Traders are split on whether this is a washout bottom or just the start.", "url": "https://x.com/i/trending/2111157201968472107"},
+      {"title": "Bank stocks log six straight down weeks, longest since 2008", "detail": "The KBW Bank Index is about 13% off its August peak, with BofA, Wells, Goldman and Morgan Stanley each down over 20% from highs. High rates and deposit costs are the drag; earnings did not help.", "url": "https://x.com/i/trending/2111211203884097812"},
+      {"title": "SpaceX reports Monday, a day before Tesla, fueling merger talk", "detail": "SpaceX posts Q3 results after the close Oct 20. Barclays floated an all-stock SpaceX-Tesla merger idea and Kalshi shows about 60% odds of a deal before May 2027. Expect TSLA chatter all weekend.", "url": "https://x.com/i/trending/2111079976711721032"},
+      {"title": "Schwab opens Bitcoin and Ether trading to retail clients", "detail": "Schwab Crypto is now live for eligible US accounts with a 0.75% fee, Solana planned later. Bitcoin is holding near 81K after dipping under 80K; traders want a weekly close above 82K.", "url": "https://x.com/i/trending/2111264303999320522"}
     ],
     "tech": [
-      {"title": "Bank of America says the AI boom mirrors past busts", "detail": "Hyperscaler capex forecasts jumped from 330 billion to 1 trillion, about 3% of US GDP, while AI token prices halved since summer. BofA compares it to the railroad and dot-com eras.", "url": "https://x.com/i/trending/2111163523803885953"},
-      {"title": "Taiwan moves to criminalize AI chip exports to China", "detail": "Part of the US-Taiwan trade deal: unauthorized AI server and advanced chip exports to China would become a crime. China proposed export controls on 40 technologies of its own.", "url": "https://x.com/i/trending/2111040513482563612"},
-      {"title": "Elorian launches Glimpse visual reasoning model", "detail": "The Palo Alto startup with ex-DeepMind and Apple talent opened a research preview, claiming stronger chart and video reasoning than rivals.", "url": "https://x.com/i/trending/2111144487468831169"},
-      {"title": "Terence Tao warns of an AI industrial age in math", "detail": "After a flood of AI-generated math papers, Tao said volume is crowding out insight and could hit junior researchers hard.", "url": "https://x.com/i/trending/2111160366147293207"}
+      {"title": "Anthropic staff expect Nobel-level AI science by 2027", "detail": "Internal surveys shared by chief economist Peter McCrory show 91% of employees expect AI-driven Nobel-level breakthroughs by 2030, versus 39% of US adults. Staff see AI doing 75% of their work hours by 2030.", "url": "https://x.com/i/trending/2111264306767462683"},
+      {"title": "Linus Torvalds vibe-codes a tool with Google's Antigravity", "detail": "Torvalds merged an AI-generated Python visualizer into his AudioNoise hobby project, keeping the core C by hand. It reignited the debate over speed versus maintainability of AI-written code.", "url": "https://x.com/i/trending/2111196900020064564"},
+      {"title": "OpenAI dots are handling 3 AM on-call pages", "detail": "OpenAI's always-on agents triage incidents, draft pull requests and monitor channels. One engineer handled a page from bed through the ChatGPT app; teams cite over 1,400 merged PRs.", "url": "https://x.com/i/trending/2111266734019899600"},
+      {"title": "Nvidia's ASPIRE robot solves a Rubik's Cube with two arms", "detail": "Nvidia's GEAR lab open-sourced ASPIRE v1.0, a framework that lets robots learn, debug and improve from real-world feedback. Demos include the cube solve, screwing bottle caps and stacking cups.", "url": "https://x.com/i/trending/2111166917532684350"}
     ],
     "world": [
-      {"title": "Pentagon to hold Minab school strike report until after midterms", "detail": "The near-complete review reportedly cites flawed intelligence, outdated imagery and AI overreliance. Rep. Jason Crow and others are demanding immediate release.", "url": "https://x.com/i/trending/2110781575268798694"},
-      {"title": "Norte Fire forces evacuations near San Clemente", "detail": "The Orange County fire grew past 250 acres under Santa Ana winds, with homes burned and orders in San Clemente and San Juan Capistrano zones.", "url": "https://x.com/search?q=%23NorteFire"},
-      {"title": "Iran puts its military on 72-hour high alert", "detail": "Reports describe air defenses, missiles and armor moving near the Iraqi border. Israel raised its own alert; no confirmed attack plans so far.", "url": "https://x.com/i/trending/2110911772496736350"},
-      {"title": "Iran vows to push US Navy ships farther from its coast", "detail": "Tehran says it will force US warships beyond 500 km and reports tanker incidents near Hormuz. CENTCOM says commercial ships still pass.", "url": "https://x.com/i/trending/2111053125947973979"}
+      {"title": "Norte Fire hits 465 acres with zero containment", "detail": "Santa Ana winds pushed the San Clemente fire through neighborhoods, destroying homes. Evacuations cover San Clemente and San Juan Capistrano zones, with other fires burning at Camp Pendleton and Malibu.", "url": "https://x.com/i/trending/2110793878274277537"},
+      {"title": "Iran's president says Tehran wants no nuclear weapons", "detail": "Pezeshkian told Georgia's prime minister Iran is open to talks without pressure. Traders see possible oil relief but doubt the timing, with Iran's forces still on high alert near Hormuz.", "url": "https://x.com/i/trending/2111243976275828833"},
+      {"title": "Indonesia stocks crash 11% on an MSCI downgrade threat", "detail": "The Jakarta index had its worst day in nearly three decades after MSCI opened a review on moving Indonesia out of emerging markets over ownership transparency. The market is down nearly 40% this year.", "url": "https://x.com/i/trending/2110897849785319527"},
+      {"title": "FIFA reviews its Trump Peace Prize after one year", "detail": "FIFA's council asked its social responsibility committee to decide whether to keep, change or scrap the prize, with some members wanting politicians excluded. A report is due in Doha in December.", "url": "https://x.com/i/trending/2111107702168469663"}
     ]
   },
   "gbot": {
     "name": "GROK",
-    "mood": "chill",
-    "say": "Opex chewed us up, Kent. Shake it off: Lakers close preseason vs Denver tonight, Chiefs host LA Sunday sans Rice."
+    "mood": "thinking",
+    "say": "Luka and a brand-new starting five vs Denver right now. Then SpaceX reports Monday, TSLA Wednesday. Buckle up, Kent."
   }
 }
