@@ -334,7 +334,11 @@
   }
   var gFeed=[],gi=0;
   function refreshFeed(){try{var f=window.__briefing&&window.__briefing.feed?window.__briefing.feed():[];if(f&&f.length)gFeed=f;}catch(e){}}
-  function sayG(){refreshFeed();if(!gFeed.length)return;var it=gFeed[gi++%gFeed.length];say("g",it.text,it.kind==="say"?"":it.tag);}
+  function sayG(){refreshFeed();if(!gFeed.length)return;
+    /* skip anything already showing in the chat (today's restored lines included) */
+    var shown={};Array.prototype.forEach.call(thr.children,function(k){shown[k.textContent]=1;});
+    for(var tries=0;tries<gFeed.length&&shown[gFeed[gi%gFeed.length].text];tries++)gi++;
+    var it=gFeed[gi++%gFeed.length];say("g",it.text,it.kind==="say"?"":it.tag);}
   function latestC(){return cMsgs.length?cMsgs[cMsgs.length-1]:null;}
   function latestM(){return mMsgs.length?mMsgs[mMsgs.length-1]:null;}
   /* new posts take the floor when you're on home: mine as a message, Noctis's by waking him */

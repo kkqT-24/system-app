@@ -118,3 +118,6 @@ body.tab-open .crew-tx { display: none; }
 @media (prefers-reduced-motion: reduce) {
   .crew-intro .main-title, .crew-intro .main-greet, .crew-duo, .crew-date { transition: none; }
 }
+
+/* a little more air between the modules and the status bar */
+.showcase .showcase-status { margin-top: 24px; }
