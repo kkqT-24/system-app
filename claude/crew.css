@@ -116,8 +116,10 @@ body.tab-open .crew-tx { display: none; }
 /* a little more air between the modules and the status bar */
 .showcase .showcase-status { margin-top: 24px; }
 
-/* OLED to the very top edge: the strip behind the phone's status bar is pure black on home too */
-html:has(body:not(.tab-open)), body:not(.tab-open) { background: #000; }
+/* OLED to the very top edge. The page itself is always pure black (home, open modules, boot):
+   iOS colors the strip behind the status bar from it, and if a module left it navy the strip
+   stayed navy after going back home. The modules and boot paint their own glow on top. */
+html, body, body.tab-open { background: #000 !important; }
 
 /* ---------- "!" when one of us needs you ---------- */
 .crew-who, .crew-noc-box { position: relative; }
