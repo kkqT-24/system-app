@@ -38,7 +38,7 @@ body.tab-open .crew-date { opacity: 0; }
 /* ---------- stage: intro and crew share one spot ---------- */
 .crew { width: 100%; }
 /* the crew takes the top half of the screen; the modules sit lower */
-.crew-stage { display: grid; width: 100%; min-height: max(330px, 47dvh); align-items: stretch; }
+.crew-stage { display: grid; width: 100%; min-height: max(320px, 41dvh); align-items: stretch; }
 .crew { margin-bottom: 34px; }
 .crew-stage > * { grid-area: 1 / 1; }
 .crew-intro { display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; align-self: start; padding-top: 14px; pointer-events: none; }
@@ -66,7 +66,7 @@ body.tab-open .crew-date { opacity: 0; }
 .crew-bot.c .crew-name { color: #ff9f6b; }
 .crew-sub { font-family: "Share Tech Mono", monospace; font-size: 10px; letter-spacing: 0.18em; color: var(--ink-faint); text-transform: uppercase; max-width: 90px; text-align: center; }
 .crew-gname { display: inline-flex; align-items: center; }
-.crew-x { display: inline-grid; place-items: center; width: 28px; height: 28px; margin: -8px -8px -8px 0; padding: 0; border: 0; background: none; cursor: pointer; border-radius: 6px; }
+.crew-x { display: inline-grid; place-items: center; width: 28px; height: 28px; margin: -8px -8px -8px -12px; padding: 0; border: 0; background: none; cursor: pointer; border-radius: 6px; }
 .crew-x img { width: 10px; height: 10px; display: block; }
 .crew-x:focus-visible { outline: 2px solid var(--lav); }
 
