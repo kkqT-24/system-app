@@ -1630,7 +1630,9 @@
   }
   window.__briefing = { open: open, load: load,
     /* the crew on home reads gbot's lines and the brief's freshness from here */
-    feed: function () { return feedItems(new Date()); }, brief: function () { return brief; } };
+    feed: function () { return feedItems(new Date()); }, brief: function () { return brief; },
+    /* for the crew's "!": is today's brief out, and has it been opened today */
+    status: function () { var t = dayKey(new Date()); return { fresh: !!brief && isFresh(), opened: Object.keys(C.seen).some(function (k) { return k.indexOf(t + ":") === 0 && C.seen[k] > 0; }), wrapped: !!C.wrap[t] }; } };
 
 
   /* ---------------- Trading Desk module: LEV200 + NOISE BOT ----------------

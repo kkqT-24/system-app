@@ -12,7 +12,7 @@
   background: linear-gradient(to bottom, #000 0, #000 var(--oled, 52%), rgba(0,0,0,0) calc(var(--oled, 52%) + 80px)); }
 #main canvas.ambient { z-index: 0; }
 body.tab-open .crew-black { display: none; }
-.crew-stars { position: absolute; left: 0; right: 0; top: 0; height: calc(var(--oled, 52%) + 70px); z-index: 1; pointer-events: none; }
+.crew-stars { position: absolute; left: 0; right: 0; top: 0; width: 100%; height: calc(var(--oled, 52%) + 70px); z-index: 1; pointer-events: none; }
 body.tab-open .crew-stars { display: none; }
 
 /* the rings and the old briefing box step aside (they stay in the page so their scripts keep running) */
@@ -118,3 +118,50 @@ body.tab-open .crew-tx { display: none; }
 
 /* OLED to the very top edge: the strip behind the phone's status bar is pure black on home too */
 html:has(body:not(.tab-open)), body:not(.tab-open) { background: #000; }
+
+/* ---------- "!" when one of us needs you ---------- */
+.crew-who, .crew-noc-box { position: relative; }
+.crew-bang { position: absolute; top: 4px; left: calc(50% + 24px); z-index: 4; width: 17px; height: 17px; border-radius: 50%; display: grid; place-items: center;
+  font: 700 11px/1 "Orbitron", sans-serif; font-style: normal; color: #000; pointer-events: none; opacity: 0; transform: scale(0.4); transition: opacity 0.4s ease, transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1); }
+.crew-bang.on { opacity: 1; transform: none; animation: crewBang 2.6s ease-in-out infinite; }
+.crew-bot.g .crew-bang { background: #7dd3fc; box-shadow: 0 0 10px rgba(125, 211, 252, 0.7); }
+.crew-bot.c .crew-bang { background: #ff9f6b; box-shadow: 0 0 10px rgba(255, 159, 107, 0.7); }
+.crew-noc .crew-bang { top: 10px; left: calc(50% + 18px); background: #d8b4fe; box-shadow: 0 0 10px rgba(216, 180, 254, 0.7); }
+@keyframes crewBang { 0%, 100% { opacity: 1; } 50% { opacity: 0.55; } }
+
+/* ---------- my Morning Protocol: opens in place out of me ---------- */
+.crew-ck { position: absolute; left: 10px; right: 10px; z-index: 7; display: none; flex-direction: column; cursor: pointer;
+  background: linear-gradient(180deg, #120a07, #0a0605 70%, #070505); border: 1px solid rgba(255, 159, 107, 0.24); border-radius: 18px; box-shadow: 0 0 30px rgba(255, 120, 60, 0.08); }
+.crew-ck.open { display: flex; }
+.crew-ck-h { display: flex; justify-content: space-between; align-items: baseline; padding: 14px 16px 6px; }
+.crew-ck-h b { font-family: "Orbitron", sans-serif; font-size: 12px; font-weight: 700; letter-spacing: 0.18em; text-transform: uppercase; color: #ffd9c2; }
+.crew-ck-h span { font-family: "Share Tech Mono", monospace; font-size: 11px; letter-spacing: 0.14em; color: #ff9f6b; }
+.crew-ck-list { flex: 1; min-height: 0; overflow-y: auto; scrollbar-width: none; padding: 4px 10px 6px; display: flex; flex-direction: column; gap: 6px; }
+.crew-ck-list::-webkit-scrollbar { display: none; }
+.crew-ckrow { display: grid; grid-template-columns: 22px 1fr; column-gap: 10px; align-items: center; width: 100%; padding: 10px 10px; border-radius: 12px; text-align: left;
+  border: 1px solid rgba(255, 159, 107, 0.14); background: rgba(255, 159, 107, 0.04); color: #fff3ea; font: 600 14.5px/1.3 "Rajdhani", sans-serif; -webkit-tap-highlight-color: transparent;
+  transition: background 0.25s ease, border-color 0.25s ease, opacity 0.25s ease; }
+.crew-ckrow small { grid-column: 2; margin-top: 2px; font-family: "Share Tech Mono", monospace; font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase; color: rgba(255, 217, 194, 0.5); }
+.crew-ckbox { grid-row: span 2; width: 18px; height: 18px; border-radius: 5px; border: 1.5px solid rgba(255, 159, 107, 0.6); position: relative; transition: background 0.25s ease, box-shadow 0.25s ease; }
+.crew-ckrow:not(:has(small)) .crew-ckbox { grid-row: auto; }
+.crew-ckrow.on { opacity: 0.55; background: transparent; }
+.crew-ckrow.on .crew-cktx { text-decoration: line-through; text-decoration-color: rgba(255, 159, 107, 0.6); }
+.crew-ckrow.on .crew-ckbox { background: #ff9f6b; box-shadow: 0 0 10px rgba(255, 159, 107, 0.6); }
+.crew-ckrow.on .crew-ckbox::after { content: ""; position: absolute; left: 5px; top: 1.5px; width: 5px; height: 9px; border: solid #1a0d06; border-width: 0 2px 2px 0; transform: rotate(45deg); }
+.crew-ckrow.late { border-color: rgba(255, 159, 107, 0.5); }
+.crew-ckrow.late small { color: #ff9f6b; }
+.crew-ck-foot { padding: 6px 16px 14px; font-family: "Share Tech Mono", monospace; font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--ink-faint); text-align: center; }
+.crew-ck.clear .crew-ck-foot { color: #ff9f6b; }
+.crew-ck-pop { position: absolute; left: 50%; top: 46%; transform: translate(-50%, -50%); display: flex; align-items: baseline; gap: 6px; pointer-events: none;
+  font-family: "Orbitron", sans-serif; color: #ffd9c2; text-shadow: 0 0 18px rgba(255, 159, 107, 0.9); animation: ckPop 1.8s cubic-bezier(0.22, 1, 0.36, 1) forwards; }
+.crew-ck-pop b { font-size: 34px; } .crew-ck-pop span { font-size: 13px; letter-spacing: 0.2em; }
+@keyframes ckPop { 0% { opacity: 0; transform: translate(-50%, -30%) scale(0.7); } 18% { opacity: 1; transform: translate(-50%, -50%) scale(1.05); } 70% { opacity: 1; } 100% { opacity: 0; transform: translate(-50%, -90%) scale(1); } }
+body.tab-open .crew-ck { display: none; }
+@media (prefers-reduced-motion: reduce) { .crew-bang.on { animation: none; } .crew-ck-pop { animation-duration: 0.01s; } }
+
+/* the secret-quest popup sits invisible over everything when it isn't showing; keep it (and its looping glows) asleep until it is */
+.sq-overlay:not(.show) { visibility: hidden; transition: opacity 0.3s ease, visibility 0s linear 0.3s; }
+.sq-overlay:not(.show), .sq-overlay:not(.show) * { animation-play-state: paused !important; }
+.sq-overlay.show { visibility: visible; }
+/* the parallax layers move every frame: give them their own layer so moving them doesn't repaint */
+#main > .bg-glow, #main > canvas.ambient { will-change: translate; }

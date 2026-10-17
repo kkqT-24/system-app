@@ -288,7 +288,7 @@
   function save(o){try{localStorage.setItem(KEY,JSON.stringify(o));}catch(e){}}
   var mem=load();
   function dayKey(d){d=d||new Date();return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0");}
-  if(mem.day!==dayKey())mem={day:dayKey(),hist:[],seenC:mem.seenC||"",seenM:mem.seenM||""};
+  if(mem.day!==dayKey())mem={day:dayKey(),hist:[],seenC:mem.seenC||"",seenM:mem.seenM||"",ackC:mem.ackC||"",ackM:mem.ackM||""};
   mem.hist=mem.hist||[];
 
   /* ---------- speech ---------- */
@@ -330,11 +330,11 @@
   function getJSON(u){return fetch(u,{cache:"no-store"}).then(function(r){if(!r.ok)throw new Error(r.status);return r.json();});}
   function repoJSON(n){return getJSON(RAW+n+"?t="+Date.now()).catch(function(){return getJSON("data/"+n);});}
   var cMsgs=[],mMsgs=[];
-  function clean(d){return (d&&Array.isArray(d.messages)?d.messages:[]).filter(function(m){return m&&m.id&&m.text;}).slice(-20);}
+  function clean(d){return (d&&Array.isArray(d.messages)?d.messages:[]).filter(function(m){return m&&m.id&&m.text;}).slice(-20).map(function(m){return {id:m.id,time:m.time,text:m.text,attn:m.attn===true};});}
   function isToday(m){var d=new Date(m.time||0);return !isNaN(d)&&dayKey(d)===dayKey();}
   function pull(){
-    repoJSON("claude.json").then(function(d){cMsgs=clean(d);checkNew();}).catch(function(){});
-    repoJSON("noctis.json").then(function(d){mMsgs=clean(d);checkNew();}).catch(function(){});
+    repoJSON("claude.json").then(function(d){cMsgs=clean(d);ckData=cleanCk(d&&d.checklist);checkNew();bangs();if(ckOpen)renderCk();}).catch(function(){});
+    repoJSON("noctis.json").then(function(d){mMsgs=clean(d);checkNew();bangs();}).catch(function(){});
   }
   var gFeed=[],gi=0;
   function refreshFeed(){try{var f=window.__briefing&&window.__briefing.feed?window.__briefing.feed():[];if(f&&f.length)gFeed=f;}catch(e){}}
@@ -349,7 +349,7 @@
   function checkNew(){
     if(!onHome()||!mainEl.classList.contains("crew-done"))return;
     var c=latestC(),m=latestM();
-    if(c&&c.id!==mem.seenC&&isToday(c)){mem.seenC=c.id;save(mem);say("c",c.text,"",new Date(c.time));return;}
+    if(c&&c.id!==mem.seenC&&isToday(c)){mem.seenC=c.id;if(c.attn)mem.ackC=c.id;save(mem);bangs();say("c",c.text,"",new Date(c.time));return;}
     if(m&&m.id!==mem.seenM){mem.seenM=m.id;save(mem);wakeMuse(m.text,new Date(m.time));}
   }
 
@@ -361,58 +361,92 @@
   function openApp(scheme,fallback){var t=Date.now(),gone=false;function v(){if(document.hidden)gone=true;}
     document.addEventListener("visibilitychange",v);try{window.location.href=scheme;}catch(e){}
     setTimeout(function(){document.removeEventListener("visibilitychange",v);if(!gone&&!document.hidden&&Date.now()-t<3000&&fallback)fallback();},1500);}
-  /* Apps whose web links hand off to the app (Grok): open the link in the sheet, iOS passes it to the
-     app, and the sheet left blank behind it is closed as soon as the System app is back in view.
-     This has to run straight from a tap or release — from a timer iOS blocks it. */
-  var outWin=null;
-  function handOff(u){var w=null;try{w=window.open(u,"_blank");}catch(e){}if(!w){window.location.href=u;return;}try{w.opener=null;}catch(e){}outWin=w;}
-  function closeOut(){if(!outWin)return;var w=outWin;outWin=null;try{w.close();}catch(e){}}
-  document.addEventListener("visibilitychange",function(){if(!document.hidden)closeOut();});window.addEventListener("focus",closeOut);window.addEventListener("pageshow",closeOut);
-  /* Real Safari (with its logins) instead of the in-app sheet */
-  function inSafari(u){window.location.href="x-safari-"+u;}
   function webSheet(u){return function(){var w=null;try{w=window.open(u,"_blank");}catch(e){}if(w)try{w.opener=null;}catch(e){}};}
 
   /* ---------- gbot: tap opens the Daily Briefing; the X by his name opens X ---------- */
-  /* gbot: tap opens the Daily Briefing; hold and he charges up, throws sparks, then opens the Grok app */
-  var gbtn=q('[data-bot="g"]'),gHold={on:false,t0:0,fired:false,go:false,tm:[]},GHOLD=1000,GCH=0;
-  function openBriefing(){if(window.__briefing){window.__briefing.open();window.__briefing.load(false);}}
-  function openGrokApp(){var b=null;try{b=window.__briefing&&window.__briefing.brief?window.__briefing.brief():null;}catch(e){}handOff((b&&b.gbot&&b.gbot.link)||"https://grok.com");}
-  gbtn.addEventListener("pointerdown",function(e){gHold.on=true;gHold.fired=false;gHold.go=false;gHold.t0=performance.now();try{gbtn.setPointerCapture(e.pointerId);}catch(err){}
+  /* gbot: tap opens the Daily Briefing; hold and he charges up, throws sparks and pulls the next headline into the chat */
+  var gbtn=q('[data-bot="g"]'),gHold={on:false,t0:0,fired:false,tm:[]},GHOLD=1000,GCH=0;
+  function openBriefing(){if(window.__briefing){window.__briefing.open();window.__briefing.load(false);}setTimeout(bangs,600);}
+  gbtn.addEventListener("pointerdown",function(e){gHold.on=true;gHold.fired=false;gHold.t0=performance.now();try{gbtn.setPointerCapture(e.pointerId);}catch(err){}
     gHold.tm.push(setTimeout(function(){if(!gHold.on)return;gHold.fired=true;gHold.on=false;try{if(navigator.vibrate)navigator.vibrate([10,30,10]);}catch(err){}
-      core.boostUntil=nowT()+.7;fl.g.hop=1;gHold.go=true;},GHOLD));});
-  /* the charge fires during the hold; Grok opens on the release (a real gesture, so iOS allows it) */
-  function gRelease(e){if(gHold.go){gHold.go=false;if(!e||e.type!=="pointercancel")openGrokApp();return;}if(!gHold.on)return;gHold.on=false;gHold.tm.forEach(clearTimeout);gHold.tm=[];if(!gHold.fired&&performance.now()-gHold.t0<300)openBriefing();}
+      core.boostUntil=nowT()+.9;fl.g.hop=1;nextG=Date.now()+20000;
+      (function go(n){if(!gSpeak||n>16){sayG();nextG=Date.now()+16000;}else setTimeout(function(){go(n+1);},300);})(0);},GHOLD));});
+  function gRelease(){if(!gHold.on)return;gHold.on=false;gHold.tm.forEach(clearTimeout);gHold.tm=[];if(!gHold.fired&&performance.now()-gHold.t0<300)openBriefing();}
   gbtn.addEventListener("pointerup",gRelease);gbtn.addEventListener("pointercancel",gRelease);gbtn.addEventListener("contextmenu",function(e){e.preventDefault();});
   gbtn.addEventListener("keydown",function(e){if(e.key==="Enter"||e.key===" "){e.preventDefault();openBriefing();}});
   q(".crew-x").addEventListener("click",function(e){e.stopPropagation();openApp("twitter://timeline",webSheet("https://x.com"));});
 
-  /* ---------- me: tap repeats my latest; hold runs a system scan ---------- */
-  var cbtn=q('[data-bot="c"]'),cHold={on:false,t0:0,fired:false,tm:[]},CHOLD=1300;
-  function ago(iso){var d=new Date(iso);if(isNaN(d))return "unknown";return (dayKey(d)===dayKey()?"":"on "+(d.getMonth()+1)+"/"+d.getDate()+" at ")+stamp(d);}
-  function scanLine(){
-    var b=null;try{b=window.__briefing&&window.__briefing.brief?window.__briefing.brief():null;}catch(e){}
-    var parts=[];
-    parts.push(b&&b.written?"briefing "+ago(b.written):"briefing not loaded");
-    var c=latestC();parts.push(c?"my last post "+ago(c.time):"no posts from me yet");
-    var m=latestM();parts.push(m?"Noctis last spoke "+ago(m.time):"Noctis quiet");
-    return "Scan done: "+parts.join(", ")+".";
-  }
-  cbtn.addEventListener("pointerdown",function(e){cHold.on=true;cHold.fired=false;cHold.t0=performance.now();try{cbtn.setPointerCapture(e.pointerId);}catch(err){}
-    cHold.tm.push(setTimeout(function(){if(!cHold.on)return;cHold.fired=true;cHold.on=false;try{if(navigator.vibrate)navigator.vibrate([12,30,12]);}catch(err){}
-      st.clearT=nowT();say("c",scanLine());},CHOLD));});
-  function sayMine(){var c=latestC();say("c",c?c.text:"Nothing new from me. I'll post when there's something worth your time.");}
-  /* a tap opens the Claude app through its own claude:// scheme (no browser sheet left behind) */
+  /* ---------- me: tap opens the Morning Protocol; hold spins my ring up and opens the Claude app ---------- */
+  var cbtn=q('[data-bot="c"]'),cHold={on:false,t0:0,fired:false,go:false,tm:[]},CHOLD=900;
+  cbtn.addEventListener("pointerdown",function(e){cHold.on=true;cHold.fired=false;cHold.go=false;cHold.t0=performance.now();try{cbtn.setPointerCapture(e.pointerId);}catch(err){}
+    cHold.tm.push(setTimeout(function(){if(!cHold.on)return;cHold.fired=true;cHold.on=false;cHold.go=true;try{if(navigator.vibrate)navigator.vibrate([12,30,12]);}catch(err){}
+      st.clearT=nowT();},CHOLD));});
+  /* the app opens on the release (a real gesture, so iOS lets the claude:// link through) */
   function openClaude(){openApp("claude://",webSheet("https://claude.ai/new"));}
-  function cRelease(){if(!cHold.on)return;cHold.on=false;cHold.tm.forEach(clearTimeout);cHold.tm=[];if(!cHold.fired&&performance.now()-cHold.t0<300)openClaude();}
+  function cRelease(e){if(cHold.go){cHold.go=false;if(!e||e.type!=="pointercancel")openClaude();return;}
+    if(!cHold.on)return;cHold.on=false;cHold.tm.forEach(clearTimeout);cHold.tm=[];if(!cHold.fired&&performance.now()-cHold.t0<350)openCk();}
   cbtn.addEventListener("pointerup",cRelease);cbtn.addEventListener("pointercancel",cRelease);cbtn.addEventListener("contextmenu",function(e){e.preventDefault();});
-  cbtn.addEventListener("keydown",function(e){if(e.key==="Enter"||e.key===" "){e.preventDefault();openClaude();}});
+  cbtn.addEventListener("keydown",function(e){if(e.key==="Enter"||e.key===" "){e.preventDefault();openCk();}});
 
-  /* ---------- Noctis: tap opens Muse; hold reboots the system ---------- */
+  /* ---------- the Morning Protocol: my checklist for the day ----------
+     I write the day's list into claude.json ("checklist"); until I do, a standing list stands in.
+     Ticks live on this device for the day. The whole list done = +5 EXP, once a day. */
+  var CK_EXP=5,ckEl=document.getElementById("crewCk"),ckList=document.getElementById("crewCkList"),ckMeta=document.getElementById("crewCkMeta"),ckFoot=document.getElementById("crewCkFoot"),ckOpen=false,ckData=null;
+  function standingCk(d){var dw=d.getDay();
+    if(dw===0||dw===6)return {title:"Weekend Protocol",items:[
+      {id:"wk-review",text:"Look back over the week on the Daily Chart Logs"},
+      {id:"wk-next",text:"Pick next week's research focus"}]};
+    return {title:"Morning Protocol",items:[
+      {id:"noise",text:"NOISE BOT session started (check the start push)",by:"09:45"},
+      {id:"chart",text:"Chart screenshot sent: lines and your read",by:"10:00"},
+      {id:"paper",text:"Paper call written: trigger, stop, target",by:"10:00"},
+      {id:"ibkr",text:"Laptop open and IBKR logged in for the 4:30 pickup",by:"15:30"},
+      {id:"lev",text:"LEV200: signal checked, QLD vs your last buy",by:"15:45"}]};}
+  function cleanCk(c){if(!c||!Array.isArray(c.items))return null;var items=c.items.filter(function(it){return it&&it.id&&it.text;}).slice(0,10).map(function(it){
+      return {id:String(it.id).slice(0,40),text:String(it.text).slice(0,120),by:/^\d{1,2}:\d{2}$/.test(it.by||"")?it.by:""};});
+    return items.length?{date:String(c.date||""),title:String(c.title||"Morning Protocol").slice(0,30),items:items}:null;}
+  function todayCk(){var d=new Date();return ckData&&ckData.date===dayKey(d)?ckData:standingCk(d);}
+  function ckState(){if(!mem.ck||mem.ck.day!==dayKey()){mem.ck={day:dayKey(),done:{},exp:false};}return mem.ck;}
+  function byTime(by){var p=by.split(":"),d=new Date();d.setHours(+p[0],+p[1],0,0);return d;}
+  function fmtBy(by){var p=by.split(":"),h=+p[0],m=p[1];return (h%12||12)+":"+m+(h<12?" AM":" PM");}
+  function overdue(it){var S=ckState();return !!it.by&&!S.done[it.id]&&new Date()>=byTime(it.by);}
+  function renderCk(){var C=todayCk(),S=ckState(),n=0;ckList.textContent="";
+    ckEl.querySelector(".crew-ck-h b").textContent=C.title;
+    C.items.forEach(function(it){var on=!!S.done[it.id];if(on)n++;
+      var r=document.createElement("button");r.type="button";r.className="crew-ckrow"+(on?" on":"")+(overdue(it)?" late":"");r.setAttribute("aria-pressed",on?"true":"false");
+      var bx=document.createElement("i");bx.className="crew-ckbox";bx.setAttribute("aria-hidden","true");
+      var tx=document.createElement("span");tx.className="crew-cktx";tx.textContent=it.text;
+      r.appendChild(bx);r.appendChild(tx);
+      if(it.by){var by=document.createElement("small");by.textContent=(overdue(it)?"! ":"")+"by "+fmtBy(it.by);r.appendChild(by);}
+      r.addEventListener("click",function(e){e.stopPropagation();if(ghost())return;tick(it.id);});ckList.appendChild(r);});
+    ckMeta.textContent=n+" / "+C.items.length;
+    var all=n===C.items.length;ckFoot.textContent=all?(S.exp?"Protocol clear · +"+CK_EXP+" EXP earned":"Protocol clear"):"Tap an item when it's done · tap outside to close";
+    ckEl.classList.toggle("clear",all);}
+  function tick(id){var S=ckState();S.done[id]=!S.done[id];try{if(navigator.vibrate)navigator.vibrate(S.done[id]?8:4);}catch(e){}
+    var C=todayCk(),all=C.items.every(function(it){return S.done[it.id];});
+    if(all&&!S.exp){S.exp=true;try{if(window.__ksGainExp)window.__ksGainExp(CK_EXP);}catch(e){}save(mem);renderCk();
+      var pop=document.createElement("div");pop.className="crew-ck-pop";pop.innerHTML="<b>+"+CK_EXP+"</b><span>EXP</span>";ckEl.appendChild(pop);setTimeout(function(){pop.remove();},1900);
+      setTimeout(function(){closeCk();setTimeout(function(){window.__crew.clear("Protocol clear. Good start.");},500);},1500);}
+    else{save(mem);renderCk();}
+    bangs();}
+  /* the tap that opens the panel also lands a click on whatever slid under the finger; ignore it */
+  var ckAt=0;function ghost(){return performance.now()-ckAt<500;}
+  function openCk(){if(ckOpen)return;if(txOpen)closeHist();ckOpen=true;ckAt=performance.now();renderCk();var G=geom();ckEl.style.top=G.top+"px";ckEl.style.height=(G.bottom-G.top)+"px";ckEl.classList.add("open");duo.classList.add("dimmed");
+    var R=ckEl.getBoundingClientRect(),C2=cbtn.getBoundingClientRect(),ins=[C2.top-R.top,R.right-C2.right,R.bottom-C2.bottom,C2.left-R.left].map(function(v){return Math.max(0,v).toFixed(1)+"px";}).join(" ");
+    try{ckEl.animate([{clipPath:"inset("+ins+" round 48px)",opacity:.4},{clipPath:"inset(0px 0px 0px 0px round 18px)",opacity:1}],{duration:640,easing:"cubic-bezier(.65,0,.35,1)"});
+      ckList.animate([{opacity:0,transform:"translateY(6px)"},{opacity:1,transform:"none"}],{duration:460,delay:220,easing:"ease-out",fill:"backwards"});}catch(e){}}
+  function closeCk(){if(!ckOpen)return;var R=ckEl.getBoundingClientRect(),C2=cbtn.getBoundingClientRect();duo.classList.remove("dimmed");
+    var ins=[C2.top-R.top,R.right-C2.right,R.bottom-C2.bottom,C2.left-R.left].map(function(v){return Math.max(0,v).toFixed(1)+"px";}).join(" ");
+    var done=function(){ckEl.classList.remove("open");ckOpen=false;};
+    try{var an=ckEl.animate([{clipPath:"inset(0px 0px 0px 0px round 18px)",opacity:1},{clipPath:"inset("+ins+" round 48px)",opacity:0}],{duration:420,easing:"cubic-bezier(.65,0,.35,1)"});an.onfinish=done;}catch(e){done();}}
+  ckEl.addEventListener("click",function(){if(!ghost())closeCk();});
+  document.addEventListener("keydown",function(e){if(e.key==="Escape")closeCk();});
+
+  /* ---------- Noctis: tap wakes him with his last line; hold reboots the system ---------- */
   function wakeMuse(text,when){if(museT)clearTimeout(museT);muse.target=1;nocName.classList.add("on");
     if(text)setTimeout(function(){say("m",text,"",when);},700);
     museT=setTimeout(function(){muse.target=0;nocName.classList.remove("on");},text?9000:2600);}
-  /* a tap opens Muse in real Safari, signed in (muse.ai does not hand off to an app, and the in-app sheet has no login) */
-  function openMuse(){inSafari("https://muse.ai");}
+  function tapMuse(){var m=latestM();if(m){mem.ackM=m.id;save(mem);}wakeMuse(m?m.text:null,m?new Date(m.time):null);bangs();}
   var nbtn=q('[data-bot="m"]'),HOLD=1500,hold={on:false,t0:0,fired:false,tm:[]};
   function napSoon(){if(museT)clearTimeout(museT);museT=setTimeout(function(){muse.target=0;nocName.classList.remove("on");},1200);}
   nbtn.addEventListener("pointerdown",function(e){
@@ -425,11 +459,11 @@
   });
   function release(){if(!hold.on)return;hold.on=false;hold.tm.forEach(clearTimeout);hold.tm=[];
     if(hold.fired)return;
-    if(performance.now()-hold.t0<380){wakeMuse(null);openMuse();}
+    if(performance.now()-hold.t0<380)tapMuse();
     else{if(window.__mxSwirl)window.__mxSwirl.stop(false);napSoon();}}
   nbtn.addEventListener("pointerup",release);nbtn.addEventListener("pointercancel",release);
   nbtn.addEventListener("contextmenu",function(e){e.preventDefault();});
-  nbtn.addEventListener("keydown",function(e){if(e.key==="Enter"||e.key===" "){e.preventDefault();wakeMuse(null);openMuse();}});
+  nbtn.addEventListener("keydown",function(e){if(e.key==="Enter"||e.key===" "){e.preventDefault();tapMuse();}});
 
   /* ---------- hold the conversation: it opens in place into today's whole thread ---------- */
   var txEl=document.getElementById("crewTx"),txList=document.getElementById("crewTxList"),txBar=document.getElementById("crewTxBar"),thrHold=null,txOpen=false,barT=null;
@@ -473,7 +507,7 @@
       if(!thr.children.length)mem.hist.slice(-12).forEach(function(h){post(h.who,h.text,true);});
       refreshFeed();var opening=Math.min(3,gFeed.length);gi=0;
       for(var oi=0;oi<opening;oi++)(function(n){setTimeout(function(){if(onHome()&&!txOpen)sayG();},700+n*3600);})(oi);
-      setTimeout(checkNew,700+opening*3600);nextG=Date.now()+700+opening*3600+9000;},1100);}
+      setTimeout(checkNew,700+opening*3600);setTimeout(bangs,1500);nextG=Date.now()+700+opening*3600+9000;},1100);}
   /* runs once each time home arrives (first entry, and again after a reboot); class changes of our own don't retrigger it */
   var arrived=false;
   function arriveState(){return mainEl.classList.contains("arrive")&&!mainEl.classList.contains("is-hidden");}
@@ -485,6 +519,18 @@
   function setOled(){var lab=document.querySelector(".showcase-grid");if(!lab)return;var P=mainEl.getBoundingClientRect(),L=lab.getBoundingClientRect();
     mainEl.style.setProperty("--oled",Math.max(0,L.top-P.top-56)+"px");document.documentElement.style.setProperty("--oled-vp",Math.max(0,L.top-56)+"px");}
   window.addEventListener("resize",setOled);if(document.fonts&&document.fonts.ready)document.fonts.ready.then(setOled);
+
+  /* ---------- "!" when one of us needs you ----------
+     me: a checklist item past its time. Grok: today's brief is out, it's past 10 and you haven't opened it.
+     Noctis: Muse flagged a line ("attn": true) you haven't tapped him for yet. Same for a flagged line of mine. */
+  var bangEl={g:q(".crew-bot.g .crew-bang"),c:q(".crew-bot.c .crew-bang"),m:q(".crew-noc .crew-bang")};
+  function bangs(){
+    var C=todayCk(),cOn=C.items.some(overdue),lc=latestC();if(lc&&lc.attn&&isToday(lc)&&lc.id!==mem.ackC)cOn=true;
+    var gOn=false;try{var bs=window.__briefing&&window.__briefing.status?window.__briefing.status():null;gOn=!!(bs&&bs.fresh&&!bs.opened&&new Date().getHours()>=10);}catch(e){}
+    var lm=latestM(),mOn=!!(lm&&lm.attn&&lm.id!==mem.ackM);
+    bangEl.c&&bangEl.c.classList.toggle("on",cOn);bangEl.g&&bangEl.g.classList.toggle("on",gOn);bangEl.m&&bangEl.m.classList.toggle("on",mOn);}
+  setInterval(function(){if(onHome())bangs();if(ckOpen)renderCk();},30000);
+  document.addEventListener("visibilitychange",function(){if(!document.hidden)setTimeout(bangs,400);});
 
   /* gbot takes the floor every so often with the next briefing item; new posts are checked every few minutes */
   var nextG=0;
@@ -501,7 +547,7 @@
   function pickAct(t){var a=ACTS[Math.random()*ACTS.length|0];act={type:a,t0:t,until:t+(a==="glance"?1.8:a==="sigh"?2:4.8),fired:false};nextAct=t+18+Math.random()*22;}
   function float(t,k){
     if(gHold.on){GCH=Math.max(0,Math.min(1,(performance.now()-gHold.t0-80)/(GHOLD-80)));}else GCH*=Math.pow(.9,k);
-    if(cHold.on){CCH=Math.max(0,Math.min(1,(performance.now()-cHold.t0-80)/(CHOLD-80)));}else CCH*=Math.pow(.9,k);
+    if(cHold.go)CCH=1;else if(cHold.on){CCH=Math.max(0,Math.min(1,(performance.now()-cHold.t0-80)/(CHOLD-80)));}else CCH*=Math.pow(.9,k);
     if(hold.on){var hc=performance.now()-hold.t0;NCH=Math.max(0,Math.min(1,(hc-380)/(HOLD-380)));}else NCH*=Math.pow(.9,k);
     var e=1-Math.pow(.9,k),slow=1-Math.pow(.97,k);
     var wg=wander(t,18,30,.3,0),wc=wander(t,14,24,.19,2.4);
@@ -534,8 +580,11 @@
   /* starfield in the black: a few dim drifting points and the odd shooting star */
   var SC=document.getElementById("crewStars"),SX=SC.getContext("2d"),STARS=[],shoot=null,nextShoot=5+Math.random()*6,sw0=0,sh0=0;
   for(var si2=0;si2<54;si2++)STARS.push({x:Math.random(),y:Math.random(),r:Math.random()<.12?1.3:.5+Math.random()*.6,ph:Math.random()*6,sp:.4+Math.random()*1.4,vx:(Math.random()*.6+.2)*.0016,c:Math.random()<.25?"#c3b8fe":"#ffffff"});
+  /* drawn every other crew frame (~15 fps) at 1.5x: dim drifting points don't need more, and this canvas is the biggest on home */
+  var starK=0,starOdd=false;
   function stars(t,k){
-    var d=Math.min(2,window.devicePixelRatio||1),w=SC.clientWidth,h=SC.clientHeight;if(!w||!h)return;
+    starK+=k;starOdd=!starOdd;if(starOdd)return;k=starK;starK=0;
+    var d=Math.min(1.5,window.devicePixelRatio||1),w=SC.clientWidth,h=SC.clientHeight;if(!w||!h)return;
     if(w!==sw0||h!==sh0){SC.width=w*d;SC.height=h*d;sw0=w;sh0=h;}
     SX.setTransform(d,0,0,d,0,0);SX.clearRect(0,0,w,h);
     STARS.forEach(function(s2){s2.x+=s2.vx*k*.06;if(s2.x>1.02)s2.x=-.02;

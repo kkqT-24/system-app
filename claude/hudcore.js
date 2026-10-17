@@ -75,10 +75,11 @@
     g.restore();
   }
   function frame(ts) {
+    /* boot screen gone or app in the background: check back a few times a second instead of every frame */
+    if (document.hidden || (boot && boot.classList.contains("is-hidden"))) { last = 0; setTimeout(function () { requestAnimationFrame(frame); }, 400); return; }
     requestAnimationFrame(frame);
     if (ts - last < 30) return;
     var k = last ? Math.min(4, (ts - last) / 16.667) : 1; last = ts;
-    if (document.hidden || (boot && boot.classList.contains("is-hidden"))) return;
     /* keep the soft glow centered on the core (it moves during the boot's own animations) */
     if (glow && (++gN % 6 === 0)) { var hr = hud.getBoundingClientRect(), gr = glow.getBoundingClientRect(); if (gr.height) { glow.style.setProperty("--hud-x", (hr.left + hr.width / 2 - gr.left) + "px"); glow.style.setProperty("--hud-y", (hr.top + hr.height / 2 - gr.top) + "px"); } }
     var cl = hud.classList, target = cl.contains("holdspin3") ? 1 : cl.contains("holdspin2") ? 0.65 : cl.contains("holdspin") ? 0.35 : cl.contains("spinup") ? 0.5 : 0;
