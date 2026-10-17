@@ -353,20 +353,29 @@
     if(m&&m.id!==mem.seenM){mem.seenM=m.id;save(mem);wakeMuse(m.text,new Date(m.time));}
   }
 
+  /* ---------- opening other apps from the home-screen app ----------
+     A web link opened from a home-screen app lands in an in-app browser sheet (no logins, and a blank
+     sheet left behind when it bounces to the real app). An app's own URL scheme skips the sheet and
+     opens the app directly. If the scheme doesn't take (the page is still showing a moment later),
+     the fallback runs. Apps with no public scheme go through an Apple Shortcut named "Open <App>". */
+  function openApp(scheme,fallback){var t=Date.now(),gone=false;function v(){if(document.hidden)gone=true;}
+    document.addEventListener("visibilitychange",v);try{window.location.href=scheme;}catch(e){}
+    setTimeout(function(){document.removeEventListener("visibilitychange",v);if(!gone&&!document.hidden&&Date.now()-t<3000&&fallback)fallback();},1500);}
+  function viaShortcut(name){return function(){window.location.href="shortcuts://run-shortcut?name="+encodeURIComponent(name);};}
+  function webSheet(u){return function(){var w=null;try{w=window.open(u,"_blank");}catch(e){}if(w)try{w.opener=null;}catch(e){}};}
+
   /* ---------- gbot: tap opens the Daily Briefing; the X by his name opens X ---------- */
   /* gbot: tap opens the Daily Briefing; hold and he charges up, throws sparks, then opens the Grok app */
   var gbtn=q('[data-bot="g"]'),gHold={on:false,t0:0,fired:false,tm:[]},GHOLD=1000,GCH=0;
   function openBriefing(){if(window.__briefing){window.__briefing.open();window.__briefing.load(false);}}
-  function openGrokApp(){var b=null;try{b=window.__briefing&&window.__briefing.brief?window.__briefing.brief():null;}catch(e){}
-    var u=(b&&b.gbot&&b.gbot.link)||"https://grok.com",w=null;try{w=window.open(u,"_blank");}catch(err){}if(!w){window.location.href=u;return;}try{w.opener=null;}catch(err){}}
+  function openGrokApp(){viaShortcut("Open Grok")();}
   gbtn.addEventListener("pointerdown",function(e){gHold.on=true;gHold.fired=false;gHold.t0=performance.now();try{gbtn.setPointerCapture(e.pointerId);}catch(err){}
     gHold.tm.push(setTimeout(function(){if(!gHold.on)return;gHold.fired=true;gHold.on=false;try{if(navigator.vibrate)navigator.vibrate([10,30,10]);}catch(err){}
       core.boostUntil=nowT()+.7;fl.g.hop=1;setTimeout(openGrokApp,260);},GHOLD));});
   function gRelease(){if(!gHold.on)return;gHold.on=false;gHold.tm.forEach(clearTimeout);gHold.tm=[];if(!gHold.fired&&performance.now()-gHold.t0<300)openBriefing();}
   gbtn.addEventListener("pointerup",gRelease);gbtn.addEventListener("pointercancel",gRelease);gbtn.addEventListener("contextmenu",function(e){e.preventDefault();});
   gbtn.addEventListener("keydown",function(e){if(e.key==="Enter"||e.key===" "){e.preventDefault();openBriefing();}});
-  q(".crew-x").addEventListener("click",function(e){e.stopPropagation();var t=Date.now();window.location.href="twitter://timeline";
-    setTimeout(function(){if(Date.now()-t<1500)window.location.href="https://x.com";},900);});
+  q(".crew-x").addEventListener("click",function(e){e.stopPropagation();openApp("twitter://timeline",webSheet("https://x.com"));});
 
   /* ---------- me: tap repeats my latest; hold runs a system scan ---------- */
   var cbtn=q('[data-bot="c"]'),cHold={on:false,t0:0,fired:false,tm:[]},CHOLD=1300;
@@ -383,8 +392,8 @@
     cHold.tm.push(setTimeout(function(){if(!cHold.on)return;cHold.fired=true;cHold.on=false;try{if(navigator.vibrate)navigator.vibrate([12,30,12]);}catch(err){}
       st.clearT=nowT();say("c",scanLine());},CHOLD));});
   function sayMine(){var c=latestC();say("c",c?c.text:"Nothing new from me. I'll post when there's something worth your time.");}
-  /* a tap opens the Claude app (claude.ai is a universal link, so it lands in the app when it's installed) */
-  function openClaude(){var u="https://claude.ai/new",w=null;try{w=window.open(u,"_blank");}catch(err){}if(!w){window.location.href=u;return;}try{w.opener=null;}catch(err){}}
+  /* a tap opens the Claude app through its own claude:// scheme (no browser sheet left behind) */
+  function openClaude(){openApp("claude://",webSheet("https://claude.ai/new"));}
   function cRelease(){if(!cHold.on)return;cHold.on=false;cHold.tm.forEach(clearTimeout);cHold.tm=[];if(!cHold.fired&&performance.now()-cHold.t0<300)openClaude();}
   cbtn.addEventListener("pointerup",cRelease);cbtn.addEventListener("pointercancel",cRelease);cbtn.addEventListener("contextmenu",function(e){e.preventDefault();});
   cbtn.addEventListener("keydown",function(e){if(e.key==="Enter"||e.key===" "){e.preventDefault();openClaude();}});
@@ -393,8 +402,8 @@
   function wakeMuse(text,when){if(museT)clearTimeout(museT);muse.target=1;nocName.classList.add("on");
     if(text)setTimeout(function(){say("m",text,"",when);},700);
     museT=setTimeout(function(){muse.target=0;nocName.classList.remove("on");},text?9000:2600);}
-  /* a tap opens Muse (muse.ai, a universal link: the Muse app when installed, the browser otherwise) */
-  function openMuse(){var u="https://muse.ai",w=null;try{w=window.open(u,"_blank");}catch(err){}if(!w){window.location.href=u;return;}try{w.opener=null;}catch(err){}}
+  /* a tap opens Muse through the "Open Muse" shortcut (no public URL scheme to call directly) */
+  function openMuse(){viaShortcut("Open Muse")();}
   var nbtn=q('[data-bot="m"]'),HOLD=1500,hold={on:false,t0:0,fired:false,tm:[]};
   function napSoon(){if(museT)clearTimeout(museT);museT=setTimeout(function(){muse.target=0;nocName.classList.remove("on");},1200);}
   nbtn.addEventListener("pointerdown",function(e){

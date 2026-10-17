@@ -1,8 +1,8 @@
 /* System v2 offline worker: the app shell is cached so it opens
    without a connection; the page itself is fetched fresh first
    (network-first) so updates show up on the next open. */
-var CACHE = "system-v3.2";
-var V = "?v=3.2"; /* keep in step with the ?v= on the links in index.html */
+var CACHE = "system-v3.3";
+var V = "?v=3.3"; /* keep in step with the ?v= on the links in index.html */
 var SHELL = ["./", "index.html", "motion.css" + V, "quests.css" + V, "v2.css" + V, "polish.css" + V, "intel.css" + V, "motion.js" + V, "bolts.js" + V, "aura.js" + V, "quests.js" + V, "v2.js" + V, "polish.js" + V, "intel.js" + V, "crew.css" + V, "crew.js" + V, "hudcore.css" + V, "hudcore.js" + V, "assets/x-white.png", "assets/noctis/noctis-body-awake.png", "assets/noctis/noctis-body-sleeping.png", "assets/noctis/noctis-tail-awake.png", "assets/noctis/noctis-tail-sleeping.png", "assets/noctis/noctis-orb-mask.png", "data/econ.json", "shadows3d.js" + V,
   "manifest.webmanifest", "icon-512.png", "apple-touch-icon.png", "../x-logo.png"];
 self.addEventListener("install", function (e) {
