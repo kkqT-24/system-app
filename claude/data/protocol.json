@@ -1,0 +1,9 @@
+{
+ "version": 1,
+ "date": "2026-10-17",
+ "holiday": false,
+ "checks": {},
+ "todo": [
+  {"id": "t20261017-1", "text": "Delete the Open Grok / Open Muse shortcuts if you made them (the app doesn't use them now)", "added": "2026-10-17"}
+ ]
+}

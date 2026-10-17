@@ -165,3 +165,16 @@ body.tab-open .crew-ck { display: none; }
 .sq-overlay.show { visibility: visible; }
 /* the parallax layers move every frame: give them their own layer so moving them doesn't repaint */
 #main > .bg-glow, #main > canvas.ambient { will-change: translate; }
+.crew-ck-sec { margin: 8px 4px 0; font-family: "Share Tech Mono", monospace; font-size: 10px; letter-spacing: 0.2em; text-transform: uppercase; color: rgba(255, 217, 194, 0.45); }
+.crew-ck-sec:first-child { margin-top: 0; }
+.crew-ckrow.wait small { color: rgba(255, 217, 194, 0.38); }
+.crew-ckrow.on small { text-decoration: none; }
+.crew-ckrow.auto.on .crew-ckbox { background: rgba(255, 159, 107, 0.75); }
+.crew-ck-empty { margin: 28px 12px; text-align: center; font-family: "Share Tech Mono", monospace; font-size: 11px; letter-spacing: 0.14em; line-height: 1.7; text-transform: uppercase; color: var(--ink-faint); }
+/* compact rows so a full weekday fits with little scrolling; notes read as plain sentences */
+.crew-ck-list { gap: 5px; }
+.crew-ckrow { padding: 7px 10px; font-size: 14px; row-gap: 1px; }
+.crew-ckrow small { font: 600 12px/1.25 "Rajdhani", sans-serif; letter-spacing: 0.02em; text-transform: none; }
+.crew-ckrow.on { padding-top: 5px; padding-bottom: 5px; }
+.crew-ckrow.on .crew-cktx { font-size: 13px; }
+.crew-ck-sec { margin-top: 6px; }

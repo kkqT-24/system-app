@@ -333,7 +333,11 @@
   function clean(d){return (d&&Array.isArray(d.messages)?d.messages:[]).filter(function(m){return m&&m.id&&m.text;}).slice(-20).map(function(m){return {id:m.id,time:m.time,text:m.text,attn:m.attn===true};});}
   function isToday(m){var d=new Date(m.time||0);return !isNaN(d)&&dayKey(d)===dayKey();}
   function pull(){
-    repoJSON("claude.json").then(function(d){cMsgs=clean(d);ckData=cleanCk(d&&d.checklist);checkNew();bangs();if(ckOpen)renderCk();}).catch(function(){});
+    repoJSON("claude.json").then(function(d){cMsgs=clean(d);checkNew();bangs();}).catch(function(){});
+    var after=function(){bangs();if(ckOpen)renderCk();expCheck();};
+    repoJSON("protocol.json").then(function(d){if(d&&typeof d==="object")PROTO=d;after();}).catch(function(){});
+    repoJSON("market.json").then(function(d){MKT=d;after();}).catch(function(){});
+    repoJSON("desk.json").then(function(d){DESK=d;after();}).catch(function(){});
     repoJSON("noctis.json").then(function(d){mMsgs=clean(d);checkNew();bangs();}).catch(function(){});
   }
   var gFeed=[],gi=0;
@@ -388,47 +392,85 @@
   cbtn.addEventListener("pointerup",cRelease);cbtn.addEventListener("pointercancel",cRelease);cbtn.addEventListener("contextmenu",function(e){e.preventDefault();});
   cbtn.addEventListener("keydown",function(e){if(e.key==="Enter"||e.key===" "){e.preventDefault();openCk();}});
 
-  /* ---------- the Morning Protocol: my checklist for the day ----------
-     I write the day's list into claude.json ("checklist"); until I do, a standing list stands in.
-     Ticks live on this device for the day. The whole list done = +5 EXP, once a day. */
-  var CK_EXP=5,ckEl=document.getElementById("crewCk"),ckList=document.getElementById("crewCkList"),ckMeta=document.getElementById("crewCkMeta"),ckFoot=document.getElementById("crewCkFoot"),ckOpen=false,ckData=null;
-  function standingCk(d){var dw=d.getDay();
-    if(dw===0||dw===6)return {title:"Weekend Protocol",items:[
-      {id:"wk-review",text:"Look back over the week on the Daily Chart Logs"},
-      {id:"wk-next",text:"Pick next week's research focus"}]};
-    return {title:"Morning Protocol",items:[
-      {id:"noise",text:"NOISE BOT session started (check the start push)",by:"09:45"},
-      {id:"chart",text:"Chart screenshot sent: lines and your read",by:"10:00"},
-      {id:"paper",text:"Paper call written: trigger, stop, target",by:"10:00"},
-      {id:"ibkr",text:"Laptop open and IBKR logged in for the 4:30 pickup",by:"15:30"},
-      {id:"lev",text:"LEV200: signal checked, QLD vs your last buy",by:"15:45"}]};}
-  function cleanCk(c){if(!c||!Array.isArray(c.items))return null;var items=c.items.filter(function(it){return it&&it.id&&it.text;}).slice(0,10).map(function(it){
-      return {id:String(it.id).slice(0,40),text:String(it.text).slice(0,120),by:/^\d{1,2}:\d{2}$/.test(it.by||"")?it.by:""};});
-    return items.length?{date:String(c.date||""),title:String(c.title||"Morning Protocol").slice(0,30),items:items}:null;}
-  function todayCk(){var d=new Date();return ckData&&ckData.date===dayKey(d)?ckData:standingCk(d);}
-  function ckState(){if(!mem.ck||mem.ck.day!==dayKey()){mem.ck={day:dayKey(),done:{},exp:false};}return mem.ck;}
+  /* ---------- the Morning Protocol ----------
+     Mostly a health check on everything running in the background, plus the things you need to do.
+     Some items the app checks itself (the briefing bot, the market feed, the desk feed); the rest my
+     scheduled checks write into protocol.json (Mac, IBKR, NOISE, LEV200 at 9:50; your lines and paper
+     call at 10:20 and 12:20; the 4:02 drop at 4:30). Anything off gets a "!" with what I saw; tap it
+     once you've handled it. Morning items all clear = +5 EXP, once a day. */
+  var CK_EXP=5,ckEl=document.getElementById("crewCk"),ckList=document.getElementById("crewCkList"),ckMeta=document.getElementById("crewCkMeta"),ckFoot=document.getElementById("crewCkFoot"),ckOpen=false;
+  var PROTO=null,MKT=null,DESK=null;
+  var WEEKDAY=[
+    {id:"brief",sec:"Systems",text:"Briefing bot posted this morning",by:"08:45",wait:"first update at 8:00",src:"app"},
+    {id:"market",sec:"Systems",text:"Market data feed updating",by:"09:50",wait:"updates every 30 min",src:"app"},
+    {id:"mac",sec:"Systems",text:"Mac awake and reachable",by:"10:05",wait:"checks at 9:50"},
+    {id:"ibkr",sec:"Systems",text:"IBKR gateway logged in",by:"10:05",wait:"checks at 9:50"},
+    {id:"noise",sec:"Systems",text:"NOISE BOT session started",by:"10:05",wait:"checks at 9:50"},
+    {id:"lev200",sec:"Systems",text:"LEV200 signal and dip-add",by:"10:05",wait:"checks at 9:50"},
+    {id:"lines",sec:"You",text:"Lines logged: send me your screenshot",by:"10:30",wait:"checks at 10:20",you:true},
+    {id:"paper",sec:"You",text:"Paper call written before the move",by:"10:30",wait:"checks at 10:20",you:true},
+    {id:"bars",sec:"Afternoon",text:"4:02 IBKR drop archived and charted",by:"16:50",wait:"checks at 4:30"},
+    {id:"desk",sec:"Afternoon",text:"Trading Desk refreshed into the app",by:"17:15",wait:"after 4:55",src:"app"}];
+  var MORNING={brief:1,market:1,mac:1,ibkr:1,noise:1,lev200:1,lines:1,paper:1};
+  function hm(d){var h=d.getHours(),m=d.getMinutes();return (h%12||12)+":"+(m<10?"0":"")+m+(h<12?" AM":" PM");}
+  function isWeekday(d){var w=d.getDay();return w>0&&w<6;}
+  function protoToday(){return PROTO&&PROTO.date===dayKey()?PROTO:null;}
+  function ckItems(){var d=new Date(),P=protoToday(),list=[];
+    if(isWeekday(d)&&!(P&&P.holiday))list=WEEKDAY.slice();
+    var todo=(PROTO&&Array.isArray(PROTO.todo)?PROTO.todo:[]).filter(function(t){return t&&t.id&&t.text&&!(mem.todoDone||{})[t.id];});
+    todo.slice(0,10).forEach(function(t){list.push({id:t.id,sec:"To do",text:String(t.text).slice(0,120),todo:true,due:/^\d{4}-\d{2}-\d{2}$/.test(t.by||"")?t.by:""});});
+    return list;}
+  function ckState(){if(!mem.ck||mem.ck.day!==dayKey()){mem.ck={day:dayKey(),done:{},exp:false};}if(!mem.todoDone)mem.todoDone={};return mem.ck;}
   function byTime(by){var p=by.split(":"),d=new Date();d.setHours(+p[0],+p[1],0,0);return d;}
-  function fmtBy(by){var p=by.split(":"),h=+p[0],m=p[1];return (h%12||12)+":"+m+(h<12?" AM":" PM");}
-  function overdue(it){var S=ckState();return !!it.by&&!S.done[it.id]&&new Date()>=byTime(it.by);}
-  function renderCk(){var C=todayCk(),S=ckState(),n=0;ckList.textContent="";
-    ckEl.querySelector(".crew-ck-h b").textContent=C.title;
-    C.items.forEach(function(it){var on=!!S.done[it.id];if(on)n++;
-      var r=document.createElement("button");r.type="button";r.className="crew-ckrow"+(on?" on":"")+(overdue(it)?" late":"");r.setAttribute("aria-pressed",on?"true":"false");
+  /* what the app can see for itself */
+  function appCheck(id){var now=new Date(),w,dt;
+    if(id==="brief"){var b=null;try{b=window.__briefing&&window.__briefing.brief?window.__briefing.brief():null;}catch(e){}
+      w=b&&Date.parse(b.written);if(w&&dayKey(new Date(w))===dayKey()&&new Date(w).getHours()>=5)return {s:"ok",note:"posted "+hm(new Date(w))};return null;}
+    if(id==="market"){w=MKT&&Date.parse(MKT.updated);if(!w)return null;dt=new Date(w);if(dayKey(dt)!==dayKey())return null;
+      var mins=(now-dt)/60000,open=now.getHours()*60+now.getMinutes();
+      if(open>=575&&open<=990&&mins>75)return {s:"fail",note:"no update since "+hm(dt)+": check the GitHub job"};return {s:"ok",note:"updated "+hm(dt)};}
+    if(id==="desk"){w=DESK&&Date.parse(DESK.updated);if(!w)return null;dt=new Date(w);if(dayKey(dt)===dayKey()&&dt.getHours()*60+dt.getMinutes()>=1000)return {s:"ok",note:"refreshed "+hm(dt)};return null;}
+    return null;}
+  /* one item's state: ok, a problem (fail / warn / action / missing / late), or still waiting */
+  function itemState(it){var S=ckState();
+    if(it.todo){var late=it.due&&dayKey()>it.due;return {s:late?"late":"todo",note:it.due?(late?"was due ":"due ")+it.due.slice(5).replace("-","/"):""};}
+    var r=it.src==="app"?appCheck(it.id):null,P=protoToday();
+    if(!r&&P&&P.checks&&P.checks[it.id]){var c=P.checks[it.id];r={s:String(c.s||""),note:String(c.note||"").slice(0,120)+(c.at?" · "+c.at:"")};}
+    if(S.done[it.id])return {s:"ok",note:(r&&r.s!=="ok"?"handled":"marked done"),hand:true};
+    if(r&&r.s)return r;
+    if(it.by&&new Date()>=byTime(it.by))return {s:"late",note:it.src==="app"?"nothing came in":"the check didn't report: it may not have run"};
+    return {s:"wait",note:it.wait||""};}
+  function bad(x){return x.s==="fail"||x.s==="warn"||x.s==="action"||x.s==="missing"||x.s==="late";}
+  function overdue(it){return bad(itemState(it));}
+  function morningClear(){var items=ckItems().filter(function(it){return MORNING[it.id];});return items.length>0&&items.every(function(it){return itemState(it).s==="ok";});}
+  function renderCk(){var items=ckItems(),S=ckState(),n=0,sec="";ckList.textContent="";
+    var d=new Date(),P=protoToday();
+    ckEl.querySelector(".crew-ck-h b").textContent=isWeekday(d)&&!(P&&P.holiday)?"Morning Protocol":(P&&P.holiday?"Market Holiday":"Weekend");
+    if(!items.length){var em=document.createElement("p");em.className="crew-ck-empty";em.textContent=isWeekday(d)?"Market's closed. Systems rest today, and nothing's on your list.":"Systems rest on weekends. Nothing on your list.";ckList.appendChild(em);}
+    items.forEach(function(it){var x=itemState(it),on=x.s==="ok";if(on)n++;
+      if(it.sec!==sec){sec=it.sec;var hd=document.createElement("div");hd.className="crew-ck-sec";hd.textContent=sec;ckList.appendChild(hd);}
+      var r=document.createElement("button");r.type="button";r.className="crew-ckrow"+(on?" on":"")+(bad(x)?" late":"")+(x.s==="wait"?" wait":"")+(it.src==="app"||(!it.you&&!it.todo)?" auto":"");
+      r.setAttribute("aria-pressed",on?"true":"false");
       var bx=document.createElement("i");bx.className="crew-ckbox";bx.setAttribute("aria-hidden","true");
       var tx=document.createElement("span");tx.className="crew-cktx";tx.textContent=it.text;
       r.appendChild(bx);r.appendChild(tx);
-      if(it.by){var by=document.createElement("small");by.textContent=(overdue(it)?"! ":"")+"by "+fmtBy(it.by);r.appendChild(by);}
-      r.addEventListener("click",function(e){e.stopPropagation();if(ghost())return;tick(it.id);});ckList.appendChild(r);});
-    ckMeta.textContent=n+" / "+C.items.length;
-    var all=n===C.items.length;ckFoot.textContent=all?(S.exp?"Protocol clear · +"+CK_EXP+" EXP earned":"Protocol clear"):"Tap an item when it's done · tap outside to close";
-    ckEl.classList.toggle("clear",all);}
-  function tick(id){var S=ckState();S.done[id]=!S.done[id];try{if(navigator.vibrate)navigator.vibrate(S.done[id]?8:4);}catch(e){}
-    var C=todayCk(),all=C.items.every(function(it){return S.done[it.id];});
-    if(all&&!S.exp){S.exp=true;try{if(window.__ksGainExp)window.__ksGainExp(CK_EXP);}catch(e){}save(mem);renderCk();
-      var pop=document.createElement("div");pop.className="crew-ck-pop";pop.innerHTML="<b>+"+CK_EXP+"</b><span>EXP</span>";ckEl.appendChild(pop);setTimeout(function(){pop.remove();},1900);
-      setTimeout(function(){closeCk();setTimeout(function(){window.__crew.clear("Protocol clear. Good start.");},500);},1500);}
-    else{save(mem);renderCk();}
-    bangs();}
+      if(x.note){var sm=document.createElement("small");sm.textContent=(bad(x)?"! ":"")+x.note;r.appendChild(sm);}
+      r.addEventListener("click",function(e){e.stopPropagation();if(ghost())return;tick(it,x);});ckList.appendChild(r);});
+    ckMeta.textContent=items.length?n+" / "+items.length:"";
+    var clear=morningClear();
+    ckFoot.textContent=clear?(S.exp?"Morning clear · +"+CK_EXP+" EXP earned":"Morning clear"):(items.length?"I tick what I can check · tap one you've handled":"tap to close");
+    ckEl.classList.toggle("clear",clear);}
+  function tick(it,x){var S=ckState();
+    if(it.todo){mem.todoDone[it.id]=true;}
+    else if(x.s==="ok"&&!x.hand)return;
+    else S.done[it.id]=!S.done[it.id];
+    try{if(navigator.vibrate)navigator.vibrate(8);}catch(e){}
+    save(mem);renderCk();bangs();expCheck();}
+  /* the morning half all clear (checked or handled) pays out once a day */
+  function expCheck(){var S=ckState();if(S.exp||!morningClear())return;S.exp=true;save(mem);try{if(window.__ksGainExp)window.__ksGainExp(CK_EXP);}catch(e){}
+    if(ckOpen){renderCk();var pop=document.createElement("div");pop.className="crew-ck-pop";pop.innerHTML="<b>+"+CK_EXP+"</b><span>EXP</span>";ckEl.appendChild(pop);setTimeout(function(){pop.remove();},1900);
+      setTimeout(function(){closeCk();setTimeout(function(){window.__crew.clear("Morning's clear. Everything's running.");},500);},1500);}
+    else if(onHome())window.__crew.clear("Morning's clear. Everything's running.");}
   /* the tap that opens the panel also lands a click on whatever slid under the finger; ignore it */
   var ckAt=0;function ghost(){return performance.now()-ckAt<500;}
   function openCk(){if(ckOpen)return;if(txOpen)closeHist();ckOpen=true;ckAt=performance.now();renderCk();var G=geom();ckEl.style.top=G.top+"px";ckEl.style.height=(G.bottom-G.top)+"px";ckEl.classList.add("open");duo.classList.add("dimmed");
@@ -525,11 +567,11 @@
      Noctis: Muse flagged a line ("attn": true) you haven't tapped him for yet. Same for a flagged line of mine. */
   var bangEl={g:q(".crew-bot.g .crew-bang"),c:q(".crew-bot.c .crew-bang"),m:q(".crew-noc .crew-bang")};
   function bangs(){
-    var C=todayCk(),cOn=C.items.some(overdue),lc=latestC();if(lc&&lc.attn&&isToday(lc)&&lc.id!==mem.ackC)cOn=true;
+    var cOn=ckItems().some(overdue),lc=latestC();if(lc&&lc.attn&&isToday(lc)&&lc.id!==mem.ackC)cOn=true;
     var gOn=false;try{var bs=window.__briefing&&window.__briefing.status?window.__briefing.status():null;gOn=!!(bs&&bs.fresh&&!bs.opened&&new Date().getHours()>=10);}catch(e){}
     var lm=latestM(),mOn=!!(lm&&lm.attn&&lm.id!==mem.ackM);
     bangEl.c&&bangEl.c.classList.toggle("on",cOn);bangEl.g&&bangEl.g.classList.toggle("on",gOn);bangEl.m&&bangEl.m.classList.toggle("on",mOn);}
-  setInterval(function(){if(onHome())bangs();if(ckOpen)renderCk();},30000);
+  setInterval(function(){if(onHome()){bangs();expCheck();}if(ckOpen)renderCk();},30000);
   document.addEventListener("visibilitychange",function(){if(!document.hidden)setTimeout(bangs,400);});
 
   /* gbot takes the floor every so often with the next briefing item; new posts are checked every few minutes */
