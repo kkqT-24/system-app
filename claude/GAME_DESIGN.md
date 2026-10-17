@@ -216,3 +216,17 @@ On higher floors, small gates tear open at random spots on the map during a wave
 - It releases a small pack straight onto the nearest stretch of road, which can skip past your front-line posts.
 - The Hunter can close it early by standing in it or hitting it before it fully opens, for bonus mana and ARISE corpses.
 - Starts around floor 5+, gets more frequent higher up. A rare red variant could bring a mini-boss.
+
+## Round 10 (Oct 17, 2026): puzzle direction — Shadow Runes (match-3 battle)
+The TD felt "not terrible but needs a lot of refinement," so it's parked (`claude/game/td/` stays as is).
+Trying a match-3 battle instead, since puzzle visuals (glowing runes, effects) are where code-drawn art can look finished.
+Test page: `claude/game/puzzle/`.
+- 7×6 board, five rune colors, each powering one squad member: **Blade** (Vanguard, heavy single hit), **Arrow** (Ranger, hit + splash),
+  **Arcane** (Mage, hits all), **Mend** (Healer, heals), **Ward** (Bulwark, shield, capped at 30% max HP).
+- Swipe (or tap-tap) to swap; invalid swaps bounce back. Cascades build a combo multiplier.
+- Specials: match 4 → **Line rune** (clears its row/column), L/T → **Burst rune** (3×3), match 5 → **Monarch rune** (swap it to wipe a color).
+- Monsters show a turn counter and strike when it hits 0; tap one to focus it. Weak/resist tags (▲/▼ in the rune's color).
+- **ARISE** meter fills from runes and combos; firing it hits every monster with the whole army and heals 15%.
+- Floor = 3 waves (last is the named boss). Clear → boss extraction → pick 1 of 3 boons → next floor (+22% HP, +13% attack per floor).
+- Squad levels come from the real army in `systemApp.v2` (Lv = 1 + shadows of that role, max 10); no army → Lv3 test squad.
+- Bot sim (greedy best-move): floors 1–2 easy, real pressure from 3–4, runs end around floor 6–10.
