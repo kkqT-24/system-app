@@ -298,15 +298,19 @@
     onStart();var t0=performance.now(),D=Math.min(1200,300+text.length*10);
     (function step(tt){var p=Math.min(1,(tt-t0)/D),n=Math.floor(text.length*p),s=text.slice(0,n);
       for(var i=n;i<Math.min(text.length,n+6);i++)s+=text[i]===" "?" ":GLY[Math.random()*GLY.length|0];
-      node.textContent=s;if(p<1)requestAnimationFrame(step);else{node.textContent=text;setTimeout(onEnd,1400);}})(t0);
+      node.textContent=s;stick();if(p<1)requestAnimationFrame(step);else{node.textContent=text;stick();setTimeout(onEnd,1400);}})(t0);
+    /* safety: if the screen sleeps mid-line, nobody stays stuck "talking" */
+    setTimeout(function(){node.textContent=text;onEnd();},D+4000);
   }
+  /* the chat scrolls: it follows the newest line unless you've scrolled up to read */
+  var follow=true;
+  function stick(){if(follow)thr.scrollTop=thr.scrollHeight;}
   /* the chat keeps the last few lines, each older one a bit fainter; the top one fades out at the edge */
-  var FADE=[1,.58,.4,.28,.2];
   function post(who,text,instant){
-    while(thr.children.length>4)thr.removeChild(thr.firstChild);
+    while(thr.children.length>40)thr.removeChild(thr.firstChild);
     var b=document.createElement("div");b.className="crew-tb "+who;thr.appendChild(b);
-    var kids=thr.children;for(var i=0;i<kids.length;i++){var age=kids.length-1-i;kids[i].classList.toggle("old",age>0);kids[i].style.opacity=FADE[Math.min(age,FADE.length-1)];}
-    if(instant)b.textContent=text;return b;
+    var kids=thr.children;for(var i=0;i<kids.length;i++){var age=kids.length-1-i;kids[i].classList.toggle("old",age>0);kids[i].style.opacity=age===0?1:.62;}
+    if(instant)b.textContent=text;stick();return b;
   }
   var NAMES={g:"Grok",c:"Claude",m:"Noctis"};
   function stamp(d){d=d||new Date();var h=d.getHours()%12||12,m=d.getMinutes();return h+":"+(m<10?"0":"")+m;}
@@ -418,7 +422,10 @@
     var done=function(){txEl.classList.remove("open");txOpen=false;};
     try{txList.animate([{opacity:1},{opacity:0}],{duration:200,fill:"forwards"}).onfinish=function(){txList.getAnimations().forEach(function(a){a.cancel();});};
       var an=txEl.animate([{clipPath:"inset(0px 0px 0px 0px round 18px)"},{clipPath:"inset("+insets(G,R)+" round 14px)"}],{duration:480,easing:"cubic-bezier(.65,0,.35,1)"});an.onfinish=done;}catch(e){done();}}
-  thr.addEventListener("pointerdown",function(){clearTimeout(thrHold);thrHold=setTimeout(function(){try{if(navigator.vibrate)navigator.vibrate(10);}catch(e){}openHist();},450);});
+  var tp=null;
+  thr.addEventListener("scroll",function(){follow=thr.scrollTop+thr.clientHeight>=thr.scrollHeight-24;clearTimeout(thrHold);},{passive:true});
+  thr.addEventListener("pointerdown",function(e){tp=[e.clientX,e.clientY];clearTimeout(thrHold);thrHold=setTimeout(function(){try{if(navigator.vibrate)navigator.vibrate(10);}catch(err){}openHist();},500);});
+  thr.addEventListener("pointermove",function(e){if(tp&&Math.hypot(e.clientX-tp[0],e.clientY-tp[1])>8)clearTimeout(thrHold);},{passive:true});
   ["pointerup","pointerleave","pointercancel"].forEach(function(ev){thr.addEventListener(ev,function(){clearTimeout(thrHold);});});
   thr.addEventListener("contextmenu",function(e){e.preventDefault();});
   thr.addEventListener("keydown",function(e){if(e.key==="Enter"||e.key===" "){e.preventDefault();openHist();}});
@@ -431,7 +438,7 @@
   function startup(){mainEl.classList.remove("crew-done");clearTimeout(introT);setDates();introT=setTimeout(function(){mainEl.classList.add("crew-done");setOled();
       /* so it never opens empty: today's last few lines come back instantly, then gbot opens with a quick run
          of briefing items (faster at first), then anything new from me or Noctis gets the floor */
-      if(!thr.children.length)mem.hist.slice(-3).forEach(function(h){post(h.who,h.text,true);});
+      if(!thr.children.length)mem.hist.slice(-12).forEach(function(h){post(h.who,h.text,true);});
       refreshFeed();var opening=Math.min(3,gFeed.length);gi=0;
       for(var oi=0;oi<opening;oi++)(function(n){setTimeout(function(){if(onHome()&&!txOpen)sayG();},700+n*3600);})(oi);
       setTimeout(checkNew,700+opening*3600);nextG=Date.now()+700+opening*3600+9000;},2400);}

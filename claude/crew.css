@@ -36,7 +36,7 @@ body.tab-open .crew-stars { display: none; }
 body.tab-open .crew-date { opacity: 0; }
 
 /* ---------- stage: intro and crew share one spot ---------- */
-.crew { width: 100%; }
+.crew { width: 100%; touch-action: manipulation; }
 /* the crew takes the top half of the screen; the modules sit lower */
 .crew-stage { display: grid; width: 100%; min-height: max(320px, 41dvh); align-items: stretch; }
 .crew { margin-bottom: 34px; }
@@ -80,9 +80,11 @@ body.tab-open .crew-date { opacity: 0; }
 
 /* ---------- the shared conversation ---------- */
 /* fixed height so a long message never pushes Noctis around; the older bubble fades out at the top */
-.crew-thread { position: relative; z-index: 2; display: flex; flex-direction: column; justify-content: flex-end; gap: 8px; position: absolute; left: 0; right: 0; top: 118px; bottom: 0; overflow: hidden; padding: 10px 0 4px; cursor: pointer;
-  -webkit-mask-image: linear-gradient(to bottom, transparent 0, #000 26px); mask-image: linear-gradient(to bottom, transparent 0, #000 26px);
+.crew-thread { position: relative; z-index: 2; display: flex; flex-direction: column; justify-content: flex-start; gap: 8px; position: absolute; left: 0; right: 0; top: 118px; bottom: 0; overflow-y: auto; overflow-x: hidden; overscroll-behavior: contain; -webkit-overflow-scrolling: touch; touch-action: pan-y; scrollbar-width: none; padding: 10px 0 4px; cursor: pointer;
+  -webkit-mask-image: linear-gradient(to bottom, transparent 0, rgba(0,0,0,.15) 18px, rgba(0,0,0,.6) 40px, #000 64px); mask-image: linear-gradient(to bottom, transparent 0, rgba(0,0,0,.15) 18px, rgba(0,0,0,.6) 40px, #000 64px);
   -webkit-touch-callout: none; user-select: none; -webkit-user-select: none; }
+.crew-thread::-webkit-scrollbar { display: none; }
+.crew-thread > :first-child { margin-top: auto; }
 .crew-thread:focus-visible { outline: 2px solid var(--lav); outline-offset: 4px; border-radius: 12px; }
 .crew-tb { position: relative; flex: none; padding: 8px 10px; border-radius: 12px; font-size: 14px; font-weight: 600; line-height: 1.28; overflow-wrap: anywhere; text-align: left; transition: opacity 0.4s ease; }
 .crew-tb.g { margin-right: 12px; background: rgba(56, 152, 248, 0.1); border: 1px solid rgba(76, 168, 255, 0.36); color: #e3f1ff; }
@@ -121,3 +123,6 @@ body.tab-open .crew-tx { display: none; }
 
 /* a little more air between the modules and the status bar */
 .showcase .showcase-status { margin-top: 24px; }
+
+/* OLED to the very top edge: the strip behind the phone's status bar is pure black on home too */
+html:has(body:not(.tab-open)), body:not(.tab-open) { background: #000; }
