@@ -389,10 +389,12 @@
   cbtn.addEventListener("pointerup",cRelease);cbtn.addEventListener("pointercancel",cRelease);cbtn.addEventListener("contextmenu",function(e){e.preventDefault();});
   cbtn.addEventListener("keydown",function(e){if(e.key==="Enter"||e.key===" "){e.preventDefault();openClaude();}});
 
-  /* ---------- Noctis: tap wakes him; hold reboots the system ---------- */
+  /* ---------- Noctis: tap opens Muse; hold reboots the system ---------- */
   function wakeMuse(text,when){if(museT)clearTimeout(museT);muse.target=1;nocName.classList.add("on");
     if(text)setTimeout(function(){say("m",text,"",when);},700);
     museT=setTimeout(function(){muse.target=0;nocName.classList.remove("on");},text?9000:2600);}
+  /* a tap opens Muse (muse.ai, a universal link: the Muse app when installed, the browser otherwise) */
+  function openMuse(){var u="https://muse.ai",w=null;try{w=window.open(u,"_blank");}catch(err){}if(!w){window.location.href=u;return;}try{w.opener=null;}catch(err){}}
   var nbtn=q('[data-bot="m"]'),HOLD=1500,hold={on:false,t0:0,fired:false,tm:[]};
   function napSoon(){if(museT)clearTimeout(museT);museT=setTimeout(function(){muse.target=0;nocName.classList.remove("on");},1200);}
   nbtn.addEventListener("pointerdown",function(e){
@@ -405,11 +407,11 @@
   });
   function release(){if(!hold.on)return;hold.on=false;hold.tm.forEach(clearTimeout);hold.tm=[];
     if(hold.fired)return;
-    if(performance.now()-hold.t0<380){var m=latestM();wakeMuse(m&&isToday(m)?m.text:null,m?new Date(m.time):null);}
+    if(performance.now()-hold.t0<380){wakeMuse(null);openMuse();}
     else{if(window.__mxSwirl)window.__mxSwirl.stop(false);napSoon();}}
   nbtn.addEventListener("pointerup",release);nbtn.addEventListener("pointercancel",release);
   nbtn.addEventListener("contextmenu",function(e){e.preventDefault();});
-  nbtn.addEventListener("keydown",function(e){if(e.key==="Enter"||e.key===" "){e.preventDefault();wakeMuse(null);}});
+  nbtn.addEventListener("keydown",function(e){if(e.key==="Enter"||e.key===" "){e.preventDefault();wakeMuse(null);openMuse();}});
 
   /* ---------- hold the conversation: it opens in place into today's whole thread ---------- */
   var txEl=document.getElementById("crewTx"),txList=document.getElementById("crewTxList"),txBar=document.getElementById("crewTxBar"),thrHold=null,txOpen=false,barT=null;
