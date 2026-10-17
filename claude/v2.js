@@ -45,7 +45,7 @@
       if (raw.settings && typeof raw.settings === "object") { D.settings.sound = !!raw.settings.sound; if (raw.settings.view3d === false) D.settings.view3d = false; }
     }
   } catch (e) {}
-  function save() { try { localStorage.setItem(KEY, JSON.stringify(D)); } catch (e) {} }
+  function save() { if (window.__ksNoSave) return; try { localStorage.setItem(KEY, JSON.stringify(D)); } catch (e) {} }
   if (!D.firstOpen) { D.firstOpen = Date.now(); save(); }
 
   /* ---------------- history ---------------- */
@@ -816,6 +816,7 @@
         if (o.v2) localStorage.setItem(KEY, o.v2);
         if (o.intel) localStorage.setItem("systemApp.intel", o.intel);
         if (o.crew) localStorage.setItem("systemApp.crew", o.crew);
+        window.__ksNoSave = true;  /* the reload must not save the old progress back over the import */
         alert("Save loaded. Reloading.");
         location.reload();
       } catch (err) { alert("That code didn't work — copy it again and paste the whole thing."); }
@@ -1022,7 +1023,8 @@
       if (o.v1) localStorage.setItem("systemApp.v1", o.v1);
       if (o.v2) localStorage.setItem(KEY, o.v2);
       if (o.intel) localStorage.setItem("systemApp.intel", o.intel);
-        if (o.crew) localStorage.setItem("systemApp.crew", o.crew);
+      if (o.crew) localStorage.setItem("systemApp.crew", o.crew);
+      window.__ksNoSave = true;  /* the reload must not save the old progress back over the restore */
       var c2 = cloud(); c2.gist = r.id; c2.last = Date.now(); setCloud(c2);
       alert("Restored. Reloading.");
       location.reload();

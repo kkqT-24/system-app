@@ -2314,13 +2314,13 @@
         .showcase-status .gl::before, .showcase-status .gl::after { display: none; }
       }
     </style>
-      <link rel="stylesheet" href="motion.css?v=3.9" />
-    <link rel="stylesheet" href="quests.css?v=3.9" />
-    <link rel="stylesheet" href="v2.css?v=3.9" />
-    <link rel="stylesheet" href="polish.css?v=3.9" />
-    <link rel="stylesheet" href="intel.css?v=3.9" />
-    <link rel="stylesheet" href="crew.css?v=3.9" />
-    <link rel="stylesheet" href="hudcore.css?v=3.9" />
+      <link rel="stylesheet" href="motion.css?v=4.0" />
+    <link rel="stylesheet" href="quests.css?v=4.0" />
+    <link rel="stylesheet" href="v2.css?v=4.0" />
+    <link rel="stylesheet" href="polish.css?v=4.0" />
+    <link rel="stylesheet" href="intel.css?v=4.0" />
+    <link rel="stylesheet" href="crew.css?v=4.0" />
+    <link rel="stylesheet" href="hudcore.css?v=4.0" />
     <link rel="manifest" href="manifest.webmanifest" />
     <meta name="theme-color" content="#000000" />
     <meta name="mobile-web-app-capable" content="yes" />
@@ -2425,7 +2425,7 @@
             </div>
           </div>
 
-          <p class="verse-line">&ldquo;For what shall it profit a man, if he shall gain the whole world, and lose his own soul?&rdquo; <span class="ref">&mdash; Mark 8:36</span><span class="verse-ver" id="appVersion">Core v3.9</span></p>
+          <p class="verse-line">&ldquo;For what shall it profit a man, if he shall gain the whole world, and lose his own soul?&rdquo; <span class="ref">&mdash; Mark 8:36</span><span class="verse-ver" id="appVersion">Core v4.0</span></p>
 
           <!-- recall handle: sits directly above the section panel box,
                under the greeting. Shown only while a section panel is open;
@@ -2891,7 +2891,11 @@
             var _parsed = JSON.parse(_raw);
             if (_parsed && typeof _parsed === "object") window.__ksPersisted = _parsed;
           }
-        } catch (e) { window.__ksPersisted = null; }
+        } catch (e) {
+          window.__ksPersisted = null;
+          /* a save that won't parse is kept aside before the defaults get written over it */
+          try { var _bad = store.get(PERSIST_KEY); if (_bad) store.set(PERSIST_KEY + ".unreadable-" + Date.now(), _bad); } catch (e2) {}
+        }
         /* Merge persisted numbers into a defaults object (clamped >= 0). */
         window.__ksMergeNums = function (dst, src, keys) {
           if (!src || typeof src !== "object") return;
@@ -2903,6 +2907,7 @@
         /* Serialize the whole app state. Every read is guarded so a
            partially-initialized page still saves without throwing. */
         window.__ksSaveState = function () {
+          if (window.__ksNoSave) return;
           try {
             var data = { v: 1, savedAt: Date.now() };
             try { if (typeof QUESTS !== "undefined" && QUESTS) data.quests = JSON.parse(JSON.stringify(QUESTS)); } catch (e) {}
@@ -2919,6 +2924,10 @@
             try { if (typeof TODO !== "undefined" && TODO) data.todo = JSON.parse(JSON.stringify({ items: TODO.items, day: TODO.day })); } catch (e) {}
             try { if (window.__ksMaintEntries) data.maintEntries = JSON.parse(JSON.stringify(window.__ksMaintEntries)); } catch (e) {}
             try { if (typeof SECRET !== "undefined" && SECRET) data.secret = JSON.parse(JSON.stringify({ openCount: SECRET.openCount, targetOpens: SECRET.targetOpens, active: (SECRET.active && SECRET.active.test) ? null : SECRET.active, lastType: SECRET.lastType, lastTime: SECRET.lastTime })); } catch (e) {}
+            /* anything not set up yet (an early save during startup, or a startup
+               line that threw) keeps its last saved value instead of vanishing */
+            var _prev = window.__ksPersisted;
+            if (_prev && typeof _prev === "object") for (var _k in _prev) if (!(_k in data)) data[_k] = _prev[_k];
             store.set(PERSIST_KEY, JSON.stringify(data));
           } catch (e) {}
         };
@@ -3990,8 +3999,12 @@
            workout undo entries belong to the old day and are
            dropped. */
         function workoutDayCheck() {
+          if (typeof questDayCheck === "function") questDayCheck(true);
           if (typeof WORKOUT === "undefined" || !WORKOUT.day) return;
           if (todayKey() === WORKOUT.day) return;
+          /* the settle never pays workout EXP: a penalty that drops the rank
+             would otherwise re-score yesterday's reps against a lower minimum */
+          var _syncWas = workoutSyncing; workoutSyncing = true;
           var yParts = WORKOUT.day.split("-");
           var yDate = new Date(+yParts[0], (+yParts[1] || 1) - 1, +yParts[2] || 1);
           var yTotal = workoutTotal();
@@ -4002,23 +4015,19 @@
           var yWeek = weekKeyOf(yDate);
           if (FREE_SKIPS_WEEK !== yWeek) { FREE_SKIPS_WEEK = yWeek; FREE_SKIPS_USED = 0; }
           var _skipsBefore = FREE_SKIPS_USED;
-          if (yTotal < minY) {
-            if (FREE_SKIPS_USED < FREE_SKIP_LIMIT) {
-              FREE_SKIPS_USED += 1;
-            } else {
-              var pen = missPenaltyForRank(rankY);
-              var beforeV = hunterTotalValue();
-              LAST_PENALTY = pen;
-              subtractExp(pen);
-              var lost = Math.max(0, beforeV - hunterTotalValue());
-              LAST_PENALTY = lost;
-              if (lost > 0) TOTAL_PENALTY += lost;
-              try { if (window.__mxEvt) window.__mxEvt("penalty", { lost: lost, day: WORKOUT.day }); } catch (e) {}
-              updateHunterTexts();
-              if (!main.classList.contains("is-hidden")) showMissPopup(lost, minY, TOTAL_PENALTY);
-              else pendingMiss = { lost: lost, min: minY, total: TOTAL_PENALTY };
-            }
+          var lostAll = 0, missMin = minY;
+          /* one missed day: a free skip if the week has one, else the penalty */
+          function settleMiss(dayStr, rankL) {
+            if (FREE_SKIPS_USED < FREE_SKIP_LIMIT) { FREE_SKIPS_USED += 1; return false; }
+            var pen = missPenaltyForRank(rankL);
+            var beforeV = hunterTotalValue();
+            subtractExp(pen);
+            var lost = Math.max(0, beforeV - hunterTotalValue());
+            if (lost > 0) { TOTAL_PENALTY += lost; lostAll += lost; }
+            try { if (window.__mxEvt) window.__mxEvt("penalty", { lost: lost, day: dayStr }); } catch (e) {}
+            return true;
           }
+          if (yTotal < minY) settleMiss(WORKOUT.day, rankY);
           /* streak: yesterday met -> +1 (WORKOUT.day is still yesterday
              here; it becomes today after this block). Yesterday missed
              on a free skip -> hold. Yesterday missed for real (a free
@@ -4028,6 +4037,24 @@
             STREAK.lastMet = WORKOUT.day;
           } else if (FREE_SKIPS_USED <= _skipsBefore) {
             STREAK.count = 0;
+          }
+          /* days the app was never opened logged no reps: each one settles
+             as a miss too (free skip from its own week, else the penalty) */
+          var gapD = new Date(yDate.getFullYear(), yDate.getMonth(), yDate.getDate() + 1), gapN = 0;
+          while (gapN < 60) {
+            var gk = gapD.getFullYear() + "-" + String(gapD.getMonth() + 1).padStart(2, "0") + "-" + String(gapD.getDate()).padStart(2, "0");
+            if (gk >= todayKey()) break;
+            var gw = weekKeyOf(gapD);
+            if (FREE_SKIPS_WEEK !== gw) { FREE_SKIPS_WEEK = gw; FREE_SKIPS_USED = 0; }
+            var gRank = currentRankLetter();
+            if (settleMiss(gk, gRank)) { STREAK.count = 0; missMin = workoutRepsForRank(gRank); }
+            gapD.setDate(gapD.getDate() + 1); gapN++;
+          }
+          if (lostAll > 0) {
+            LAST_PENALTY = lostAll;
+            updateHunterTexts();
+            if (!main.classList.contains("is-hidden")) showMissPopup(lostAll, missMin, TOTAL_PENALTY);
+            else pendingMiss = { lost: lostAll, min: missMin, total: TOTAL_PENALTY };
           }
           /* if today opened a new week, the allowance refills */
           var nowWeek = weekKeyOf(new Date());
@@ -4046,9 +4073,9 @@
           WORKOUT.cardio = false;
           WORKOUT.expGranted = 0;
           WORKOUT.day = todayKey();
-          if (typeof UNDO_STACK !== "undefined") {
-            for (var ui = UNDO_STACK.length - 1; ui >= 0; ui--) if (UNDO_STACK[ui].type === "workout") UNDO_STACK.splice(ui, 1);
-          }
+          /* undo never reaches back across a new day (it would undo the settle too) */
+          if (typeof UNDO_STACK !== "undefined") UNDO_STACK.length = 0;
+          workoutSyncing = _syncWas;
           var wItem = findWorkoutItem();
           if (wItem && wItem.done) { wItem.done = false; renderQuestGroup("daily"); }
           if (typeof refreshUndo === "function") refreshUndo();
@@ -4385,14 +4412,24 @@
             if (typeof p.questWeek === "string" && /^\d{4}-\d{2}-\d{2}$/.test(p.questWeek)) QUEST_WEEK = p.questWeek;
           } catch (e) {}
         })();
-        if (QUEST_DAY !== todayKey()) {
-          QUESTS.daily.forEach(function (it) { it.done = false; });
-          QUEST_DAY = todayKey();
+        /* the quest reset runs on load AND whenever the app comes back or
+           the 30 s check fires (workoutDayCheck calls it): iOS often resumes
+           the home-screen app without reloading, which left yesterday's
+           ticks standing past 7 AM */
+        function questDayCheck(render) {
+          if (typeof QUESTS === "undefined" || !QUESTS || !QUESTS.daily) return;
+          var changed = false;
+          if (QUEST_DAY !== todayKey()) {
+            QUESTS.daily.forEach(function (it) { it.done = false; });
+            QUEST_DAY = todayKey(); changed = true;
+          }
+          if (QUEST_WEEK !== weekKeyOf(new Date())) {
+            QUESTS.weekly.forEach(function (it) { it.done = false; });
+            QUEST_WEEK = weekKeyOf(new Date()); changed = true;
+          }
+          if (changed && render) { renderQuestGroup("daily"); renderQuestGroup("weekly"); }
         }
-        if (QUEST_WEEK !== weekKeyOf(new Date())) {
-          QUESTS.weekly.forEach(function (it) { it.done = false; });
-          QUEST_WEEK = weekKeyOf(new Date());
-        }
+        questDayCheck(false);
         var Q_DEFAULT_EXP = { daily: 10, weekly: 50, hidden: null };
         /* undo stack: every completion and every swipe-removal pushes
            one entry; the undo button under the hunter block pops the
@@ -5103,13 +5140,17 @@
              box OUTLINE glowing (and, on a rank-up, the old badge
              burning over the new one) — and the bar regrows from
              empty to the overflow amount. The quest lists stay put. */
+          /* the new level / EXP is committed now, so a second gain or loss
+             inside the animation builds on it instead of being dropped; only
+             the on-screen numbers wait for the bar to fill */
+          HUNTER.level = finalLevel;
+          HUNTER.exp = finalExp;
+          HUNTER.cap = finalCap;
+          HUNTER.bank = Math.min(MAX_BANK, (HUNTER.bank || 0) + bankGain);
+          if (window.__ksSaveState) window.__ksSaveState();
           fill.style.width = "100%";
           setTimeout(function () {
             if (token !== LEVEL_ANIM_TOKEN) return;
-            HUNTER.level = finalLevel;
-            HUNTER.exp = finalExp;
-            HUNTER.cap = finalCap;
-            HUNTER.bank = Math.min(MAX_BANK, (HUNTER.bank || 0) + bankGain);
             updateHunterTexts();
             triggerLevelGlow();
             var nr = rankFor(HUNTER.level);
@@ -5160,16 +5201,12 @@
               if (ei2 !== -1) SECRET_EARNED.splice(ei2, 1);
               renderSecretMemory();
             }
+            /* take back just this completion's EXP, so anything earned after
+               it (reps, other quests) stays */
             if (entry.applied) {
               LEVEL_ANIM_TOKEN++;
-              HUNTER.level = entry.prevLevel;
-              HUNTER.exp = entry.prevExp;
-              HUNTER.bank = Math.min(MAX_BANK, entry.prevBank || 0);
-              HUNTER.cap = entry.prevLevel >= MAX_LEVEL ? MAX_CAP : capForLevel(entry.prevLevel);
+              subtractExp(entry.exp || 0);
               updateHunterTexts();
-              var sec = document.getElementById("sec-quests");
-              var fill = sec.querySelector(".q-bar-fill");
-              fill.style.width = entry.prevLevel >= MAX_LEVEL ? "100%" : (HUNTER.exp / HUNTER.cap * 100) + "%";
             }
             renderQuestGroup(entry.key);
           } else if (entry.type === "workout") {
@@ -5178,18 +5215,13 @@
                un-mark the Workout quest — the reps themselves stay
                logged, so the next rep tap re-settles the EXP */
             LEVEL_ANIM_TOKEN++;
-            HUNTER.level = entry.prevLevel;
-            HUNTER.exp = entry.prevExp;
-            HUNTER.bank = Math.min(MAX_BANK, entry.prevBank || 0);
-            HUNTER.cap = entry.prevLevel >= MAX_LEVEL ? MAX_CAP : capForLevel(entry.prevLevel);
+            var paidW = Math.max(0, (WORKOUT.expGranted || 0) - (entry.prevGranted || 0));
             WORKOUT.expGranted = entry.prevGranted || 0;
             if (entry.item) entry.item.done = false;
             workoutSyncing = true;
+            subtractExp(paidW);
             updateHunterTexts();
             workoutSyncing = false;
-            var secW = document.getElementById("sec-quests");
-            var fillW = secW.querySelector(".q-bar-fill");
-            if (fillW) fillW.style.width = entry.prevLevel >= MAX_LEVEL ? "100%" : (HUNTER.exp / HUNTER.cap * 100) + "%";
             renderQuestGroup("daily");
             renderWorkouts();
           } else {
@@ -7399,16 +7431,16 @@
         /* v2: the boot card's position is pure layout now (polish.css) — no script measuring */
       })();
     </script>
-    <script src="haptics.js?v=3.9"></script>
-    <script src="motion.js?v=3.9"></script>
-    <script src="bolts.js?v=3.9"></script>
-    <script src="aura.js?v=3.9"></script>
-    <script src="quests.js?v=3.9"></script>
-    <script src="v2.js?v=3.9"></script>
-    <script src="intel.js?v=3.9"></script>
-    <script src="polish.js?v=3.9"></script>
-    <script src="crew.js?v=3.9"></script>
-    <script src="hudcore.js?v=3.9"></script>
-    <script src="shadows3d.js?v=3.9"></script>
+    <script src="haptics.js?v=4.0"></script>
+    <script src="motion.js?v=4.0"></script>
+    <script src="bolts.js?v=4.0"></script>
+    <script src="aura.js?v=4.0"></script>
+    <script src="quests.js?v=4.0"></script>
+    <script src="v2.js?v=4.0"></script>
+    <script src="intel.js?v=4.0"></script>
+    <script src="polish.js?v=4.0"></script>
+    <script src="crew.js?v=4.0"></script>
+    <script src="hudcore.js?v=4.0"></script>
+    <script src="shadows3d.js?v=4.0"></script>
   </body>
 </html>

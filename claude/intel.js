@@ -50,9 +50,16 @@
   try { C = JSON.parse(localStorage.getItem(STORE) || "{}") || {}; } catch (e) { C = {}; }
   ["calls", "days", "seen", "wrap", "ff", "recall"].forEach(function (k) { if (!C[k] || typeof C[k] !== "object") C[k] = {}; });
   if (!Array.isArray(C.words)) C.words = [];
-  function save() { try { localStorage.setItem(STORE, JSON.stringify(C)); } catch (e) {} }
+  function save() { if (window.__ksNoSave) return; try { localStorage.setItem(STORE, JSON.stringify(C)); } catch (e) {} }
 
-  function getJSON(url) { return fetch(url, { cache: "no-store" }).then(function (r) { if (!r.ok) throw new Error(r.status); return r.json(); }); }
+  /* 12 s cap per request: a fetch that hangs (phone suspended mid-request, captive Wi-Fi)
+     would otherwise hold the loading flag forever and stop every later refresh */
+  function getJSON(url) {
+    var ac = typeof AbortController === "function" ? new AbortController() : null;
+    var tm = ac ? setTimeout(function () { ac.abort(); }, 12000) : null;
+    return fetch(url, { cache: "no-store", signal: ac ? ac.signal : undefined }).then(function (r) { if (!r.ok) throw new Error(r.status); return r.json(); })
+      .then(function (d) { clearTimeout(tm); return d; }, function (e) { clearTimeout(tm); throw e; });
+  }
   /* raw GitHub copy first (live minutes after a commit), the site's copy second */
   function repoJSON(name) { return getJSON(REPO_RAW + name + "?t=" + Date.now()).catch(function () { return getJSON("data/" + name); }); }
 
@@ -376,8 +383,11 @@
   }
   /* Catalyst lives on the Market card: today's releases as a highlighted
      block up top, the week ahead under "On deck". */
+  /* the Catalyst belongs to the day its full brief was written for: a night or weekend
+     trending update rides on the last full brief, whose "today" is an earlier day */
+  function todaysCat(today) { return isFresh() && brief.date === today ? brief.catalyst : null; }
   function todaysReleases(today) {
-    var cat = isFresh() ? brief.catalyst : null;
+    var cat = todaysCat(today);
     if (cat && cat.today.length) return cat.today;
     return econ.filter(function (e) { return e.date === today; }).map(function (e) { return { name: e.name, time: e.time, actual: "", expected: "", previous: "", read: "" }; });
   }
@@ -777,7 +787,10 @@
     var dir = i >= idx ? 1 : -1;
     idx = i;
     var ek = editionKey(); C.seen[ek] = Math.max(C.seen[ek] || 0, i + 1);
-    var sk = Object.keys(C.seen).sort(); while (sk.length > 30) delete C.seen[sk.shift()];
+    /* keep the last 30 editions of progress, and separately the last 30 "chat played"
+       flags; trimmed together, the chat: keys (which sort last) pushed out today's progress */
+    var sk = Object.keys(C.seen).filter(function (k) { return k.indexOf("chat:") !== 0; }).sort(); while (sk.length > 30) delete C.seen[sk.shift()];
+    var ck2 = Object.keys(C.seen).filter(function (k) { return k.indexOf("chat:") === 0; }).sort(); while (ck2.length > 30) delete C.seen[ck2.shift()];
     save();
     var bars = player.querySelector(".ibp-bars"); bars.textContent = "";
     for (var b = 0; b < list.length; b++) bars.appendChild(el("i", b < i ? "done" : b === i ? "cur" : ""));
@@ -1113,7 +1126,7 @@
       c = cardShell("market", "Market", "01 · Your read");
       var ml = marketLine(now);
       c.appendChild(el("div", "ib-mstat " + ml.s, ml.t));
-      var todays = todaysReleases(today), olk = fresh ? brief.catalyst.outlook : "";
+      var todays = todaysReleases(today), olk = todaysCat(today) ? brief.catalyst.outlook : "";
       if (todays.length) {
         /* tap the Catalyst block to fold it into its header (a one-line
            summary); tap again to open it. Stays folded for the rest of the
@@ -1161,7 +1174,7 @@
         var pb = el("span", "v " + (port.day >= 0 ? "up" : "dn"), pctTxt(port.day));
         pr.appendChild(pb);
         var pm = el("span", "m");
-        pm.appendChild(el("span", "k", ny(new Date(Date.parse(brief.fullWritten || brief.written) || Date.now())).min < 570 ? "Portfolio · last session" : "Portfolio · today"));
+        pm.appendChild(el("span", "k", (brief.date !== today || ny(new Date(Date.parse(brief.fullWritten || brief.written) || Date.now())).min < 570) ? "Portfolio · last session" : "Portfolio · today"));
         if (port.week != null) pm.appendChild(el("span", "w", "Week " + pctTxt(port.week)));
         pr.appendChild(pm);
         c.appendChild(pr);
@@ -1347,6 +1360,8 @@
     [["green", "Green ▲"], ["red", "Red ▼"]].forEach(function (o) {
       var b = el("button", "ib-pick " + o[0] + (mine && mine.call === o[0] ? " on" : ""), o[1]); b.type = "button";
       b.addEventListener("click", function () {
+        /* the card may have sat open past the 9:30 lock: re-check at the tap */
+        if (callTarget(new Date()) !== tgt) { refreshCard(); return; }
         C.calls[tgt] = { call: o[0], at: new Date().toISOString(), result: null };
         save(); buzz(14);
         var r = b.getBoundingClientRect(); burst(r.left + r.width / 2, r.top + r.height / 2, o[0] === "green" ? "#34d399" : "#ff5a6e", 14);
@@ -1662,13 +1677,15 @@
     econ = (C.econ && Array.isArray(C.econ.events) ? C.econ.events : []).filter(function (e) { return e && /^\d{4}-\d{2}-\d{2}$/.test(e.date) && str(e.name, 80); })
       .map(function (e) { return { date: e.date, time: /^\d{1,2}:\d{2}$/.test(e.time || "") ? e.time : "", name: str(e.name, 80) }; });
   }
+  /* a fallback copy (Pages cache, offline) can be older than what's already saved */
+  function older(a, b) { var x = Date.parse(a), y = Date.parse(b); return isFinite(x) && isFinite(y) && x < y; }
   var loading = false, lastLoad = 0;
   function load(force) {
     if (loading || (!force && Date.now() - lastLoad < 90000)) return;
     loading = true; lastLoad = Date.now();
     var jobs = [
-      repoJSON("market.json").then(function (d) { if (cleanMarket(d)) C.market = d; }),
-      repoJSON("brief.json").then(function (d) { var cb = cleanBrief(d); if (cb) { C.brief = d; if (cb.edition !== "trending") C.full = d; } }),
+      repoJSON("market.json").then(function (d) { if (cleanMarket(d) && !older(d.updated, C.market && C.market.updated)) C.market = d; }),
+      repoJSON("brief.json").then(function (d) { var cb = cleanBrief(d); if (cb && !older(cb.written, C.brief && (cleanBrief(C.brief) || {}).written)) { C.brief = d; if (cb.edition !== "trending") C.full = d; } }),
       repoJSON("econ.json").then(function (d) { if (d && Array.isArray(d.events)) C.econ = d; }),
       repoJSON("desk.json").then(function (d) { if (d && d.noise) C.desk = d; })
     ];
@@ -1921,7 +1938,12 @@
   if (deskSec) new MutationObserver(function (list) {
     list.forEach(function (m) { var was = /\bis-hidden\b/.test(m.oldValue || ""), nowHidden = deskSec.classList.contains("is-hidden"); if (was && !nowHidden) { load(false); renderDesk(); } });
   }).observe(deskSec, { attributes: true, attributeFilter: ["class"], attributeOldValue: true });
-  setInterval(function () { if (!document.hidden) renderSystems(); }, 60000);
+  setInterval(function () {
+    if (document.hidden) return;
+    renderDeskTile();
+    var clk = deskRoot && deskRoot.querySelector(".dk-clock");
+    if (clk && deskSec && !deskSec.classList.contains("is-hidden")) { var ml = marketLine(new Date()); clk.className = "dk-clock " + ml.s; clk.lastChild.textContent = ml.t; }
+  }, 60000);
 
   hydrate(); scoreCalls(); renderBox(); renderSky(); renderSystems();
   if (box) {

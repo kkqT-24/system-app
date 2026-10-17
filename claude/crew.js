@@ -280,27 +280,31 @@
   var nocName=document.getElementById("crewNocName"),duo=document.getElementById("crewDuo"),thr=document.getElementById("crewThread");
   var T0m=performance.now(),lastm=0;
   function nowT(){return (performance.now()-T0m)/1000;}
-  function onHome(){return !mainEl.classList.contains("is-hidden")&&!document.body.classList.contains("tab-open")&&!document.hidden;}
+  function onHome(){var b=document.body.classList;return !mainEl.classList.contains("is-hidden")&&!b.contains("tab-open")&&!b.contains("ib-open")&&!document.hidden;}
 
   /* ---------- small storage helpers (per device) ---------- */
   var KEY="systemApp.crew";
   function load(){try{return JSON.parse(localStorage.getItem(KEY))||{};}catch(e){return {};}}
-  function save(o){try{localStorage.setItem(KEY,JSON.stringify(o));}catch(e){}}
+  function save(o){if(window.__ksNoSave)return;try{localStorage.setItem(KEY,JSON.stringify(o));}catch(e){}}
   var mem=load();
   function dayKey(d){d=d||new Date();return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0");}
-  if(mem.day!==dayKey())mem={day:dayKey(),hist:[],seenC:mem.seenC||"",seenM:mem.seenM||"",ackC:mem.ackC||"",ackM:mem.ackM||""};
+  /* a new day clears the thread and the checklist ticks; to-do ticks carry over
+     (a ticked to-do stays done until it's removed from protocol.json) */
+  function roll(){if(mem.day===dayKey())return false;mem={day:dayKey(),hist:[],seenC:mem.seenC||"",seenM:mem.seenM||"",ackC:mem.ackC||"",ackM:mem.ackM||"",todoDone:mem.todoDone||{}};save(mem);return true;}
+  roll();
   mem.hist=mem.hist||[];
 
   /* ---------- speech ---------- */
   var GLY="ABCDEFGHJKLMNPQRSTUVWXYZ0123456789#%&*+<>/";
   function decode(node,text,onStart,onEnd){
     if(REDUCE2){node.textContent=text;onStart();setTimeout(onEnd,1600);return;}
+    var ended=false,end=function(){if(ended)return;ended=true;onEnd();};
     onStart();var t0=performance.now(),D=Math.min(1200,300+text.length*10);
     (function step(tt){var p=Math.min(1,(tt-t0)/D),n=Math.floor(text.length*p),s=text.slice(0,n);
       for(var i=n;i<Math.min(text.length,n+6);i++)s+=text[i]===" "?" ":GLY[Math.random()*GLY.length|0];
-      node.textContent=s;stick();if(p<1)requestAnimationFrame(step);else{node.textContent=text;stick();setTimeout(onEnd,1400);}})(t0);
+      node.textContent=s;stick();if(p<1)requestAnimationFrame(step);else{node.textContent=text;stick();setTimeout(end,1400);}})(t0);
     /* safety: if the screen sleeps mid-line, nobody stays stuck "talking" */
-    setTimeout(function(){node.textContent=text;onEnd();},D+4000);
+    setTimeout(function(){if(!ended){node.textContent=text;end();}},D+4000);
   }
   /* the chat scrolls: it follows the newest line unless you've scrolled up to read */
   var follow=true;
@@ -315,6 +319,7 @@
   var NAMES={g:"Grok",c:"Claude",m:"Noctis"};
   function stamp(d){d=d||new Date();var h=d.getHours()%12||12,m=d.getMinutes();return h+":"+(m<10?"0":"")+m;}
   function logLine(who,text,tag,when){
+    roll();
     var last=mem.hist[mem.hist.length-1];if(last&&last.who===who&&last.text===text)return;
     mem.hist.push({who:who,text:text,tag:tag||"",time:stamp(when)});if(mem.hist.length>80)mem.hist.shift();save(mem);if(txOpen)renderHist();
   }
@@ -420,7 +425,7 @@
     var todo=(PROTO&&Array.isArray(PROTO.todo)?PROTO.todo:[]).filter(function(t){return t&&t.id&&t.text&&!(mem.todoDone||{})[t.id];});
     todo.slice(0,10).forEach(function(t){list.push({id:t.id,sec:"To do",text:String(t.text).slice(0,120),todo:true,due:/^\d{4}-\d{2}-\d{2}$/.test(t.by||"")?t.by:""});});
     return list;}
-  function ckState(){if(!mem.ck||mem.ck.day!==dayKey()){mem.ck={day:dayKey(),done:{},exp:false};}if(!mem.todoDone)mem.todoDone={};return mem.ck;}
+  function ckState(){roll();if(!mem.ck||mem.ck.day!==dayKey()){mem.ck={day:dayKey(),done:{},exp:false};}if(!mem.todoDone)mem.todoDone={};return mem.ck;}
   function byTime(by){var p=by.split(":"),d=new Date();d.setHours(+p[0],+p[1],0,0);return d;}
   /* what the app can see for itself */
   function appCheck(id){var now=new Date(),w,dt;
@@ -647,9 +652,15 @@
     CC.g.setTransform(CC.dpr,0,0,CC.dpr,0,0);CC.g.clearRect(0,0,BASE,BASE);CC.g.globalAlpha=1;CC.g.shadowBlur=0;stone.draw(CC.g,t,k,BASE/2);CC.g.globalCompositeOperation="source-over";CC.g.globalAlpha=1;
   }
   /* only draws while home is on screen; a section panel, a hidden tab or the boot screen pauses it */
-  function frameM(ts){if(ts-lastm<30){requestAnimationFrame(frameM);return;}var k=lastm?Math.min(4,(ts-lastm)/16.667):1;lastm=ts;
-    if(onHome())draw((ts-T0m)/1000,k);requestAnimationFrame(frameM);}
-  if(REDUCE2){var tryDraw=function(){if(NOC.ready)draw(2,1);else setTimeout(tryDraw,300);};tryDraw();}else requestAnimationFrame(frameM);
+  /* off home (a module, the brief, the boot screen, backgrounded) the loop stops completely
+     and a cheap check restarts it when home is back */
+  var running=false;
+  function frameM(ts){if(!onHome()){running=false;lastm=0;return;}
+    if(ts-lastm<30){requestAnimationFrame(frameM);return;}var k=lastm?Math.min(4,(ts-lastm)/16.667):1;lastm=ts;
+    draw((ts-T0m)/1000,k);requestAnimationFrame(frameM);}
+  function kick(){if(!running&&onHome()){running=true;requestAnimationFrame(frameM);}}
+  if(REDUCE2){var tryDraw=function(){if(NOC.ready)draw(2,1);else setTimeout(tryDraw,300);};tryDraw();}
+  else{kick();setInterval(kick,400);document.addEventListener("visibilitychange",kick);}
 
   /* hooks for later: a finished protocol, or a line posted from elsewhere in the app */
   window.__crew={
