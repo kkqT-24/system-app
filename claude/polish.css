@@ -545,7 +545,7 @@ body.sports-open #sec-sports.section.mx-embed { margin-bottom: 0 !important; bor
 body.sports-open #sec-sports .mx-embed-frame { border-bottom: 0 !important; min-height: 0 !important; }
 #sec-sports.section.assembling, #sec-sports.section.assembling > * { animation: none !important; }
 #sec-sports.section.assembling::before, #sec-sports.section.assembling::after { display: none !important; }
-#sec-sports.section.assembling { animation: mxSportsIn 0.34s cubic-bezier(0.22, 1, 0.36, 1) both !important; }
+#sec-sports.section.assembling { animation: mxSportsIn 0.34s cubic-bezier(0.22, 1, 0.36, 1) backwards !important; }
 @keyframes mxSportsIn { from { opacity: 0; transform: translateY(26px); } to { opacity: 1; transform: none; } }
 .mx-embed-bar .mx-embed-acts { display: flex; gap: 8px; align-items: center; }
 .mx-embed-reload {

@@ -394,7 +394,7 @@
   }
   function sync() {
     document.body.classList.toggle("sports-open", isOpen());
-    if (isOpen()) { window.scrollTo(0, 0); fit(); requestAnimationFrame(fit); }
+    if (isOpen()) { window.scrollTo(0, 0); fit(); requestAnimationFrame(fit); } else { sec.style.animation = ""; }
   }
   new MutationObserver(sync).observe(sec, { attributes: true, attributeFilter: ["class"] });
   window.addEventListener("resize", function () { setTimeout(fit, 60); });
@@ -430,7 +430,7 @@
     sec.style.transform = shown ? "translateY(" + shown.toFixed(1) + "px) scale(" + (1 - 0.025 * p).toFixed(4) + ")" : "";
     sec.style.transformOrigin = "50% 0";
   }
-  function start(y) { y0 = y; dy = 0; shown = 0; sec.style.transition = "none"; }
+  function start(y) { y0 = y; dy = 0; shown = 0; sec.classList.remove("assembling"); sec.style.animation = "none"; sec.style.transition = "none"; }
   function move(y, e) {
     if (y0 === null) return;
     dy = y - y0;
