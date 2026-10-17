@@ -312,6 +312,21 @@ body.tab-open .main-controls .replay-btn { display: none !important; }
 #phaseGreet { flex: 1 1 auto; justify-content: center; padding-bottom: 136px; min-height: 0; }
 #phaseGreet .weather-card { translate: none !important; transform: none; }
 @media (max-height: 640px) { #phaseGreet { padding-bottom: 8px; } }
+/* the idle core is drawn shrunk (scale) but its layout box stayed full
+   size, so the greeting was laid out ~75px taller than it looks and the
+   info card spilled onto the status lines. Pull the box in to match the
+   drawn size, easing with the shrink so nothing jumps. */
+#boot .hud { transition: transform 0.9s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.9s, translate 0.95s cubic-bezier(0.22, 1, 0.36, 1), margin 0.9s cubic-bezier(0.22, 1, 0.36, 1); }
+#boot .hud.idle { margin-block: calc(min(300px, 68vw) * -0.09); }
+@media (max-width: 560px) { #boot .hud.idle { margin-block: calc(min(300px, 68vw) * -0.14); } }
+/* shorter screens: keep the two newest status lines, and the card sits
+   just above them */
+@media (max-height: 800px) {
+  #chatter div:nth-last-child(n+3) { display: none; }
+  #phaseGreet { padding-bottom: 96px; }
+  #boot .boot-inner { padding-top: 2dvh; gap: 14px; }
+}
+@media (max-height: 700px) { #chatter { display: none; } #phaseGreet { padding-bottom: 8px; } }
 /* the dive into the hub: a softer zoom with a gentle blur */
 .boot-inner.fly { animation: mxFly 1.1s cubic-bezier(0.45, 0, 0.2, 1) forwards !important; }
 @keyframes mxFly {

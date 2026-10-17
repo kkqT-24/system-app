@@ -207,6 +207,20 @@ body.ib-open { overflow: hidden; }
 .ib-alert-h .lbl::before { content: ""; display: inline-block; width: 7px; height: 7px; margin-right: 8px; border-radius: 50%; background: #fbbf24; box-shadow: 0 0 8px #fbbf24; vertical-align: 1px; animation: ibBlink 1.2s ease-in-out infinite; }
 .ib-alert-h .tag { font-family: "Share Tech Mono", monospace; font-size: 10px; letter-spacing: 0.18em; text-transform: uppercase; padding: 3px 7px; background: #fbbf24; color: #1a1203; }
 .ib-alert .ib-cat:first-of-type { border-top: none; padding-top: 2px; }
+/* tap to fold the Catalyst into its header */
+.ib-alert { cursor: pointer; -webkit-tap-highlight-color: transparent; transition: padding 0.35s cubic-bezier(0.22, 1, 0.36, 1); }
+.ib-alert:active { filter: brightness(1.12); }
+.ib-alert-h { gap: 10px; transition: margin 0.35s cubic-bezier(0.22, 1, 0.36, 1); }
+.ib-alert-h .sum { flex: 1; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; text-align: right;
+  font-family: "Share Tech Mono", monospace; font-size: 11px; letter-spacing: 0.05em; text-transform: uppercase; color: rgba(251, 191, 36, 0.85);
+  opacity: 0; transform: translateX(6px); transition: opacity 0.3s ease, transform 0.3s ease; }
+.ib-alert-b { display: grid; grid-template-rows: 1fr; transition: grid-template-rows 0.38s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.3s ease; }
+.ib-alert-in { min-height: 0; overflow: hidden; }
+.ib-alert.min { padding-top: 10px; padding-bottom: 10px; animation-duration: 4.2s; }
+.ib-alert.min .ib-alert-h { margin-bottom: 0; }
+.ib-alert.min .ib-alert-h .sum { opacity: 1; transform: none; }
+.ib-alert.min .ib-alert-b { grid-template-rows: 0fr; opacity: 0; }
+.ib-alert.min .ib-alert-h .tag { display: none; }
 .ib-alert .ib-mini { margin: 0 0 6px; }
 .ib-cat { padding: 10px 0; border-top: 1px solid rgba(203, 213, 225, 0.08); }
 .ib-sl + .ib-cat { border-top: none; padding-top: 0; }

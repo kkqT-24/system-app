@@ -1086,9 +1086,27 @@
       c.appendChild(el("div", "ib-mstat " + ml.s, ml.t));
       var todays = todaysReleases(today), olk = fresh ? brief.catalyst.outlook : "";
       if (todays.length) {
-        var cb = el("div", "ib-alert");
-        var ch = el("div", "ib-alert-h"); ch.appendChild(el("span", "lbl", "Catalyst")); ch.appendChild(el("span", "tag", "Important"));
+        /* tap the Catalyst block to fold it into its header (a one-line
+           summary); tap again to open it. Stays folded for the rest of the
+           day, so a new day's releases always arrive open. */
+        var cb = el("div", "ib-alert" + (C.catMin === today ? " min" : ""));
+        cb.setAttribute("role", "button"); cb.setAttribute("tabindex", "0");
+        var ch = el("div", "ib-alert-h"); ch.appendChild(el("span", "lbl", "Catalyst"));
+        var nxt = null; todays.forEach(function (e) { if (!nxt && e.time && !e.actual) nxt = e; });
+        ch.appendChild(el("span", "sum", todays.length === 1 ? todays[0].name + (todays[0].time ? " · " + clock24(todays[0].time) : "") : todays.length + " today" + (nxt ? " · next " + clock24(nxt.time) : "")));
+        ch.appendChild(el("span", "tag", "Important"));
         cb.appendChild(ch);
+        var cbody = el("div", "ib-alert-b"), cin = el("div", "ib-alert-in");
+        cbody.appendChild(cin);
+        function catToggle() {
+          var min = !cb.classList.contains("min");
+          cb.classList.toggle("min", min);
+          cb.setAttribute("aria-expanded", min ? "false" : "true");
+          C.catMin = min ? today : ""; save();
+        }
+        cb.setAttribute("aria-expanded", C.catMin === today ? "false" : "true");
+        cb.addEventListener("click", function (ev) { if (ev.target.closest && ev.target.closest("a")) return; catToggle(); });
+        cb.addEventListener("keydown", function (ev) { if (ev.key === "Enter" || ev.key === " ") { ev.preventDefault(); catToggle(); } });
         todays.forEach(function (e) {
           var r = el("div", "ib-cat");
           var top = el("div", "top"); top.appendChild(el("span", "n", e.name)); if (e.time) top.appendChild(el("span", "tm", clock24(e.time)));
@@ -1101,9 +1119,10 @@
             r.appendChild(nums);
           }
           if (e.read) r.appendChild(el("p", "ib-p", e.read));
-          cb.appendChild(r);
+          cin.appendChild(r);
         });
-        if (olk) cb.appendChild(el("p", "ib-p dim", olk));
+        if (olk) cin.appendChild(el("p", "ib-p dim", olk));
+        cb.appendChild(cbody);
         c.appendChild(cb);
       }
       var gpn = gapPanel(now); if (gpn) c.appendChild(gpn);

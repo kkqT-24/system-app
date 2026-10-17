@@ -230,13 +230,13 @@
         g.drawImage(img,0,r,TW,Math.min(2,TH-r),x+(TX+d)*sc,y+(TY+r)*sc,TW*sc,Math.min(2,TH-r)*sc+.35);}}
     if(w<.999){tail(NOC.tipS,1);body(NOC.sleep,1);}
     if(w>.001){tail(NOC.tipA,w);body(NOC.awake,w);}
-    /* inside the orb: slow swirl, a drifting glow and tiny rising bubbles, masked to the glass so the cat stays clean */
+    /* inside the orb: slow swirl (always turning, even asleep — the middle band counter-rotates), a drifting glow and tiny rising bubbles, masked to the glass so the cat stays clean */
     if(NOC.mask.complete&&NOC.mask.naturalWidth){
       var o=OC.getContext("2d");o.setTransform(1,0,0,1,0,0);o.globalCompositeOperation="source-over";o.globalAlpha=1;o.clearRect(0,0,OC.width,OC.height);
       o.setTransform(OC.width/240,0,0,OC.height/281,0,0);o.globalCompositeOperation="lighter";
       var bx=118,by=205,sw=(1+w*.3+NCH*7);
-      for(var si=0;si<3;si++){o.save();o.translate(bx,by);o.scale(1,.58);o.rotate(t*(.22+si*.09)*sw+si*2.1);
-        o.strokeStyle=si===1?"rgba(218,120,245,"+(.16+w*.22)+")":"rgba(201,168,255,"+(.18+w*.24)+")";o.lineWidth=9-si*2;o.lineCap="round";
+      for(var si=0;si<3;si++){o.save();o.translate(bx,by);o.scale(1,.58);o.rotate((si===1?-1:1)*t*(.3+si*.08)*sw+si*2.1);
+        o.strokeStyle=si===1?"rgba(218,120,245,"+(.34+w*.14)+")":"rgba(201,168,255,"+(.38+w*.16)+")";o.lineWidth=9-si*2;o.lineCap="round";
         o.shadowColor=si===1?"#da78f5":"#c9a8ff";o.shadowBlur=10;o.beginPath();o.arc(0,0,28+si*17,0,Math.PI*(1-si*.18));o.stroke();o.restore();}
       o.shadowBlur=0;
       var gx2=bx+Math.cos(t*.5)*26,gy2=by+Math.sin(t*.7)*16,rg=o.createRadialGradient(gx2,gy2,2,gx2,gy2,42);
@@ -244,7 +244,7 @@
       for(var bi2=0;bi2<NOC.bub.length;bi2++){var bb=NOC.bub[bi2],ph=(t*bb.v*(1+w*.2)+bb.o)%1,yy=by+62-ph*125,xx=bx+bb.x+Math.sin(t*1.3+bb.o*9)*3;
         o.globalAlpha=Math.sin(ph*Math.PI)*.8;o.strokeStyle="rgba(255,255,255,.55)";o.lineWidth=1.2;o.beginPath();o.arc(xx,yy,bb.r,0,TAU);o.stroke();}
       o.globalAlpha=1;o.globalCompositeOperation="destination-in";o.drawImage(NOC.mask,0,0,240,281);
-      g.globalCompositeOperation="lighter";g.globalAlpha=.6+.4*w;g.drawImage(OC,x,y,W,H);g.globalCompositeOperation="source-over";
+      g.globalCompositeOperation="lighter";g.globalAlpha=.85+.15*w;g.drawImage(OC,x,y,W,H);g.globalCompositeOperation="source-over";
     }
     g.globalAlpha=1;g.restore();
     /* particles ride on top so they read against him, not hidden behind the orb */
