@@ -38,7 +38,8 @@ body.tab-open .crew-date { opacity: 0; }
 /* ---------- stage: intro and crew share one spot ---------- */
 .crew { width: 100%; }
 /* the crew takes the top half of the screen; the modules sit lower */
-.crew-stage { display: grid; width: 100%; min-height: max(330px, 50dvh); align-items: stretch; }
+.crew-stage { display: grid; width: 100%; min-height: max(330px, 47dvh); align-items: stretch; }
+.crew { margin-bottom: 34px; }
 .crew-stage > * { grid-area: 1 / 1; }
 .crew-intro { display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; align-self: start; padding-top: 14px; pointer-events: none; }
 .crew-intro .main-title { transition: transform 0.75s cubic-bezier(0.65, 0, 0.35, 1), opacity 0.55s ease 0.2s; }
@@ -69,7 +70,8 @@ body.tab-open .crew-date { opacity: 0; }
 .crew-x img { width: 10px; height: 10px; display: block; }
 .crew-x:focus-visible { outline: 2px solid var(--lav); }
 
-.crew-mid { display: flex; flex-direction: column; align-items: stretch; justify-content: space-between; align-self: stretch; min-width: 0; padding: 6px 0 2px; }
+/* Noctis sits at the top; the chat fills the rest of the column without ever changing its height */
+.crew-mid { position: relative; display: flex; flex-direction: column; align-items: stretch; align-self: stretch; min-width: 0; padding: 6px 0 2px; }
 .crew-noc { position: relative; z-index: 3; display: flex; flex-direction: column; align-items: center; justify-content: flex-end; will-change: transform; }
 .crew-name.noc { color: #d8b4fe; opacity: 0.55; transition: opacity 0.6s ease, text-shadow 0.6s ease; position: relative; z-index: 1; }
 .crew-name.noc.on { opacity: 1; text-shadow: 0 0 10px rgba(185, 140, 255, 0.7); }
@@ -78,7 +80,7 @@ body.tab-open .crew-date { opacity: 0; }
 
 /* ---------- the shared conversation ---------- */
 /* fixed height so a long message never pushes Noctis around; the older bubble fades out at the top */
-.crew-thread { position: relative; z-index: 2; display: flex; flex-direction: column; justify-content: flex-end; gap: 8px; height: 172px; overflow: hidden; padding: 10px 0 4px; cursor: pointer;
+.crew-thread { position: relative; z-index: 2; display: flex; flex-direction: column; justify-content: flex-end; gap: 8px; position: absolute; left: 0; right: 0; top: 118px; bottom: 0; overflow: hidden; padding: 10px 0 4px; cursor: pointer;
   -webkit-mask-image: linear-gradient(to bottom, transparent 0, #000 26px); mask-image: linear-gradient(to bottom, transparent 0, #000 26px);
   -webkit-touch-callout: none; user-select: none; -webkit-user-select: none; }
 .crew-thread:focus-visible { outline: 2px solid var(--lav); outline-offset: 4px; border-radius: 12px; }
@@ -90,7 +92,7 @@ body.tab-open .crew-date { opacity: 0; }
 .crew-tb.g::before { left: -5px; border-left: 1px solid rgba(76, 168, 255, 0.36); border-bottom: 1px solid rgba(76, 168, 255, 0.36); }
 .crew-tb.c::before { right: -5px; border-right: 1px solid rgba(255, 159, 107, 0.28); border-top: 1px solid rgba(255, 159, 107, 0.28); }
 .crew-tb.m::before { top: -5px; left: 50%; transform: translateX(-50%) rotate(45deg); border-left: 1px solid rgba(221, 190, 255, 0.38); border-top: 1px solid rgba(221, 190, 255, 0.38); }
-.crew-tb.old { opacity: 0.4; }
+.crew-tb { transition: opacity 0.5s ease; }
 .crew-tb.old::before { display: none; }
 
 /* ---------- hold the conversation: today's thread, opened in place ---------- */
