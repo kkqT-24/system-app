@@ -7,20 +7,12 @@
 
 /* OLED: pure black up top; the old glow and ambient motes only live below the crew */
 #main { background: #000; }
-#main .bg-glow {
-  top: var(--oled, 52%) !important; bottom: 0; height: auto;
-  -webkit-mask-image: linear-gradient(to bottom, transparent, #000 80px); mask-image: linear-gradient(to bottom, transparent, #000 80px);
-}
-#main canvas.ambient {
-  -webkit-mask-image: linear-gradient(to bottom, transparent 0, transparent var(--oled-vp, 50vh), #000 calc(var(--oled-vp, 50vh) + 80px));
-  mask-image: linear-gradient(to bottom, transparent 0, transparent var(--oled-vp, 50vh), #000 calc(var(--oled-vp, 50vh) + 80px));
-}
-body.tab-open #main .bg-glow { top: 0 !important; -webkit-mask-image: none; mask-image: none; }
-body.tab-open #main canvas.ambient { -webkit-mask-image: none; mask-image: none; }
-.crew-stars {
-  position: absolute; left: 0; right: 0; top: 0; height: calc(var(--oled, 52%) + 70px); z-index: 1; pointer-events: none;
-  -webkit-mask-image: linear-gradient(to bottom, #000 72%, transparent); mask-image: linear-gradient(to bottom, #000 72%, transparent);
-}
+/* a plain black cover over the top half (cheap: no masks on the animated layers underneath) */
+.crew-black { position: absolute; left: 0; right: 0; top: 0; height: calc(var(--oled, 52%) + 80px); z-index: 1; pointer-events: none;
+  background: linear-gradient(to bottom, #000 0, #000 var(--oled, 52%), rgba(0,0,0,0) calc(var(--oled, 52%) + 80px)); }
+#main canvas.ambient { z-index: 0; }
+body.tab-open .crew-black { display: none; }
+.crew-stars { position: absolute; left: 0; right: 0; top: 0; height: calc(var(--oled, 52%) + 70px); z-index: 1; pointer-events: none; }
 body.tab-open .crew-stars { display: none; }
 
 /* the rings and the old briefing box step aside (they stay in the page so their scripts keep running) */
@@ -57,7 +49,7 @@ body.tab-open .crew-date { opacity: 0; }
 .crew-bot { position: relative; z-index: 3; display: flex; flex-direction: column; align-items: center; min-width: 0; }
 .crew-who { display: flex; flex-direction: column; align-items: center; gap: 2px; will-change: transform; }
 .crew-av { position: relative; width: 96px; height: 96px; padding: 0; border: 0; background: none; cursor: pointer; border-radius: 50%;
-  -webkit-tap-highlight-color: transparent; -webkit-touch-callout: none; user-select: none; -webkit-user-select: none; touch-action: manipulation; flex: none; }
+  -webkit-tap-highlight-color: transparent; -webkit-touch-callout: none; user-select: none; -webkit-user-select: none; touch-action: none; flex: none; }
 .crew-av:focus-visible { outline: 2px solid var(--lav); outline-offset: 2px; }
 .crew-av:active { transform: scale(0.94); }
 .crew-av canvas { position: absolute; left: 50%; top: 50%; width: 150px; height: 150px; transform: translate(-50%, -50%); pointer-events: none; }
@@ -67,7 +59,7 @@ body.tab-open .crew-date { opacity: 0; }
 .crew-sub { font-family: "Share Tech Mono", monospace; font-size: 10px; letter-spacing: 0.18em; color: var(--ink-faint); text-transform: uppercase; max-width: 90px; text-align: center; }
 .crew-gname { display: inline-flex; align-items: center; }
 .crew-x { display: inline-grid; place-items: center; width: 28px; height: 28px; margin: -8px -8px -8px -7px; padding: 0; border: 0; background: none; cursor: pointer; border-radius: 6px; }
-.crew-x img { width: 10px; height: 10px; display: block; }
+.crew-x img { width: 8.5px; height: 8.5px; display: block; }
 .crew-x:focus-visible { outline: 2px solid var(--lav); }
 
 /* Noctis sits at the top; the chat fills the rest of the column without ever changing its height */

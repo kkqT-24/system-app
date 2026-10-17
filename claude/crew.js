@@ -61,7 +61,7 @@
     var ease=1-Math.pow(.95,k);for(var key in am)am[key]+=(target[key]-am[key])*ease;
     var ct=t-st.clearT,clr=ct>=0&&ct<1.8?Math.sin(ct/1.8*Math.PI):0;
     var lev=st.speaking?.8:S.lev;lev=Math.max(lev,clr,CCH*.9);this.level+=(lev-this.level)*(1-Math.pow(.97,k));lev=this.level;
-    var speed=(.08+lev*.12)*(1-am.sleep*.7)+clr*.5+CCH*1.4;this.rot+=speed*k/60;
+    var speed=(.08+lev*.12)*(1-am.sleep*.7)+clr*.5+CCH*CCH*3.2;this.rot+=speed*k/60;
     var tilt=-.3,sq=.26,cy=c+Math.sin(t*(.7-am.sleep*.35))*1.2*(1+am.unread*.8),R=23;
     var rr=1-am.focus*.1+clr*.16-CCH*.14;
     /* random events, like gbot's lightning: a crack flashes across the stone, or a rock catches fire */
@@ -373,9 +373,11 @@
     cHold.tm.push(setTimeout(function(){if(!cHold.on)return;cHold.fired=true;cHold.on=false;try{if(navigator.vibrate)navigator.vibrate([12,30,12]);}catch(err){}
       st.clearT=nowT();say("c",scanLine());},CHOLD));});
   function sayMine(){var c=latestC();say("c",c?c.text:"Nothing new from me. I'll post when there's something worth your time.");}
-  function cRelease(){if(!cHold.on)return;cHold.on=false;cHold.tm.forEach(clearTimeout);cHold.tm=[];if(!cHold.fired&&performance.now()-cHold.t0<300)sayMine();}
+  /* a tap opens the Claude app (claude.ai is a universal link, so it lands in the app when it's installed) */
+  function openClaude(){var u="https://claude.ai/new",w=null;try{w=window.open(u,"_blank");}catch(err){}if(!w){window.location.href=u;return;}try{w.opener=null;}catch(err){}}
+  function cRelease(){if(!cHold.on)return;cHold.on=false;cHold.tm.forEach(clearTimeout);cHold.tm=[];if(!cHold.fired&&performance.now()-cHold.t0<300)openClaude();}
   cbtn.addEventListener("pointerup",cRelease);cbtn.addEventListener("pointercancel",cRelease);cbtn.addEventListener("contextmenu",function(e){e.preventDefault();});
-  cbtn.addEventListener("keydown",function(e){if(e.key==="Enter"||e.key===" "){e.preventDefault();sayMine();}});
+  cbtn.addEventListener("keydown",function(e){if(e.key==="Enter"||e.key===" "){e.preventDefault();openClaude();}});
 
   /* ---------- Noctis: tap wakes him; hold reboots the system ---------- */
   function wakeMuse(text,when){if(museT)clearTimeout(museT);muse.target=1;nocName.classList.add("on");
@@ -441,7 +443,7 @@
       if(!thr.children.length)mem.hist.slice(-12).forEach(function(h){post(h.who,h.text,true);});
       refreshFeed();var opening=Math.min(3,gFeed.length);gi=0;
       for(var oi=0;oi<opening;oi++)(function(n){setTimeout(function(){if(onHome()&&!txOpen)sayG();},700+n*3600);})(oi);
-      setTimeout(checkNew,700+opening*3600);nextG=Date.now()+700+opening*3600+9000;},2400);}
+      setTimeout(checkNew,700+opening*3600);nextG=Date.now()+700+opening*3600+9000;},1100);}
   /* runs once each time home arrives (first entry, and again after a reboot); class changes of our own don't retrigger it */
   var arrived=false;
   function arriveState(){return mainEl.classList.contains("arrive")&&!mainEl.classList.contains("is-hidden");}
@@ -468,7 +470,7 @@
   var ACTS=["visitC","poke","checkN","glance","sigh"];
   function pickAct(t){var a=ACTS[Math.random()*ACTS.length|0];act={type:a,t0:t,until:t+(a==="glance"?1.8:a==="sigh"?2:4.8),fired:false};nextAct=t+18+Math.random()*22;}
   function float(t,k){
-    if(cHold.on){CCH=Math.max(0,Math.min(1,(performance.now()-cHold.t0-300)/(CHOLD-300)));}else CCH*=Math.pow(.88,k);
+    if(cHold.on){CCH=Math.max(0,Math.min(1,(performance.now()-cHold.t0-80)/(CHOLD-80)));}else CCH*=Math.pow(.9,k);
     if(hold.on){var hc=performance.now()-hold.t0;NCH=Math.max(0,Math.min(1,(hc-380)/(HOLD-380)));}else NCH*=Math.pow(.9,k);
     var e=1-Math.pow(.9,k),slow=1-Math.pow(.97,k);
     var wg=wander(t,18,30,.3,0),wc=wander(t,14,24,.19,2.4);
@@ -506,7 +508,7 @@
     if(w!==sw0||h!==sh0){SC.width=w*d;SC.height=h*d;sw0=w;sh0=h;}
     SX.setTransform(d,0,0,d,0,0);SX.clearRect(0,0,w,h);
     STARS.forEach(function(s2){s2.x+=s2.vx*k*.06;if(s2.x>1.02)s2.x=-.02;
-      SX.globalAlpha=(.18+.42*(.5+.5*Math.sin(t*s2.sp+s2.ph)))*(s2.r>1?1.2:1);SX.fillStyle=s2.c;SX.beginPath();SX.arc(s2.x*w,s2.y*h,s2.r,0,TAU);SX.fill();});
+      var fy=Math.min(1,Math.max(0,(1-s2.y)/.28));SX.globalAlpha=(.18+.42*(.5+.5*Math.sin(t*s2.sp+s2.ph)))*(s2.r>1?1.2:1)*fy;SX.fillStyle=s2.c;SX.beginPath();SX.arc(s2.x*w,s2.y*h,s2.r,0,TAU);SX.fill();});
     if(!shoot&&t>nextShoot){var dir=Math.random()<.5?1:-1,ang=(.18+Math.random()*.35),spd=3+Math.random()*3;
       shoot={x:dir>0?Math.random()*w*.5:w*.5+Math.random()*w*.5,y:Math.random()*h*.4,vx:Math.cos(ang)*spd*dir,vy:Math.sin(ang)*spd,len:22+Math.random()*30,life:1,fade:.018+Math.random()*.012};
       nextShoot=t+12+Math.random()*22;}
