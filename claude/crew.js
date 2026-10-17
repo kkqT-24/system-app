@@ -357,22 +357,31 @@
      A web link opened from a home-screen app lands in an in-app browser sheet (no logins, and a blank
      sheet left behind when it bounces to the real app). An app's own URL scheme skips the sheet and
      opens the app directly. If the scheme doesn't take (the page is still showing a moment later),
-     the fallback runs. Apps with no public scheme go through an Apple Shortcut named "Open <App>". */
+     the fallback runs. */
   function openApp(scheme,fallback){var t=Date.now(),gone=false;function v(){if(document.hidden)gone=true;}
     document.addEventListener("visibilitychange",v);try{window.location.href=scheme;}catch(e){}
     setTimeout(function(){document.removeEventListener("visibilitychange",v);if(!gone&&!document.hidden&&Date.now()-t<3000&&fallback)fallback();},1500);}
-  function viaShortcut(name){return function(){window.location.href="shortcuts://run-shortcut?name="+encodeURIComponent(name);};}
+  /* Apps whose web links hand off to the app (Grok): open the link in the sheet, iOS passes it to the
+     app, and the sheet left blank behind it is closed as soon as the System app is back in view.
+     This has to run straight from a tap or release — from a timer iOS blocks it. */
+  var outWin=null;
+  function handOff(u){var w=null;try{w=window.open(u,"_blank");}catch(e){}if(!w){window.location.href=u;return;}try{w.opener=null;}catch(e){}outWin=w;}
+  function closeOut(){if(!outWin)return;var w=outWin;outWin=null;try{w.close();}catch(e){}}
+  document.addEventListener("visibilitychange",function(){if(!document.hidden)closeOut();});window.addEventListener("focus",closeOut);window.addEventListener("pageshow",closeOut);
+  /* Real Safari (with its logins) instead of the in-app sheet */
+  function inSafari(u){window.location.href="x-safari-"+u;}
   function webSheet(u){return function(){var w=null;try{w=window.open(u,"_blank");}catch(e){}if(w)try{w.opener=null;}catch(e){}};}
 
   /* ---------- gbot: tap opens the Daily Briefing; the X by his name opens X ---------- */
   /* gbot: tap opens the Daily Briefing; hold and he charges up, throws sparks, then opens the Grok app */
-  var gbtn=q('[data-bot="g"]'),gHold={on:false,t0:0,fired:false,tm:[]},GHOLD=1000,GCH=0;
+  var gbtn=q('[data-bot="g"]'),gHold={on:false,t0:0,fired:false,go:false,tm:[]},GHOLD=1000,GCH=0;
   function openBriefing(){if(window.__briefing){window.__briefing.open();window.__briefing.load(false);}}
-  function openGrokApp(){viaShortcut("Open Grok")();}
-  gbtn.addEventListener("pointerdown",function(e){gHold.on=true;gHold.fired=false;gHold.t0=performance.now();try{gbtn.setPointerCapture(e.pointerId);}catch(err){}
+  function openGrokApp(){var b=null;try{b=window.__briefing&&window.__briefing.brief?window.__briefing.brief():null;}catch(e){}handOff((b&&b.gbot&&b.gbot.link)||"https://grok.com");}
+  gbtn.addEventListener("pointerdown",function(e){gHold.on=true;gHold.fired=false;gHold.go=false;gHold.t0=performance.now();try{gbtn.setPointerCapture(e.pointerId);}catch(err){}
     gHold.tm.push(setTimeout(function(){if(!gHold.on)return;gHold.fired=true;gHold.on=false;try{if(navigator.vibrate)navigator.vibrate([10,30,10]);}catch(err){}
-      core.boostUntil=nowT()+.7;fl.g.hop=1;setTimeout(openGrokApp,260);},GHOLD));});
-  function gRelease(){if(!gHold.on)return;gHold.on=false;gHold.tm.forEach(clearTimeout);gHold.tm=[];if(!gHold.fired&&performance.now()-gHold.t0<300)openBriefing();}
+      core.boostUntil=nowT()+.7;fl.g.hop=1;gHold.go=true;},GHOLD));});
+  /* the charge fires during the hold; Grok opens on the release (a real gesture, so iOS allows it) */
+  function gRelease(e){if(gHold.go){gHold.go=false;if(!e||e.type!=="pointercancel")openGrokApp();return;}if(!gHold.on)return;gHold.on=false;gHold.tm.forEach(clearTimeout);gHold.tm=[];if(!gHold.fired&&performance.now()-gHold.t0<300)openBriefing();}
   gbtn.addEventListener("pointerup",gRelease);gbtn.addEventListener("pointercancel",gRelease);gbtn.addEventListener("contextmenu",function(e){e.preventDefault();});
   gbtn.addEventListener("keydown",function(e){if(e.key==="Enter"||e.key===" "){e.preventDefault();openBriefing();}});
   q(".crew-x").addEventListener("click",function(e){e.stopPropagation();openApp("twitter://timeline",webSheet("https://x.com"));});
@@ -402,8 +411,8 @@
   function wakeMuse(text,when){if(museT)clearTimeout(museT);muse.target=1;nocName.classList.add("on");
     if(text)setTimeout(function(){say("m",text,"",when);},700);
     museT=setTimeout(function(){muse.target=0;nocName.classList.remove("on");},text?9000:2600);}
-  /* a tap opens Muse through the "Open Muse" shortcut (no public URL scheme to call directly) */
-  function openMuse(){viaShortcut("Open Muse")();}
+  /* a tap opens Muse in real Safari, signed in (muse.ai does not hand off to an app, and the in-app sheet has no login) */
+  function openMuse(){inSafari("https://muse.ai");}
   var nbtn=q('[data-bot="m"]'),HOLD=1500,hold={on:false,t0:0,fired:false,tm:[]};
   function napSoon(){if(museT)clearTimeout(museT);museT=setTimeout(function(){muse.target=0;nocName.classList.remove("on");},1200);}
   nbtn.addEventListener("pointerdown",function(e){
