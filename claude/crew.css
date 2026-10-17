@@ -66,7 +66,7 @@ body.tab-open .crew-date { opacity: 0; }
 .crew-bot.c .crew-name { color: #ff9f6b; }
 .crew-sub { font-family: "Share Tech Mono", monospace; font-size: 10px; letter-spacing: 0.18em; color: var(--ink-faint); text-transform: uppercase; max-width: 90px; text-align: center; }
 .crew-gname { display: inline-flex; align-items: center; }
-.crew-x { display: inline-grid; place-items: center; width: 28px; height: 28px; margin: -8px -8px -8px -12px; padding: 0; border: 0; background: none; cursor: pointer; border-radius: 6px; }
+.crew-x { display: inline-grid; place-items: center; width: 28px; height: 28px; margin: -8px -8px -8px -7px; padding: 0; border: 0; background: none; cursor: pointer; border-radius: 6px; }
 .crew-x img { width: 10px; height: 10px; display: block; }
 .crew-x:focus-visible { outline: 2px solid var(--lav); }
 
