@@ -72,7 +72,7 @@ body.tab-open .crew-date { opacity: 0; }
 
 /* ---------- the shared conversation ---------- */
 /* fixed height so a long message never pushes Noctis around; the older bubble fades out at the top */
-.crew-thread { position: relative; z-index: 2; display: flex; flex-direction: column; justify-content: flex-start; gap: 8px; position: absolute; left: 0; right: 0; top: 118px; bottom: 0; overflow-y: auto; overflow-x: hidden; overscroll-behavior: contain; -webkit-overflow-scrolling: touch; touch-action: pan-y; scrollbar-width: none; padding: 10px 0 4px; cursor: pointer;
+.crew-thread { position: relative; z-index: 4; display: flex; flex-direction: column; justify-content: flex-start; gap: 8px; position: absolute; left: 0; right: 0; top: 118px; bottom: 0; overflow-y: auto; overflow-x: hidden; overscroll-behavior: contain; -webkit-overflow-scrolling: touch; touch-action: pan-y; scrollbar-width: none; padding: 10px 0 4px; cursor: pointer;
   -webkit-mask-image: linear-gradient(to bottom, transparent 0, rgba(0,0,0,.15) 18px, rgba(0,0,0,.6) 40px, #000 64px); mask-image: linear-gradient(to bottom, transparent 0, rgba(0,0,0,.15) 18px, rgba(0,0,0,.6) 40px, #000 64px);
   -webkit-touch-callout: none; user-select: none; -webkit-user-select: none; }
 .crew-thread::-webkit-scrollbar { display: none; }
@@ -87,6 +87,11 @@ body.tab-open .crew-date { opacity: 0; }
 .crew-tb.c::before { right: -5px; border-right: 1px solid rgba(255, 159, 107, 0.28); border-top: 1px solid rgba(255, 159, 107, 0.28); }
 .crew-tb.m::before { top: -5px; left: 50%; transform: translateX(-50%) rotate(45deg); border-left: 1px solid rgba(221, 190, 255, 0.38); border-top: 1px solid rgba(221, 190, 255, 0.38); }
 .crew-tb { transition: opacity 0.5s ease; }
+/* bubbles sit above Grok and Claude with a solid black base (same look on the black),
+   so when they drift in to react, they slip behind the text instead of covering it */
+.crew-tb.g { background: linear-gradient(rgba(56, 152, 248, 0.1), rgba(56, 152, 248, 0.1)), #000; }
+.crew-tb.c { background: linear-gradient(rgba(255, 159, 107, 0.07), rgba(255, 159, 107, 0.07)), #000; }
+.crew-tb.m { background: linear-gradient(rgba(216, 180, 254, 0.1), rgba(216, 180, 254, 0.1)), #000; }
 .crew-tb.old::before { display: none; }
 
 /* ---------- hold the conversation: today's thread, opened in place ---------- */

@@ -621,18 +621,20 @@
       var card = $("#phaseGreet .weather-card"), note = card ? $(".weather-note", card) : null;
       if (card) card.insertBefore(brief, note); else headEl.appendChild(brief);
     }
-    var dDone = s.daily.filter(function (q) { return q.done; }).length;
+    /* a check-in quest on its off day isn't due today, so it doesn't count here (same rule as ARISE) */
+    var due = s.daily.filter(function (q) { return !offToday(q.name); });
+    var dDone = due.filter(function (q) { return q.done; }).length, left = due.length - dDone;
     var line;
     if (s.secretActive) line = "A secret quest is waiting for you.";
-    else if (dDone === s.daily.length) line = "All daily quests cleared. Well done, Hunter.";
-    else if (s.reps >= s.repsMin) line = "Workout cleared. " + (s.daily.length - dDone) + " daily quest" + (s.daily.length - dDone === 1 ? "" : "s") + " remain.";
+    else if (left === 0) line = "All daily quests cleared. Well done, Hunter.";
+    else if (s.reps >= s.repsMin) line = "Workout cleared. " + left + " daily quest" + (left === 1 ? "" : "s") + " remain.";
     else if (new Date().getHours() >= 18) line = "The day is ending. " + (s.repsMin - s.reps) + " reps stand between you and the penalty.";
     else line = "Daily quests have arrived. Do not fall behind.";
     brief.innerHTML =
       '<div class="mx-chips">' +
       '<span class="chip r-' + s.rank.toLowerCase() + '"><b>LV ' + s.level + '</b> · Rank ' + s.rank + '</span>' +
       '<span class="chip"><i class="fl"></i>' + s.streak + '-day streak</span>' +
-      '<span class="chip">Quests <b>' + dDone + '/' + s.daily.length + '</b></span>' +
+      '<span class="chip">Quests <b>' + dDone + '/' + due.length + '</b></span>' +
       '<span class="chip">Reps <b>' + Math.min(s.reps, s.repsMin) + '/' + s.repsMin + '</b></span>' +
       '<span class="chip">Shadows <b>' + D.shadows.length + '</b></span>' +
       '</div><div class="mx-brief-line">' + esc(line) + '</div>';
@@ -813,6 +815,7 @@
         if (o.v1) localStorage.setItem("systemApp.v1", o.v1);
         if (o.v2) localStorage.setItem(KEY, o.v2);
         if (o.intel) localStorage.setItem("systemApp.intel", o.intel);
+        if (o.crew) localStorage.setItem("systemApp.crew", o.crew);
         alert("Save loaded. Reloading.");
         location.reload();
       } catch (err) { alert("That code didn't work — copy it again and paste the whole thing."); }
@@ -933,7 +936,7 @@
      into Notes. "Later" snoozes it a day. */
   var WEEK = 7 * 864e5;
   function saveCode() {
-    return "SYSTEM-SAVE:" + btoa(unescape(encodeURIComponent(JSON.stringify({ v1: localStorage.getItem("systemApp.v1"), v2: localStorage.getItem(KEY), intel: localStorage.getItem("systemApp.intel") }))));
+    return "SYSTEM-SAVE:" + btoa(unescape(encodeURIComponent(JSON.stringify({ v1: localStorage.getItem("systemApp.v1"), v2: localStorage.getItem(KEY), intel: localStorage.getItem("systemApp.intel"), crew: localStorage.getItem("systemApp.crew") }))));
   }
   function copySave(msg) {
     D.lastBackup = Date.now(); save();
@@ -976,7 +979,7 @@
     }).then(function (r) { if (!r.ok) { var e = new Error("GitHub " + r.status); e.status = r.status; throw e; } return r.status === 204 ? null : r.json(); });
   }
   function payload() {
-    return JSON.stringify({ app: "system-app", at: new Date().toISOString(), v1: localStorage.getItem("systemApp.v1"), v2: localStorage.getItem(KEY), intel: localStorage.getItem("systemApp.intel") });
+    return JSON.stringify({ app: "system-app", at: new Date().toISOString(), v1: localStorage.getItem("systemApp.v1"), v2: localStorage.getItem(KEY), intel: localStorage.getItem("systemApp.intel"), crew: localStorage.getItem("systemApp.crew") });
   }
   function findGist(token) {
     return gh("GET", "/gists?per_page=100", token).then(function (list) {
@@ -1019,6 +1022,7 @@
       if (o.v1) localStorage.setItem("systemApp.v1", o.v1);
       if (o.v2) localStorage.setItem(KEY, o.v2);
       if (o.intel) localStorage.setItem("systemApp.intel", o.intel);
+        if (o.crew) localStorage.setItem("systemApp.crew", o.crew);
       var c2 = cloud(); c2.gist = r.id; c2.last = Date.now(); setCloud(c2);
       alert("Restored. Reloading.");
       location.reload();
