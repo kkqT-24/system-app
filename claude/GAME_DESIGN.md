@@ -192,3 +192,20 @@ playing it yourself.
 - A few small app upgrades as real rank rises.
 - Art: Muse's pixel shadow knight is archived in `game/shadow-knight/`. For now the Hunter uses a line-art placeholder (`hunterFigure()` in v2.js, `window.MXHunterFigure`), and the existing line-art shadows stay as placeholders.
 - Asset-pack candidate for enemies and maps: Free Game Assets (CraftPix) Tower Defense bundle on itch.io.
+
+## Round 9 (Oct 16, 2026): first playable TD (test build)
+Test page: `claude/game/td/` (not linked from the app yet). All art is code-drawn for now.
+- **Floor** = one winding road from a blue gate to your seal, 6 rune build spots, 10 waves, wave 10 brings a named gate boss.
+  Waves overlap Kingdom Rush-style: the next one counts down once the last is fully out; calling it early pays mana.
+- **Posts** (3 levels each): Vanguard Rift (shadow knights block the road), Ranger Spire (fast, hits fliers),
+  Arcane Obelisk (magic, ignores armor, splash at Lv3). Post caps per type come from the real army in `systemApp.v2`
+  (Vanguard ← Knight/Bulwark/Berserker/Lancer, Ranger ← Archer/Assassin, Arcane ← Mage/Healer, a Monarch adds 1 to each, min 1).
+  Vanguard knights use your actual classes. Pause menu has an "ignore army caps" test toggle.
+- **Enemies**: Ghoul (fast), Orc Brute, Stone Golem (armored → Arcane), Gate Bat (flier), Red Cultist (magic-resistant → Rangers), boss (stomps).
+- **Hunter**: tap the road to move; melee blocks one enemy, throws daggers at fliers, respawns in 12s.
+  **Dagger Rush** (14s): dash to a tapped point, cutting everything on the line. **ARISE** (32s): the last 5 corpses rise as
+  shadow versions of themselves for 18s.
+- **Climb**: clear a floor → the boss's shadow is extracted (random class, tier odds improve with floor) → pick 1 of 3 boons
+  → next floor (+17% HP per floor). Gate integrity carries over (+4 per clear); losing ends the climb. Best floor is saved (`systemTD.v1`).
+- Core rule still applies once it's hooked up: extractions only count toward the real army on **keyed** climbs; free climbs are practice.
+- Test-build extractions stay in the climb log and are NOT written to the app army.

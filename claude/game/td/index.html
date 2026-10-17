@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+<meta name="theme-color" content="#040410" />
+<title>Shadow Gates</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Rajdhani:wght@500;600;700&family=Share+Tech+Mono&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="td.css?v=1" />
+</head>
+<body>
+<div id="app">
+  <header id="top">
+    <div class="stat" id="hLives" title="Gate integrity"><svg viewBox="0 0 24 24"><path d="M12 2 4 5v6c0 5 3.4 9.4 8 11 4.6-1.6 8-6 8-11V5z"/></svg><b>20</b></div>
+    <div class="stat mana" id="hMana" title="Mana"><svg viewBox="0 0 24 24"><path d="M12 2 6 12l6 10 6-10z"/></svg><b>0</b></div>
+    <div class="stat wave" id="hWave"><span>WAVE</span><b>0/10</b></div>
+    <div class="stat floor" id="hFloor"><span>FLOOR</span><b>1</b></div>
+    <button class="iconbtn" id="bPause" aria-label="Pause"><svg viewBox="0 0 24 24"><path d="M8 5v14M16 5v14"/></svg></button>
+  </header>
+  <main id="stage">
+    <div id="frame">
+      <canvas id="world"></canvas>
+      <div id="menu"></div>
+      <div id="hint"></div>
+    </div>
+  </main>
+  <footer id="bar">
+    <button class="ab" id="bRush"><i class="cdf"></i><svg viewBox="0 0 24 24"><path d="M4 20 15 9M15 9l2-5 3 3-5 2M9 20l2-2M4 15l2 2"/></svg><span>Rush</span></button>
+    <button class="ab arise" id="bArise"><i class="cdf"></i><em class="badge" id="corpseN">0</em><svg viewBox="0 0 24 24"><path d="M12 21V8M12 8l-4 4M12 8l4 4M5 21h14M7 4c1.5 1 3 1.5 5 1.5S15.5 5 17 4"/></svg><span>ARISE</span></button>
+    <button class="ab" id="bSpeed"><svg viewBox="0 0 24 24"><path d="M4 6l7 6-7 6zM13 6l7 6-7 6z"/></svg><span>1×</span></button>
+    <button class="ab call" id="bCall"><svg viewBox="0 0 24 24"><path d="M7 5l11 7-11 7z"/></svg><span>Start</span></button>
+  </footer>
+</div>
+<div id="overlay" class="hide"></div>
+<script src="td.js?v=1"></script>
+</body>
+</html>
