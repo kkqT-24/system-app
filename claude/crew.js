@@ -597,18 +597,18 @@
     if(cHold.go)CCH=1;else if(cHold.on){CCH=Math.max(0,Math.min(1,(performance.now()-cHold.t0-80)/(CHOLD-80)));}else CCH*=Math.pow(.9,k);
     if(hold.on){var hc=performance.now()-hold.t0;NCH=Math.max(0,Math.min(1,(hc-380)/(HOLD-380)));}else NCH*=Math.pow(.9,k);
     var e=1-Math.pow(.9,k),slow=1-Math.pow(.97,k);
-    var wg=wander(t,12,30,.3,0),wc=wander(t,10,24,.19,2.4);
+    var wg=wander(t,18,30,.3,0),wc=wander(t,14,24,.19,2.4);
     fl.g.lean+=((gSpeak?1:0)-fl.g.lean)*e;fl.c.lean+=((st.speaking?1:0)-fl.c.lean)*e;
     var nocUp=muse.wake>.5,busy=gSpeak||st.speaking||nocUp||txOpen;
     if(nocUp&&!nocWas){goG=Math.random()<.65;goC=Math.random()<.55;if(Math.random()<.25)fl.g.hop=.7;}nocWas=nocUp;
     if(!act&&!busy&&t>nextAct)pickAct(t);
     if(act&&t>act.until)act=null;
     var A=act?act.type:null,tgx=0,tgy=0,tcx=0,tcy=0,lookGC=false;
-    if(nocUp){if(goG){tgx=16;tgy=-26;}if(goC){tcx=-16;tcy=-26;}}
-    else if(A==="visitC"){tgx=22;tgy=-14;tcx=-4;lookGC=true;if(!act.fired&&t-act.t0>1.8){act.fired=true;if(Math.random()<.5)stone.forceFis=true;else core.boostUntil=t+.5;}}
-    else if(A==="poke"){tgx=16;tgy=-30;core.eye.tx=3;core.eye.ty=-1.6;core.eye.nextLook=t+1;
+    if(nocUp){if(goG){tgx=34;tgy=-18;}if(goC){tcx=-34;tcy=-18;}}
+    else if(A==="visitC"){tgx=44;tgy=-6;tcx=-6;lookGC=true;if(!act.fired&&t-act.t0>1.8){act.fired=true;if(Math.random()<.5)stone.forceFis=true;else core.boostUntil=t+.5;}}
+    else if(A==="poke"){tgx=30;tgy=-26;core.eye.tx=3;core.eye.ty=-1.6;core.eye.nextLook=t+1;
       if(!act.fired&&t-act.t0>1.9){act.fired=true;core.boostUntil=t+.5;if(Math.random()<.55){muse.target=.3;setTimeout(function(){if(muse.target<.5)muse.target=0;},1600);}}}
-    else if(A==="checkN"){tcx=-16;tcy=-28;stone.eyes.tx=-2.4;stone.eyes.ty=-1.2;stone.eyes.nl=t+1;}
+    else if(A==="checkN"){tcx=-30;tcy=-22;stone.eyes.tx=-2.4;stone.eyes.ty=-1.2;stone.eyes.nl=t+1;}
     else if(A==="glance"){lookGC=true;}
     else if(A==="sigh"&&!act.fired){act.fired=true;muse.sigh=1;}
     fl.g.vx+=(tgx-fl.g.vx)*slow;fl.g.vy+=(tgy-fl.g.vy)*slow;fl.c.vx+=(tcx-fl.c.vx)*slow;fl.c.vy+=(tcy-fl.c.vy)*slow;
