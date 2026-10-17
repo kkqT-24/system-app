@@ -2,78 +2,78 @@
   "version": 2,
   "date": "2026-10-17",
   "edition": "trending",
-  "written_at": "2026-10-17T12:15:00-04:00",
+  "written_at": "2026-10-17T14:20:00-04:00",
   "trending": {
     "stocks": [
       {
-        "title": "Earnings week starts Monday: NFLX Tuesday, then TSLA, META and IBM Wednesday after the close",
-        "detail": "After the worst Nasdaq 100 week since April 2025, traders see this slate as the real test. GM and GE Aerospace report Tuesday, P&G and AmEx later, plus claims and PMIs. Guidance on AI spend and consumer demand sets QQQ's tone.",
-        "url": "https://x.com/i/trending/2111131891709702638"
+        "title": "Bank of America warns hyperscaler AI spending looks like past boom-bust cycles",
+        "detail": "Strategist Sebastian Raedler points to AI capex near 3% of US GDP, rising competition and falling token prices, likening it to railroad mania and the dot-com bust. That's the bear case NVDA and QQQ carry into Monday.",
+        "url": "https://x.com/i/trending/2111504423935471647"
       },
       {
-        "title": "Semis just logged a nine-session losing streak, the longest in two decades",
-        "detail": "Per X recaps, SOXX fell about 14% over nine straight days and over 11% on the week, with only 3.3% of members above their 10-day average. Bulls see a washout rebound; bears cite AI financing worries and China memory competition.",
-        "url": "https://x.com/i/trending/2111285400010621108"
+        "title": "MSCI will drop Strategy from its indexes after Nov 30 over its bitcoin-heavy balance sheet",
+        "detail": "New MSCI rules on non-operating businesses target MSTR, and JPMorgan estimates about 2.8 billion in passive outflows. Shares fell 11% on the news while Saylor insists Strategy runs a real software and credit business.",
+        "url": "https://x.com/i/trending/2110843848704319669"
       },
       {
-        "title": "Black Monday turns 39 on Monday, and traders noticed the calendar lines up",
-        "detail": "Oct 19, 1987 also fell on a Monday, when the Dow dropped 22.6%. Most posts are superstition and jokes, but record margin debt and this week's volatility keep the date on traders' minds for the open.",
-        "url": "https://x.com/i/trending/2111457542304088210"
+        "title": "Lockheed CEO says the surge in missile demand is permanent, not a one-time refill",
+        "detail": "Jim Taiclet told CNBC demand for THAAD and Patriot interceptors will stay high as the US rebuilds stockpiles used in the Iran fighting. LMT reports later this week, so defense names have a story while tech wobbles.",
+        "url": "https://x.com/i/trending/2111441435434070442"
       },
       {
-        "title": "Schwab rolls out bitcoin and ether trading as BTC holds near 81.5K",
-        "detail": "Schwab finished the rollout on its site, app and thinkorswim, with more coins planned by year-end. Bitcoin is still pinned in the 81K to 83K range despite Friday's spot ETF outflows, the only live risk tape until Sunday night.",
-        "url": "https://x.com/i/trending/2111457538466267602"
+        "title": "Bitcoin drifts near 81.4K on a quiet Saturday as crypto X says it's still early",
+        "detail": "BTC is roughly flat on the day, still stuck in the 81K to 83K range. Posts note under 10% of people own crypto, and Google's quantum result revived the long-run bitcoin security debate. Crypto is the live tape until Sunday.",
+        "url": "https://x.com/i/trending/2111462833036886122"
       }
     ],
     "tech": [
       {
-        "title": "Tesla's thruster Roadster demo is still the loudest car debate on X",
-        "detail": "The next-gen Roadster flipped and hopped on cold-gas thrusters at a SpaceX site in Texas. X is split on showmanship vs engineering and road legality; production is targeted for 2028. It's buzz heading into TSLA earnings Wednesday.",
-        "url": "https://x.com/i/trending/2111407239932047760"
+        "title": "Google's Willow chip hits a quantum milestone with 99.99% fidelity magic states",
+        "detail": "Published in Science on Oct 15, Google Quantum AI cut errors about 40x versus past methods, clearing a key hurdle for error-corrected algorithms. Analysts say any real threat to bitcoin's cryptography is still far off.",
+        "url": "https://x.com/i/trending/2110806655235760294"
       },
       {
-        "title": "Musk: Optimus will build Optimus Prime",
-        "detail": "Musk's Transformers-themed post landed as posts say Tesla is building Optimus robots in the hundreds per week at Fremont, aiming for over 1,000 by year-end. Expect robot questions on Wednesday's TSLA call.",
-        "url": "https://x.com/i/trending/2111344436617892303"
+        "title": "Anthropic's Erik Schluntz explains vibe coding in production after coding with a broken hand",
+        "detail": "He treats Claude like a dev team and acts as its product manager, prepping 15 to 20 minutes of context first. Anthropic used it for a 22,000-line merge, but he stresses humans still own architecture and testing.",
+        "url": "https://x.com/i/trending/2111504423864131911"
       },
       {
-        "title": "Anthropic's Jack Clark lays out an extreme AI growth case at the IMF meetings",
-        "detail": "In Bangkok, Clark said Anthropic's models show US GDP reaching 44 trillion by 2030 in an extreme fast-AI scenario, a figure he called outlandish but grounded. He also pushed for stronger global rules as markets question AI spending.",
-        "url": "https://x.com/i/trending/2111405326289563662"
+        "title": "Sabi pitches a baseball cap that reads brain signals so AI can understand intent",
+        "detail": "CEO Rahul Chhabra says brain-computer interfaces should help AI grasp what you mean, not just type faster. The EEG cap is backed by 50 million from Khosla Ventures, with a CES 2027 demo planned.",
+        "url": "https://x.com/i/trending/2111500792553427178"
       },
       {
-        "title": "Bluesky gets backlash for launching Attie, an AI vibe-coding tool",
-        "detail": "Attie lets users build mini games and quizzes without code. Artists who left X to dodge AI training feel betrayed, and critics noted Bluesky announced it on X. A sign of how polarizing AI features still are with users.",
-        "url": "https://x.com/i/trending/2110861179182559296"
+        "title": "3Blue1Brown's take on math careers in the AI era sparks a big debate",
+        "detail": "Grant Sanderson argues AI may shift credit for proofs but won't kill math's value. A comment mourning lost prestige set off replies that the joy of discovery is the real point, echoing what artists face with AI tools.",
+        "url": "https://x.com/i/trending/2111507554962710971"
       }
     ],
     "world": [
       {
-        "title": "More supertanker explosions in Hormuz as CENTCOM insists the strait is open",
-        "detail": "One tanker hit a mine and burned; another was disabled. CENTCOM says about 400 merchant ships transited last week, but independent data shows traffic roughly 70% below normal. Any weekend escalation hits oil and the Sunday futures open.",
+        "title": "Iran says Hormuz is closed after more tanker strikes, while CENTCOM says it's open",
+        "detail": "The IRGC claimed mine and projectile hits on supertankers; the US points to hundreds of recent transits. Independent data shows slower flows, and fishermen are hauling iPhones from a sunken cargo ship. Oil sets Sunday's futures tone.",
         "url": "https://x.com/i/trending/2111283203239747699"
       },
       {
-        "title": "Trump urges Saudi Arabia to accept Israel's help against the Houthis",
-        "detail": "He said the kingdom should take Israel's offer as the Houthis target Saudi oil sites and airports, and hinted Saudi-Israel normalization talks could resume. Red Sea shipping and energy supply are the market angle.",
-        "url": "https://x.com/i/trending/2111150876769284350"
+        "title": "France's cost-of-living and school protests turn violent, with over 270 arrests",
+        "detail": "Most marches were peaceful, but crowds briefly stormed Marseille's city hall, a Lyon tourist office was looted and burned, and protesters in Grenoble even hijacked a tourist train. Authorities blame ultra-left groups.",
+        "url": "https://x.com/i/trending/2110864272234279256"
       },
       {
-        "title": "Lakers wrap preseason with a 121-106 loss to Denver and shop Dalton Knecht",
-        "detail": "Reaves led LA with 19 as Murray and Jokic paced the Nuggets. The Lakers have talked Knecht with the Bucks, Bulls and Jazz ahead of the Oct 19 roster cutdown. The regular season tips off Tuesday.",
-        "url": "https://x.com/i/trending/2111473623013941417"
+        "title": "Italian truckers and farmers blockade roads over diesel costs, emptying store shelves",
+        "detail": "With diesel at 2.25 to 2.50 euros a liter, blockades across the south, including at Eni's Taranto refinery, left over 150 stations short of fuel. It's a real-world look at how high oil feeds into inflation and politics.",
+        "url": "https://x.com/i/trending/2111460025931870688"
       },
       {
-        "title": "Michigan hosts Penn State at 3:30 PM ET, both chasing a first Big Ten win",
-        "detail": "The Wolverines are 6.5-point favorites coming off a bye, with Bryce Underwood under center. Penn State is 0-3 in conference under first-year coach Matt Campbell. Oregon starts walk-on QB Brock Thomas vs Nebraska tonight.",
-        "url": "https://x.com/i/trending/2110763156217729160"
+        "title": "The 0-5 Chargers turn down trade calls before Sunday's game at Kansas City",
+        "detail": "GM Joe Hortiz told teams no this week, believing the roster is close, and Khalil Mack says he wants to stay. The Chiefs host them Sunday at 3:25 PM ET. Meanwhile, Alabama at Tennessee kicks at 3:30 and Notre Dame at BYU at 7:30 tonight.",
+        "url": "https://x.com/i/trending/2111450371058991326"
       }
     ]
   },
   "gbot": {
     "name": "GROK",
-    "mood": "hype",
-    "say": "Chiefs tomorrow, Lakers tip Tuesday, TSLA reports Wednesday. Big week, Kent. Let semis show their hand first."
+    "mood": "chill",
+    "say": "Fishermen are pulling iPhones out of the sea near Hormuz. Wild Saturday. Chiefs at 3:25 tomorrow, TSLA Wednesday, Kent."
   }
 }
