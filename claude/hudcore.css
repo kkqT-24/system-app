@@ -20,3 +20,6 @@
     radial-gradient(ellipse 80% 50% at 50% 115%, rgba(99, 80, 240, 0.2) 0%, transparent 60%),
     linear-gradient(180deg, var(--bg) 0%, var(--bg-2) 55%, var(--bg) 100%) !important;
 }
+
+/* boot: the header, greeting and core sit a bit lower so the screen is evenly spaced top to bottom */
+#boot .boot-inner { padding-top: 5dvh; }
