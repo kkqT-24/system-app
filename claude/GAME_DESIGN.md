@@ -209,3 +209,10 @@ Test page: `claude/game/td/` (not linked from the app yet). All art is code-draw
   → next floor (+17% HP per floor). Gate integrity carries over (+4 per clear); losing ends the climb. Best floor is saved (`systemTD.v1`).
 - Core rule still applies once it's hooked up: extractions only count toward the real army on **keyed** climbs; free climbs are practice.
 - Test-build extractions stay in the climb log and are NOT written to the app army.
+
+### Parked idea (Oct 16, 2026): random gates mid-floor
+On higher floors, small gates tear open at random spots on the map during a wave (like gate breaks in the show).
+- A warning glow and short countdown before it opens, so you can react.
+- It releases a small pack straight onto the nearest stretch of road, which can skip past your front-line posts.
+- The Hunter can close it early by standing in it or hitting it before it fully opens, for bonus mana and ARISE corpses.
+- Starts around floor 5+, gets more frequent higher up. A rare red variant could bring a mini-boss.
