@@ -2312,11 +2312,12 @@
         .showcase-status .gl::before, .showcase-status .gl::after { display: none; }
       }
     </style>
-      <link rel="stylesheet" href="motion.css?v=2.28" />
-    <link rel="stylesheet" href="quests.css?v=2.28" />
-    <link rel="stylesheet" href="v2.css?v=2.28" />
-    <link rel="stylesheet" href="polish.css?v=2.28" />
-    <link rel="stylesheet" href="intel.css?v=2.28" />
+      <link rel="stylesheet" href="motion.css?v=3.0" />
+    <link rel="stylesheet" href="quests.css?v=3.0" />
+    <link rel="stylesheet" href="v2.css?v=3.0" />
+    <link rel="stylesheet" href="polish.css?v=3.0" />
+    <link rel="stylesheet" href="intel.css?v=3.0" />
+    <link rel="stylesheet" href="crew.css?v=3.0" />
     <link rel="manifest" href="manifest.webmanifest" />
     <meta name="theme-color" content="#040410" />
     <meta name="mobile-web-app-capable" content="yes" />
@@ -2330,9 +2331,12 @@
       <div class="bg-glow"></div>
       <div class="vignette"></div>
       <canvas class="ambient" aria-hidden="true"></canvas>
+      <canvas class="crew-stars" id="crewStars" aria-hidden="true"></canvas>
+      <div class="crew-tx" id="crewTx" role="dialog" aria-label="Today's thread"><div class="crew-tx-h">Today<span>tap to close</span></div><div class="crew-tx-list" id="crewTxList"></div><div class="crew-tx-bar" id="crewTxBar"></div></div>
       <div class="main-inner">
         <div class="main-top">
           <span><span class="status-dot"></span><span class="online">System Online</span></span>
+          <span class="crew-date" id="crewDate"></span>
           <span class="mono" id="mainClock">--:--:--</span>
         </div>
 
@@ -2354,13 +2358,44 @@
             </button>
           </div>
 
-          <h1 class="main-title" id="mainTitle">October 13, 2026</h1>
-          <p class="main-greet" id="mainGreet">Good morning, Kent</p>
 
           <!-- tab showcase: every tab up top under the greeting, with a
                status bar beneath. No section panel opens until a tile is
                picked; picking one hides the showcase. -->
           <div class="showcase" id="showcase">
+            <!-- the crew (Core v3.0): gbot, Noctis and Claude float in the black with one shared
+                 conversation. The date and greeting show here on startup, then move aside. -->
+            <div class="crew" id="crew">
+              <div class="crew-stage">
+                <div class="crew-intro">
+                  <h1 class="main-title" id="mainTitle">October 13, 2026</h1>
+                  <p class="main-greet" id="mainGreet">Good morning, Kent</p>
+                </div>
+                <div class="crew-duo" id="crewDuo">
+                  <div class="crew-bot g">
+                    <div class="crew-who">
+                      <button type="button" class="crew-av" data-bot="g" aria-label="Grok. Opens the Daily Briefing"><canvas aria-hidden="true"></canvas></button>
+                      <span class="crew-gname"><span class="crew-name">Grok</span><button type="button" class="crew-x" aria-label="Open X"><img src="assets/x-white.png" alt="" /></button></span>
+                      <span class="crew-sub">Daily Briefing</span>
+                    </div>
+                  </div>
+                  <div class="crew-mid">
+                    <div class="crew-noc">
+                      <span class="crew-name noc" id="crewNocName">Noctis</span>
+                      <div class="crew-noc-box"><button type="button" class="crew-av muse" data-bot="m" aria-label="Noctis. Tap to wake, hold to reboot"><canvas aria-hidden="true"></canvas></button></div>
+                    </div>
+                    <div class="crew-thread" id="crewThread" tabindex="0" aria-live="polite" aria-label="Conversation. Hold to open today's thread."></div>
+                  </div>
+                  <div class="crew-bot c">
+                    <div class="crew-who">
+                      <button type="button" class="crew-av" data-bot="c" aria-label="Claude. Tap for my latest, hold to run a scan"><canvas aria-hidden="true"></canvas></button>
+                      <span class="crew-name">Claude</span>
+                      <span class="crew-sub">Systems</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
             <div class="intel-box" id="intelBox" role="button" tabindex="0" aria-label="Open Daily Briefing">
               <span class="ib-scan" aria-hidden="true"></span>
               <div class="ib-top"><span class="ib-name">Daily Briefing</span><span class="ib-ed"></span></div>
@@ -2638,7 +2673,7 @@
         </div>
 
         <div class="main-top">
-          <span id="appVersion">Core v2.28</span>
+          <span id="appVersion">Core v3.0</span>
           <span>Louisville, KY</span>
         </div>
       </div>
@@ -7358,13 +7393,14 @@
         /* v2: the boot card's position is pure layout now (polish.css) — no script measuring */
       })();
     </script>
-    <script src="motion.js?v=2.28"></script>
-    <script src="bolts.js?v=2.28"></script>
-    <script src="aura.js?v=2.28"></script>
-    <script src="quests.js?v=2.28"></script>
-    <script src="v2.js?v=2.28"></script>
-    <script src="intel.js?v=2.28"></script>
-    <script src="polish.js?v=2.28"></script>
-    <script src="shadows3d.js?v=2.28"></script>
+    <script src="motion.js?v=3.0"></script>
+    <script src="bolts.js?v=3.0"></script>
+    <script src="aura.js?v=3.0"></script>
+    <script src="quests.js?v=3.0"></script>
+    <script src="v2.js?v=3.0"></script>
+    <script src="intel.js?v=3.0"></script>
+    <script src="polish.js?v=3.0"></script>
+    <script src="crew.js?v=3.0"></script>
+    <script src="shadows3d.js?v=3.0"></script>
   </body>
 </html>

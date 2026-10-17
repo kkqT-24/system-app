@@ -317,7 +317,7 @@
   var LOG = ["closing modules", "saving hunter state", "flushing cache", "core offline", "core online", "relinking modules", "handshake ok"];
   window.__mxReboot = function (done) {
     var main = document.getElementById("main");
-    var parts = Array.prototype.slice.call(main.querySelectorAll(".main-top, .main-rings-wrap, #mainTitle, #mainGreet, .showcase-label, .tab-tile, .showcase-status, .verse-line, .main-controls"))
+    var parts = Array.prototype.slice.call(main.querySelectorAll(".main-top, .main-rings-wrap, .crew-duo, .showcase-label, .tab-tile, .showcase-status, .verse-line, .main-controls"))
       .filter(function (e) { return e.getBoundingClientRect().height > 0; })
       .sort(function (a, b) { return a.getBoundingClientRect().top - b.getBoundingClientRect().top; });
     var top0 = parts.length ? parts[0].getBoundingClientRect().top : 0;

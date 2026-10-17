@@ -1628,7 +1628,9 @@
       loading = false; hydrate(); scoreCalls(); save(); renderBox(); refreshCard(); renderSystems();
     });
   }
-  window.__briefing = { open: open, load: load };
+  window.__briefing = { open: open, load: load,
+    /* the crew on home reads gbot's lines and the brief's freshness from here */
+    feed: function () { return feedItems(new Date()); }, brief: function () { return brief; } };
 
 
   /* ---------------- Trading Desk module: LEV200 + NOISE BOT ----------------
