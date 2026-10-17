@@ -419,28 +419,42 @@
     thBar.style.width = Math.round(40 - 16 * p) + "px"; thBar.style.height = Math.round(6 + 18 * p) + "px";
     thBar.style.background = "transparent"; thBar.style.border = "3px solid var(--violet)"; thBar.style.borderRadius = "50%"; thBar.style.boxShadow = "0 0 14px var(--glow)";
   }
-  function start(y) { y0 = y; dy = 0; sec.style.transition = "none"; }
+  /* rubber-band pull: follows the finger closely at first, then gets
+     heavier the further it goes; let go and it springs back with a
+     small overshoot, or drops away past the threshold */
+  var raf = 0, shown = 0;
+  function rubber(d) { return d <= 0 ? 0 : 260 * (1 - Math.exp(-d / 300)); }
+  function paint() {
+    raf = 0;
+    var p = Math.min(shown / 150, 1);
+    sec.style.transform = shown ? "translateY(" + shown.toFixed(1) + "px) scale(" + (1 - 0.025 * p).toFixed(4) + ")" : "";
+    sec.style.transformOrigin = "50% 0";
+  }
+  function start(y) { y0 = y; dy = 0; shown = 0; sec.style.transition = "none"; }
   function move(y, e) {
     if (y0 === null) return;
     dy = y - y0;
-    if (dy <= 0) { sec.style.transform = ""; ring(0); return; }
+    if (dy <= 0) { shown = 0; ring(0); if (!raf) raf = requestAnimationFrame(paint); return; }
     if (e && e.cancelable) e.preventDefault();
-    sec.style.transform = "translateY(" + Math.round(dy * 0.85) + "px)";
+    shown = rubber(dy);
     ring(Math.min(dy / 160, 1));
+    if (!raf) raf = requestAnimationFrame(paint);
   }
   function end() {
     if (y0 === null) return;
     y0 = null; ring(0);
+    if (raf) { cancelAnimationFrame(raf); raf = 0; }
     if (dy > 110) {
-      sec.style.transition = "transform 0.28s ease-in, opacity 0.28s ease-in";
-      sec.style.transform = "translateY(110vh)";
-      setTimeout(function () { sec.style.transition = ""; sec.style.transform = ""; handle.click(); }, 260);
+      sec.style.transition = "transform 0.3s cubic-bezier(0.55, 0, 0.9, 0.45), opacity 0.3s ease-in";
+      sec.style.transform = "translateY(110vh) scale(0.97)";
+      setTimeout(function () { sec.style.transition = ""; sec.style.transform = ""; handle.click(); }, 280);
     } else {
-      sec.style.transition = "transform 0.32s cubic-bezier(0.22, 1, 0.36, 1)";
+      /* springy return: overshoots up a touch, then settles */
+      sec.style.transition = "transform 0.55s cubic-bezier(0.34, 1.56, 0.64, 1)";
       sec.style.transform = "";
-      setTimeout(function () { sec.style.transition = ""; }, 340);
+      setTimeout(function () { sec.style.transition = ""; }, 570);
     }
-    dy = 0;
+    dy = 0; shown = 0;
   }
   /* the bar */
   if (bar) {
