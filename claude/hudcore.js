@@ -17,6 +17,7 @@
   var cv = document.createElement("canvas"); cv.className = "hud-tac"; cv.setAttribute("aria-hidden", "true");
   wrap.insertBefore(cv, wrap.firstChild);
   var g = cv.getContext("2d"), S = 300, dpr = 1, TAU = Math.PI * 2, spinA = 0, holdV = 0, last = 0, pct = 0;
+  var glow = boot ? boot.querySelector(".bg-glow") : null, gN = 0;
   var pctEl = document.getElementById("pctNum"), verEl = document.getElementById("appVersion");
   var REDUCE = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
   function size() { dpr = Math.min(2, window.devicePixelRatio || 1); cv.width = S * dpr; cv.height = S * dpr; }
@@ -75,6 +76,8 @@
     if (ts - last < 30) return;
     var k = last ? Math.min(4, (ts - last) / 16.667) : 1; last = ts;
     if (document.hidden || (boot && boot.classList.contains("is-hidden"))) return;
+    /* keep the soft glow centered on the core (it moves during the boot's own animations) */
+    if (glow && (++gN % 6 === 0)) { var hr = hud.getBoundingClientRect(), gr = glow.getBoundingClientRect(); if (gr.height) { glow.style.setProperty("--hud-x", (hr.left + hr.width / 2 - gr.left) + "px"); glow.style.setProperty("--hud-y", (hr.top + hr.height / 2 - gr.top) + "px"); } }
     var cl = hud.classList, target = cl.contains("holdspin3") ? 1 : cl.contains("holdspin2") ? 0.65 : cl.contains("holdspin") ? 0.35 : cl.contains("spinup") ? 0.5 : 0;
     holdV += (target - holdV) * (1 - Math.pow(0.9, k));
     spinA += (0.02 + (cl.contains("armed") ? 0 : 0.01) + holdV * 0.14) * k;

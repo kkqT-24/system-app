@@ -12,3 +12,11 @@
 .hud.tac.armed .hud-core-label { animation: tacBlink 2.4s ease-in-out infinite; }
 @keyframes tacBlink { 0%, 100% { opacity: 0.55; } 50% { opacity: 1; } }
 @media (prefers-reduced-motion: reduce) { .hud.tac.armed .hud-core-label { animation: none; } }
+
+/* the boot's purple cloud: a soft round glow that sits right behind the core instead of a tall column */
+#boot:has(.hud.tac) .bg-glow {
+  background:
+    radial-gradient(circle 210px at var(--hud-x, 50%) var(--hud-y, 32%), rgba(143, 94, 248, 0.34) 0%, rgba(111, 99, 246, 0.12) 45%, transparent 72%),
+    radial-gradient(ellipse 80% 50% at 50% 115%, rgba(99, 80, 240, 0.2) 0%, transparent 60%),
+    linear-gradient(180deg, var(--bg) 0%, var(--bg-2) 55%, var(--bg) 100%) !important;
+}
