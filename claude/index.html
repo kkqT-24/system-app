@@ -2263,6 +2263,8 @@
         max-width: 540px; margin: 0 auto; padding: 18px 12px 2px;
       }
       .verse-line .ref { color: var(--lav); white-space: nowrap; }
+      /* the version sits centered under the verse, the same gap below it as the status bar has above */
+      .verse-line .verse-ver { display: block; margin-top: 16px; font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--ink-faint); }
       body.tab-open .verse-line { display: none; }
       body.tab-open #mainTitle, body.tab-open #mainGreet, body.tab-open .main-rings-wrap { display: none; }
       .main-controls { display: flex; flex-direction: column; align-items: center; gap: 6px; padding-bottom: 8px; }
@@ -2312,13 +2314,13 @@
         .showcase-status .gl::before, .showcase-status .gl::after { display: none; }
       }
     </style>
-      <link rel="stylesheet" href="motion.css?v=3.7" />
-    <link rel="stylesheet" href="quests.css?v=3.7" />
-    <link rel="stylesheet" href="v2.css?v=3.7" />
-    <link rel="stylesheet" href="polish.css?v=3.7" />
-    <link rel="stylesheet" href="intel.css?v=3.7" />
-    <link rel="stylesheet" href="crew.css?v=3.7" />
-    <link rel="stylesheet" href="hudcore.css?v=3.7" />
+      <link rel="stylesheet" href="motion.css?v=3.8" />
+    <link rel="stylesheet" href="quests.css?v=3.8" />
+    <link rel="stylesheet" href="v2.css?v=3.8" />
+    <link rel="stylesheet" href="polish.css?v=3.8" />
+    <link rel="stylesheet" href="intel.css?v=3.8" />
+    <link rel="stylesheet" href="crew.css?v=3.8" />
+    <link rel="stylesheet" href="hudcore.css?v=3.8" />
     <link rel="manifest" href="manifest.webmanifest" />
     <meta name="theme-color" content="#000000" />
     <meta name="mobile-web-app-capable" content="yes" />
@@ -2423,7 +2425,7 @@
             </div>
           </div>
 
-          <p class="verse-line">&ldquo;For what shall it profit a man, if he shall gain the whole world, and lose his own soul?&rdquo; <span class="ref">&mdash; Mark 8:36</span></p>
+          <p class="verse-line">&ldquo;For what shall it profit a man, if he shall gain the whole world, and lose his own soul?&rdquo; <span class="ref">&mdash; Mark 8:36</span><span class="verse-ver" id="appVersion">Core v3.8</span></p>
 
           <!-- recall handle: sits directly above the section panel box,
                under the greeting. Shown only while a section panel is open;
@@ -2674,7 +2676,7 @@
         </div>
 
         <div class="main-top">
-          <span id="appVersion">Core v3.7</span>
+          <span></span>
           <span>Louisville, KY</span>
         </div>
       </div>
@@ -7397,15 +7399,15 @@
         /* v2: the boot card's position is pure layout now (polish.css) — no script measuring */
       })();
     </script>
-    <script src="motion.js?v=3.7"></script>
-    <script src="bolts.js?v=3.7"></script>
-    <script src="aura.js?v=3.7"></script>
-    <script src="quests.js?v=3.7"></script>
-    <script src="v2.js?v=3.7"></script>
-    <script src="intel.js?v=3.7"></script>
-    <script src="polish.js?v=3.7"></script>
-    <script src="crew.js?v=3.7"></script>
-    <script src="hudcore.js?v=3.7"></script>
-    <script src="shadows3d.js?v=3.7"></script>
+    <script src="motion.js?v=3.8"></script>
+    <script src="bolts.js?v=3.8"></script>
+    <script src="aura.js?v=3.8"></script>
+    <script src="quests.js?v=3.8"></script>
+    <script src="v2.js?v=3.8"></script>
+    <script src="intel.js?v=3.8"></script>
+    <script src="polish.js?v=3.8"></script>
+    <script src="crew.js?v=3.8"></script>
+    <script src="hudcore.js?v=3.8"></script>
+    <script src="shadows3d.js?v=3.8"></script>
   </body>
 </html>

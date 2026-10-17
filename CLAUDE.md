@@ -2,8 +2,8 @@
 
 - Claude's version lives in `claude/` (Muse's original is the root `index.html` — don't touch it unless asked).
 - **Bump the version only for meaningful updates**: new features or functional fixes. Small visual
-  changes the user can see for himself (art tweaks, a color, spacing, wording) ship without a bump. To bump, change the footer label in
-  `claude/index.html` (`<span id="appVersion">Core vX.Y</span>`) and set the cache name in `claude/sw.js`
+  changes the user can see for himself (art tweaks, a color, spacing, wording) ship without a bump. To bump, change the version label in
+  `claude/index.html` (`<span class="verse-ver" id="appVersion">Core vX.Y</span>`, under the verse) and set the cache name in `claude/sw.js`
   to match (`var CACHE = "system-vX.Y";`) — the worker is network-first, so unbumped tweaks still load.
   Also set the `?v=` on the css/js links in `claude/index.html` and `var V` in `claude/sw.js` to the new version — that
   busts the 10-minute GitHub Pages cache so the phone gets the new files at once.

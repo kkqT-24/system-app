@@ -695,28 +695,53 @@
     hint.classList.toggle("on", k > 0.02);
     if (ready !== hintReady) { hintReady = ready; hint.classList.toggle("ready", ready); hint.querySelector(".lbl").textContent = ready ? "Release to close" : "Pull to close"; if (ready) buzz(8); }
   }
-  /* release past the threshold: the sheet shrinks and flies back into
-     the briefing box, which catches it with a flash */
+  /* release past the threshold: the sheet folds into a glowing disc and
+     gets pulled back into Grok (the brief opens from him), who catches it
+     with a flash. Falls back to the old briefing box, then to a drop. */
   function dropAway() {
     busy = true;
     pullHint(0, false);
     player.classList.add("dismiss");
-    var r = box ? box.getBoundingClientRect() : null;
-    var W = innerWidth, H = innerHeight;
-    var tf = "translateY(80px) scale(0.86)";
-    if (r && r.width && r.bottom > 0 && r.top < H) {
-      var sx = r.width / W, sy = r.height / H, tx = r.left + r.width / 2 - W / 2, ty = r.top + r.height / 2 - H / 2;
-      tf = "translate(" + tx.toFixed(1) + "px," + ty.toFixed(1) + "px) scale(" + sx.toFixed(4) + "," + sy.toFixed(4) + ")";
+    var W = innerWidth, H = innerHeight, R0 = Math.ceil(Math.hypot(W, H) / 2) + 2;
+    var tgt = document.querySelector('#crew [data-bot="g"] canvas');
+    var r = tgt ? tgt.getBoundingClientRect() : null;
+    if (!r || !r.width || r.bottom < 0 || r.top > H) { r = box ? box.getBoundingClientRect() : null; tgt = box; }
+    var ok = r && r.width && r.bottom > 0 && r.top < H;
+    /* start from wherever the pull left it */
+    var from = player.style.transform || "none";
+    player.style.transition = "none";
+    player.style.clipPath = "circle(" + R0 + "px at 50% 50%)";
+    player.style.transform = from;
+    void player.offsetWidth;
+    if (ok) {
+      var d = Math.min(r.width, r.height) * 0.62, sc = d / W;
+      var tx = r.left + r.width / 2 - W / 2, ty = r.top + r.height / 2 - H / 2;
+      /* two beats: fold into a disc in place, then get pulled into him */
+      player.style.transition = "clip-path 0.34s cubic-bezier(0.6, 0, 0.3, 1), transform 0.34s cubic-bezier(0.6, 0, 0.3, 1), border-radius 0.34s ease, filter 0.34s ease";
+      player.style.clipPath = "circle(" + (W / 2) + "px at 50% 50%)";
+      player.style.transform = "scale(0.78)";
+      player.style.filter = "brightness(1.35) saturate(1.2)";
+      setTimeout(function () {
+        player.style.transition = "transform 0.42s cubic-bezier(0.55, 0, 0.85, 0.4), opacity 0.2s ease-in 0.24s, filter 0.42s ease";
+        player.style.transform = "translate(" + tx.toFixed(1) + "px," + ty.toFixed(1) + "px) scale(" + sc.toFixed(4) + ")";
+        player.style.filter = "brightness(2.2) saturate(1.4)";
+        player.style.opacity = "0";
+      }, 330);
+    } else {
+      player.style.transition = "transform 0.5s cubic-bezier(0.55, 0, 0.2, 1), opacity 0.45s ease-in 0.06s, clip-path 0.5s ease, filter 0.5s ease";
+      player.style.transform = "translateY(" + Math.round(H * 0.5) + "px) scale(0.7)";
+      player.style.clipPath = "circle(" + (W / 2) + "px at 50% 50%)";
+      player.style.opacity = "0"; player.style.filter = "brightness(1.6)";
     }
-    player.style.transition = "transform 0.55s cubic-bezier(0.55, 0, 0.2, 1), opacity 0.5s ease-in 0.08s, border-radius 0.5s ease, filter 0.5s ease";
-    player.style.transform = tf; player.style.opacity = "0"; player.style.borderRadius = "60px"; player.style.filter = "brightness(1.6)";
     setTimeout(function () {
       busy = false; player.classList.remove("dismiss"); close(true);
-      if (box) {
-        box.classList.remove("landed"); void box.offsetWidth; box.classList.add("landed");
-        var bx = box.getBoundingClientRect(); burst(bx.left + bx.width / 2, bx.top + bx.height / 2, "#c3b8fe", 14);
+      if (ok && tgt) {
+        var bx = tgt.getBoundingClientRect(); burst(bx.left + bx.width / 2, bx.top + bx.height / 2, "#c3b8fe", 18);
+        buzz(10);
+        if (tgt === box) { box.classList.remove("landed"); void box.offsetWidth; box.classList.add("landed"); }
+        else if (window.__crew && window.__crew.caught) window.__crew.caught();
       }
-    }, 560);
+    }, ok ? 760 : 560);
   }
   function open(at) {
     if (!player) buildPlayer();
@@ -730,16 +755,20 @@
     void player.offsetWidth;
     player.classList.add("show");
     document.body.classList.add("ib-open");
+    themeColor("#05041a");
     var ek = editionKey(), seen = C.seen[ek] || 0;
     idx = 0;
     go(at != null ? at : (seen > 0 && seen < list.length ? seen : 0), true);
   }
+  /* the phone's top bar follows the page: navy while the brief is up, black again on home */
+  function themeColor(c) { try { var m = document.querySelector('meta[name="theme-color"]'); if (m) m.setAttribute("content", c); } catch (e) {} }
   function close(instant) {
     if (!player) return;
     setTimeout(function () { energy.wake(); }, 80);
     if (instant) { player.style.transition = "none"; }
     player.classList.remove("show", "finale", "collapse");
     document.body.classList.remove("ib-open");
+    themeColor("#000000");
     setTimeout(function () { player.style.transition = ""; player.style.transform = ""; player.style.opacity = ""; player.style.clipPath = ""; player.style.borderRadius = ""; player.style.filter = ""; player.style.removeProperty("--pull"); }, 60);
     save(); renderBox();
   }

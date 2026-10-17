@@ -656,6 +656,8 @@
     clear:function(text){st.clearT=nowT();say("c",text||"Protocol clear. Good start.");core.boostUntil=nowT()+1.2;fl.g.hop=1;
       if(muse.target<.5&&Math.random()<.6){muse.target=.35;setTimeout(function(){if(muse.target<.5)muse.target=0;},2200);}},
     say:function(who,text){if(NAMES[who]&&text)say(who,String(text));},
+    /* the brief was swiped shut and flew back into Grok: he flares and hops */
+    caught:function(){core.boostUntil=nowT()+.9;fl.g.hop=.8;},
     refresh:pull
   };
 })();
