@@ -210,7 +210,7 @@
     /* Noctis: Muse's own art (sleeping and awake renders), crossfaded as he wakes */
     this.wake+=(this.target-this.wake)*(1-Math.pow(.95,k));var w=this.wake,L="#c3b8fe",P="#8f5ef8";
     var br=.5+.5*Math.sin(t*.7);
-    var W=52,H=W*281/240,lift=w*2,gy=c+H*.18-lift;
+    var W=58,H=W*281/240,lift=w*2,gy=c+H*.18-lift;
     /* soft, calm glow: a slow breathing halo behind the orb, a touch warmer when awake */
     g.globalCompositeOperation="lighter";
     haze(g,c,gy,40,L,P,.05+br*.035+w*.1);

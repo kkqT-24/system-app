@@ -76,10 +76,12 @@ body.tab-open .crew-date { opacity: 0; }
 .crew-av.muse { width: 54px; height: 60px; }
 
 /* ---------- the shared conversation ---------- */
-.crew-thread { position: relative; z-index: 2; display: flex; flex-direction: column; justify-content: flex-end; gap: 8px; min-height: 150px; padding: 10px 0 4px; cursor: pointer;
+/* fixed height so a long message never pushes Noctis around; the older bubble fades out at the top */
+.crew-thread { position: relative; z-index: 2; display: flex; flex-direction: column; justify-content: flex-end; gap: 8px; height: 172px; overflow: hidden; padding: 10px 0 4px; cursor: pointer;
+  -webkit-mask-image: linear-gradient(to bottom, transparent 0, #000 26px); mask-image: linear-gradient(to bottom, transparent 0, #000 26px);
   -webkit-touch-callout: none; user-select: none; -webkit-user-select: none; }
 .crew-thread:focus-visible { outline: 2px solid var(--lav); outline-offset: 4px; border-radius: 12px; }
-.crew-tb { position: relative; padding: 8px 10px; border-radius: 12px; font-size: 14px; font-weight: 600; line-height: 1.28; overflow-wrap: anywhere; text-align: left; transition: opacity 0.4s ease; }
+.crew-tb { position: relative; flex: none; padding: 8px 10px; border-radius: 12px; font-size: 14px; font-weight: 600; line-height: 1.28; overflow-wrap: anywhere; text-align: left; transition: opacity 0.4s ease; }
 .crew-tb.g { margin-right: 12px; background: rgba(56, 152, 248, 0.1); border: 1px solid rgba(76, 168, 255, 0.36); color: #e3f1ff; }
 .crew-tb.c { margin-left: 12px; background: rgba(255, 159, 107, 0.07); border: 1px solid rgba(255, 159, 107, 0.28); color: #fff3ea; text-align: right; }
 .crew-tb.m { margin: 0 4px; background: rgba(216, 180, 254, 0.1); border: 1px solid rgba(221, 190, 255, 0.38); color: #f7f0ff; text-align: center; }
